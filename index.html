@@ -15,6 +15,12 @@
 }
 /* Ganadores card weights. Canaro has no "Book" cut in this repo — the design
    calls for it on the @handle and "Hincha de" lines, so Medium stands in. */
+/* Canaro Book (400): el nombre de pila en las filas tipo MVPs / Top 5 del Figma. */
+@font-face {
+  font-family: 'CanaroLibro';
+  src: url('fonts/Canaro-Book.ttf') format('truetype');
+  font-weight: 400;
+}
 @font-face {
   font-family: 'CanaroBlack';
   src: url('fonts/Canaro-Black.ttf') format('truetype');
@@ -1083,16 +1089,20 @@ body {
 }
 
 /* ── Ranked row ── */
+/* Medidas del frame "top 5" del Figma de Luchi (templates para automatizar,
+   nodo 1102:16743), leídas por API el 21-sep-2026. Antes estaban copiadas a ojo
+   de una captura. Las coordenadas de los hijos son relativas al interior de la
+   fila (Figma − 50 − 5 de borde en x; − tope de fila − 5 en y). */
 .card-mvp .mv-row {
-  position: absolute; left: 47px; width: 986px; height: 166px;
-  background: #fff; border: 5px solid #000; border-radius: 28px;
-  box-shadow: 0 10px 0 0 rgba(0,0,0,0.25),
-              inset 0 -22px 0 0 rgba(96,96,96,0.1);
+  position: absolute; left: 50px; width: 982px; height: 166px;
+  background: #fff; border: 5px solid #000; border-radius: 29.3px;
+  box-shadow: 0 7.7px 0 0 rgba(0,0,0,0.25),
+              inset 0 -28.8px 0 0 rgba(96,96,96,0.1);
 }
 .card-mvp .mv-rank {
-  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-  width: 108px; text-align: center;
-  font-family: 'CanaroBlack'; font-size: 86px; line-height: 1;
+  position: absolute; left: 24.2px; top: calc(50% + 9.5px); transform: translateY(-50%);   /* medido contra el Figma: el número va 9,5 px más abajo que el centro de la caja de texto */
+  text-align: left;
+  font-family: 'CanaroBlack'; font-size: 86.6px; line-height: 1;
 }
 .card-mvp .mv-rank-1 { color: #FCC726; }
 .card-mvp .mv-rank-2 { color: #9A9A9A; }
@@ -1106,8 +1116,10 @@ body {
    fondo oscuro en vez de quedar encerrada. Entre fila y fila hay 49 px de aire
    (215 de paso menos 166 de alto), asi que 35 entran sin tocar la fila de
    arriba. 139 - (-35) = 174 de alto. La fila no recorta lo que se desborda. */
+/* (Figma, 21-sep-2026: la foto mide 144 x 187,6 y apoya en el borde de abajo
+   de la fila, no en la línea del gris.) */
 .card-mvp .mv-photo {
-  position: absolute; left: 128px; top: -35px; width: 140px; height: 174px;
+  position: absolute; left: 124.1px; top: -32.2px; width: 144.1px; height: 187.6px;
 }
 /* Anclada abajo: así todas las cabezas quedan a la misma altura sobre la base
    de la fila, sin importar el encuadre que traiga cada recorte. */
@@ -1116,10 +1128,12 @@ body {
   object-fit: contain; object-position: center bottom;
   display: block;
 }
+/* Figma: Canaro 47,4 px, interlínea 43,3, tracking −1,9; nombre en Book y
+   apellido en Bold. El ancho libre hasta la etiqueta de posición es de ~246 px: lo que no
+   entra lo achica mvFitNames. */
 .card-mvp .mv-name {
-  position: absolute; left: 292px; top: 50%; transform: translateY(-50%);
-  width: 250px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000;
+  position: absolute; left: 293px; top: 38.7px;
+  width: 246px; letter-spacing: -1.9px; color: #000;
 }
 /* No overflow:hidden — it sliced the accent off "Álvarez" and the descenders
    off "Depietri" / "Aguirre". Horizontal fit comes from the size tiers. */
@@ -1127,11 +1141,8 @@ body {
 .card-mvp .mv-name b {
   display: block; white-space: nowrap;
 }
-.card-mvp .mv-name span { font-weight: 400; font-size: 34px; line-height: 1.12; }
-.card-mvp .mv-name b    { font-weight: 700; font-size: 40px; line-height: 1.06; }
-/* Compound surnames (GONZÁLEZ METILLI) overrun the name slot at full size. */
-.card-mvp .mv-name.is-long  b { font-size: 32px; }
-.card-mvp .mv-name.is-xlong b { font-size: 26px; }
+.card-mvp .mv-name span { font-family: 'CanaroLibro', 'Canaro', sans-serif; font-weight: 400; font-size: 47.4px; line-height: 43.3px; }
+.card-mvp .mv-name b    { font-family: 'Canaro', sans-serif; font-weight: 700; font-size: 47.4px; line-height: 43.3px; }
 
 /* Club mark: the square club logo, not a kit illustration, with the player's
    shirt number over it (same pairing the per-player cards already use). */
@@ -1139,8 +1150,8 @@ body {
    the tag hung outside it. Comp puts the club mark at row-x 543 and the points
    pill at 740, so 543 + 188 leaves a real gap instead of colliding. */
 .card-mvp .mv-club {
-  position: absolute; left: 543px; top: 50%; transform: translateY(-50%);
-  width: 188px; height: 154px;
+  position: absolute; left: 549.6px; top: 0;
+  width: 190px; height: 156px;
 }
 /* Jersey kit (PORT-OF the app's ds/JerseyKit): kit art with the chest number
    in the club's number colors. Geometry ratios copied from JerseyKit —
@@ -1148,9 +1159,10 @@ body {
    2-digit 0.5x width with 0.03x tracking. The number's per-club fill/stroke
    colors come from public.teams (jersey_number_color / jersey_stroke_color;
    NULL stroke = flat number by design — never substitute a default outline). */
+/* Figma: camiseta de 152,6 x 133 en x=622,6 / y=fila+18,8. */
 .card-mvp .mv-kit {
-  position: absolute; left: 50%; top: 0; transform: translateX(-50%);
-  width: 140px; height: 136px; z-index: 1;
+  position: absolute; left: 18px; top: 13.8px;
+  width: 152.6px; height: 133px; z-index: 1;
 }
 .card-mvp .mv-kit img {
   position: absolute; left: 0; top: 0; width: 100%; height: 100%;
@@ -1180,7 +1192,7 @@ body {
 /* Legacy fallback when a team has no kit art (unknown slug/new club):
    badge in a rounded box with the number scrimmed over it. */
 .card-mvp .mv-club-badge {
-  position: absolute; left: 35px; top: 0;
+  position: absolute; left: 35px; top: 19px;
   width: 118px; height: 118px;
   border: 3.6px solid #000; border-radius: 18px; overflow: hidden;
   background: #fff; box-sizing: border-box;
@@ -1198,30 +1210,48 @@ body {
    transparent corners, so the tab peeks out under the hem (the kit carries
    z-index 1 above; the tab stays unindexed). With the legacy badge fallback
    the tab stacks under the opaque box instead, same as before. */
+/* Figma (template top 5): la etiqueta va ADELANTE de la camiseta, abajo a la
+   izquierda: 63,9 x 39 en x=604,6 / y=fila+111, Helvetica Neue Bold 21,3. */
 .card-mvp .mv-pos {
-  position: absolute; left: 63px; bottom: 0;
-  width: 62px; height: 30px; border-radius: 3px;
+  position: absolute; left: 0; top: 106px; z-index: 2;
+  width: 63.9px; height: 39px; border-radius: 1.8px;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 700; font-size: 17px; line-height: 1; color: #fff;
+  font-family: 'HelvNeue', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 700; font-size: 21.3px; line-height: 1; color: #fff;
 }
 .card-mvp .mv-pos-arq  { background: #ffa47c; }
 .card-mvp .mv-pos-def  { background: #f9be2c; }
 .card-mvp .mv-pos-vol  { background: #7eb367; }
 .card-mvp .mv-pos-del  { background: #e75b5e; }
 .card-mvp .mv-pos-flex { background: #000; }
+/* Figma: pastilla de 218 x 65 en x=786, borde 4,42 adentro, radio 22,6; número
+   Canaro Black 44,25 con borde OUTSIDE 1,67 (= 3,34 en CSS) y sombra 0/1,8. */
 .card-mvp .mv-pts {
-  position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
-  height: 62px; min-width: 218px; padding: 0 16px; box-sizing: border-box;
+  position: absolute; right: 23px; top: 50%; transform: translateY(-50%);
+  height: 65px; min-width: 218px; padding: 0 14px; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center;
-  background: #4b8fed; border: 5px solid #000; border-radius: 27px;
-  box-shadow: inset 0 -26px 0 0 rgba(255,255,255,0.25);
+  background: #4b8fed; border: 4.42px solid #000; border-radius: 22.6px;
+  box-shadow: inset 0 -28.8px 0 0 rgba(255,255,255,0.25);
   font-family: 'CanaroBlack'; color: #f3f3f3; white-space: nowrap;
-  text-shadow: 0 1.6px 0 #000;
-  paint-order: stroke fill; -webkit-text-stroke-color: #000; -webkit-text-stroke-width: 3px;
+  text-shadow: 0 1.8px 0 #000;
+  paint-order: stroke fill; -webkit-text-stroke-color: #000; -webkit-text-stroke-width: 3.34px;
 }
-.card-mvp .mv-pts-n { font-size: 42px; }
-.card-mvp .mv-pts-u { font-size: 20.6px; margin-left: 7px; }
+.card-mvp .mv-pts-n, .card-mvp .mv-pts-u { position: relative; top: 4px; }   /* la fuente trae más aire abajo: así queda centrado */
+.card-mvp .mv-pts-n { font-size: 44.25px; }
+.card-mvp .mv-pts-u { font-size: 20.36px; margin-left: 7px; }
+
+/* Título del template "top 5": "TOP 5" grande + dos renglones a la derecha
+   ("CLAUSURA 2026" / "ESTUDIANTES"), todo blanco. Bordes OUTSIDE 7,76 y 3,51 del
+   Figma = 0,126em en CSS; sombras 8,9 y 4 = 0,072em. En em para que mvFitTitle
+   pueda achicar todo junto cuando el nombre del club es largo. */
+.card-mvp .mv-title.is-top5 { top: 50px; height: 99px; gap: 35px; }
+.card-mvp .mv-title.is-top5 .mv-title-big { position: relative; top: 11.5px; font-size: 123.05px; -webkit-text-stroke-width: 0.126em; text-shadow: 0 0.072em 0 #000; }
+.card-mvp .mv-title-lines {
+  position: relative; top: 7px;
+  font-family: 'CanaroBlack'; font-size: 55.66px; line-height: 1.103; color: #fff; white-space: nowrap; text-align: left;
+  -webkit-text-stroke-width: 0.126em; text-shadow: 0 0.072em 0 #000;
+}
+.card-mvp .mv-title-lines div { display: block; }
 .card-mvp .mv-wordmark {
   position: absolute; left: 50%; top: 1270.59px; transform: translateX(-50%);
   /* 327 x 28.896 is Figma's POSITIONING frame; the art is nested inside it at
@@ -1546,8 +1576,9 @@ body {
 .rn-kit { --rn-kit-escala: 0.84343; position: absolute; left: 0; top: 50%; width: 198px; height: 172px; transform-origin: 0 0; transform: translateY(-50%) scale(var(--rn-kit-escala)); }
 .rn-kit img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .rn-kit-num { position: absolute; left: 0; width: 198px; height: 100px; font-family: 'AlumniCollegiate'; font-size: 110px; line-height: 100px; letter-spacing: 9.9px; text-indent: 9.9px; text-align: center; white-space: nowrap; paint-order: stroke fill; }
-/* En MVPs la caja del kit es de 140: misma camiseta y mismo dorsal, más chicos. */
-.card-mvp .mv-kit .rn-kit { --rn-kit-escala: 0.70707; }
+/* En MVPs / Top 5 la camiseta mide 152,6 (Figma): misma camiseta y mismo dorsal, más chicos.
+   top:0 y sin translateY: con el centrado heredado asomaba 15 px por arriba de la fila. */
+.card-mvp .mv-kit .rn-kit { --rn-kit-escala: 0.7707; top: 0; transform: scale(var(--rn-kit-escala)); }
 /* Marcador: marcos de 192x203 en x=341 y x=547, y=822. */
 .card-rn .rn-cifra { position: absolute; top: 822px; height: 203px; display: flex; }
 .card-rn .rn-cifra-local  { right: 547px; justify-content: flex-end; }
@@ -2652,10 +2683,12 @@ async function top5EquipoAgregar(row, fx, match, datos, matchday) {
     try { await fotoPreloadIds(rows.map(p => p.player_id)); } catch (e) { /* sin recortes sale igual */ }
     const sigla = eq.short_name || eq.name || String(teamId);
     const archivo = 'top5_' + torneo.toLowerCase() + '_' + sigla + '_f' + matchday;
-    const titulo = { big: 'TOP 5 ' + sigla, small: '', fecha: torneo, file: archivo };
+    let colores = {}; try { colores = await pvCargarColores(); } catch (e) { /* sin color queda el fondo oscuro */ }
+    const colorClub = colores[teamId] && colores[teamId] !== '#ffffff' ? colores[teamId] : null;
+    const titulo = { big: 'TOP 5', lineas: [torneo + ' ' + currentSeason, top5NombreTitulo(eq.name || sigla)], color: colorClub, dec: 1, file: archivo };
     const card = buildMvpCard('mvp', matchday, rows, datos.kits || {}, titulo);
     const w = createCardWrapper(card, archivo);
-    top5TituloControl(w, card, titulo.big, torneo);
+    top5LineasControl(w, card);
     const nota = document.createElement('div'); nota.className = 'rn-sinfoto'; nota.textContent = 'top 5 de ' + (eq.name || sigla) + ' en el ' + torneo.toLowerCase() + ' (puntos acumulados)';
     w.appendChild(nota);
     row.appendChild(w);
@@ -2671,10 +2704,13 @@ async function top5Agregar(row, fx, j, match, datos, matchday) {
   const cuenta = {}; jug.forEach(x => { cuenta[x.team] = (cuenta[x.team] || 0) + 1; });
   const equipo = (cuenta[fx.away_id] || 0) > (cuenta[fx.home_id] || 0) ? match.away_team : match.home_team;
   const archivo = 'top5_f' + matchday + '_' + match.home_team.short_name + '_vs_' + match.away_team.short_name;
-  const titulo = { big: 'TOP 5 ' + (equipo.short_name || equipo.name || ''), small: '', fecha: 'FECHA ' + matchday, file: archivo };
+  let colores = {}; try { colores = await pvCargarColores(); } catch (e) { /* sin color queda el fondo oscuro */ }
+  const idEquipo = equipo === match.away_team ? fx.away_id : fx.home_id;
+  const colorClub = colores[idEquipo] && colores[idEquipo] !== '#ffffff' ? colores[idEquipo] : null;
+  const titulo = { big: 'TOP 5', lineas: ['FECHA ' + matchday, top5NombreTitulo(equipo.name || equipo.short_name)], color: colorClub, dec: 1, file: archivo };
   const card = buildMvpCard('mvp', matchday, rows, datos.kits || {}, titulo);
   const w = createCardWrapper(card, archivo);
-  top5TituloControl(w, card, titulo.big, 'FECHA ' + matchday);
+  top5LineasControl(w, card);
   const nota = document.createElement('div'); nota.className = 'rn-sinfoto'; nota.textContent = 'top 5 del partido (estilo MVPs)';
   w.appendChild(nota);
   row.appendChild(w);
@@ -5517,8 +5553,8 @@ async function mvFetchTop(matchday, opts) {
 }
 
 /** The design prints two decimals with a comma ("23,77"). */
-function mvFormatPts(v) {
-  return (Number(v) || 0).toFixed(2).replace('.', ',');
+function mvFormatPts(v, dec) {
+  return (Number(v) || 0).toFixed(dec == null ? 2 : dec).replace('.', ',');
 }
 
 // ── Jersey kit data (PORT-OF the app's canchita look) ──
@@ -5645,11 +5681,11 @@ function mvBadgeHtml(p) {
   return `<div class="mv-club-badge">${badge}${num}</div>`;
 }
 
-function mvRowHtml(p, i, kits) {
+function mvRowHtml(p, i, kits, dec) {
   const name = ptSplitName(p.player_name, false);
   const pos  = (p.position_code || 'VOL').toUpperCase();
   const rankClass = i < 3 ? 'mv-rank-' + (i + 1) : 'mv-rank-x';
-  const top = 206 + i * 215;
+  const top = 205.2 + i * 213;   // Figma (template top 5): filas en 205,2 / 418,2 / 631,2 / 844,2…
 
   const kit = kits && p.team_id != null ? kits[p.team_id] : null;
   const club = kit ? mvKitHtml(p, kit) : mvBadgeHtml(p);
@@ -5663,7 +5699,7 @@ function mvRowHtml(p, i, kits) {
         club +
         `<div class="mv-pos mv-pos-${pos.toLowerCase()}">${gnEscape(pos)}</div>` +
       `</div>` +
-      `<div class="mv-pts"><span class="mv-pts-n">${gnEscape(mvFormatPts(p.total_points))}</span>` +
+      `<div class="mv-pts"><span class="mv-pts-n">${gnEscape(mvFormatPts(p.total_points, dec))}</span>` +
         `<span class="mv-pts-u">PTS.</span></div>` +
     `</div>`;
 }
@@ -5679,7 +5715,29 @@ const MV_SPECS = {
 
 /** Scale a title block down until it fits the row width. Strokes and shadows
  *  are em-based, so they scale with it and the outline weight stays on-system. */
+const MV_NAME_MAX_W = 246;   // de x=348 del nombre a x=604 de la etiqueta de posición, menos 10 de aire
+function mvFitNames(card) {
+  const scale = (card.getBoundingClientRect().width / 1080) || 1;
+  card.querySelectorAll('.mv-name span, .mv-name b').forEach(el => {
+    el.style.fontSize = '';
+    const r = document.createRange(); r.selectNodeContents(el);
+    const w = r.getBoundingClientRect().width / scale;
+    if (w > MV_NAME_MAX_W) el.style.fontSize = Math.max(22, 47.4 * MV_NAME_MAX_W / w) + 'px';
+  });
+}
+
 function mvFitTitle(card, maxW) {
+  mvFitNames(card);   // todos los que dibujan una placa de filas pasan por acá después de insertarla
+  // Título del template "top 5": "TOP 5" no se toca; se achican sólo los dos
+  // renglones hasta entrar en los 475 px que tienen en el Figma.
+  const lineas = card.querySelector('.mv-title.is-top5 .mv-title-lines');
+  if (lineas) {
+    const esc = (card.getBoundingClientRect().width / 1080) || 1;
+    lineas.style.fontSize = '';
+    const ancho = lineas.getBoundingClientRect().width / esc;
+    if (ancho > 475) lineas.style.fontSize = (55.66 * 475 / ancho) + 'px';
+    return;
+  }
   maxW = maxW || MV_TITLE_MAX_W;
   const title = card.querySelector('.mv-title');
   const kids = [...title.children];
@@ -5696,7 +5754,7 @@ function mvFitTitle(card, maxW) {
   kids.forEach(el => {
     el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * k) + 'px';
   });
-  title.style.gap = (31 * k) + 'px';
+  title.style.gap = ((title.classList.contains('is-top5') ? 35 : 31) * k) + 'px';
 }
 
 function buildMvpCard(kind, matchday, rows, kits, titulo) {
@@ -5713,17 +5771,72 @@ function buildMvpCard(kind, matchday, rows, kits, titulo) {
   // cards in proportion instead of pinning it to a fixed px.
   const smallSize = Math.round(spec.bigSize * 0.46);
 
+  // titulo.lineas = ['CLAUSURA 2026', 'ESTUDIANTES']: título del template "top 5"
+  // del Figma ("TOP 5" grande + dos renglones). Sin lineas, el título de siempre.
+  const tituloHtml = spec.lineas
+    ? '<div class="mv-title is-top5">' +
+        `<div class="mv-title-big">${gnEscape(spec.big)}</div>` +
+        `<div class="mv-title-lines"><div>${gnEscape(spec.lineas[0] || '')}</div><div>${gnEscape(spec.lineas[1] || '')}</div></div>` +
+      '</div>'
+    : '<div class="mv-title">' +
+        `<div class="mv-title-big" style="font-size:${spec.bigSize}px;">${spec.big}</div>` +
+        (spec.small === '' ? '' : `<div class="mv-title-small" style="font-size:${smallSize}px;">${spec.small || 'DE<br>LA'}</div>`) +
+        `<div class="mv-title-fecha" style="font-size:${spec.bigSize}px;">${spec.fecha || 'FECHA ' + matchday}</div>` +
+      '</div>';
+
   card.innerHTML =
     '<div class="mv-bg"></div>' +
-    '<div class="mv-title">' +
-      `<div class="mv-title-big" style="font-size:${spec.bigSize}px;">${spec.big}</div>` +
-      (spec.small === '' ? '' : `<div class="mv-title-small" style="font-size:${smallSize}px;">${spec.small || 'DE<br>LA'}</div>`) +
-      `<div class="mv-title-fecha" style="font-size:${spec.bigSize}px;">${spec.fecha || 'FECHA ' + matchday}</div>` +
-    '</div>' +
-    rows.map((p, i) => mvRowHtml(p, i, kits)).join('') +
+    tituloHtml +
+    rows.map((p, i) => mvRowHtml(p, i, kits, spec.dec)).join('') +
     '<img class="mv-wordmark" src="icons/wordmark-original.png" alt="">';
 
+  if (spec.color) mvFondoEquipo(card, spec.color);
   return card;
+}
+
+/* Fondo del template "top 5": los mismos hexágonos del póster (icons/bg-ganador.svg,
+   1620 x 2308 puesto en x=-269 / y=-610) con el color del club en vez del celeste y
+   blanco en vez del azul, más un velo negro al 30 %. */
+let mvHexSvg = null;
+async function mvFondoEquipo(card, color) {
+  try {
+    if (!mvHexSvg) mvHexSvg = await (await fetch('icons/bg-ganador.svg')).text();
+    const svg = mvHexSvg.replace(/#C8D9F0/gi, color).replace(/#A2BFE8/gi, '#ffffff');
+    const bg = card.querySelector('.mv-bg');
+    bg.style.backgroundImage = 'linear-gradient(rgba(0,0,0,.3), rgba(0,0,0,.3)), url("data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))) + '")';
+    bg.style.backgroundSize = 'auto, 1618px 2305.2px';
+    bg.style.backgroundPosition = '0 0, -269px -610px';
+    bg.style.backgroundRepeat = 'no-repeat';
+  } catch (e) { console.warn('fondo del club', e); }
+}
+
+/* Nombre del club como va en un título (el template dice "ESTUDIANTES", no
+   "ESTUDIANTES DE LA PLATA"). Lo que no está acá sale con el nombre completo;
+   igual se puede escribir a mano en "renglón 2". */
+const TOP5_NOMBRE_TITULO = {
+  'estudiantes de la plata': 'ESTUDIANTES', 'estudiantes de rio iv': 'ESTUDIANTES RC', 'velez sarsfield': 'VÉLEZ', "newell's old boys": "NEWELL'S",
+  'argentinos juniors': 'ARGENTINOS', 'boca juniors': 'BOCA', 'river plate': 'RIVER', 'racing club': 'RACING',
+  'independiente rivadavia': 'INDEP. RIVADAVIA', 'gimnasia de mendoza': 'GIMNASIA MZA', 'gimnasia lp': 'GIMNASIA LP', 'atletico tucuman': 'ATL. TUCUMÁN',
+};
+function top5NombreTitulo(nombre) {
+  const k = String(nombre || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  return TOP5_NOMBRE_TITULO[k] || String(nombre || '').toUpperCase();
+}
+
+/* Dos campos para escribir los renglones del título del template "top 5". */
+function top5LineasControl(w, card) {
+  const ctl = document.createElement('div'); ctl.className = 'fj-ctl';
+  const divs = card.querySelectorAll('.mv-title-lines div');
+  ctl.innerHTML = '<label>renglón 1 <input type="text" size="16"></label> <label>renglón 2 <input type="text" size="16"></label>';
+  ctl.querySelectorAll('input').forEach((inp, i) => {
+    inp.value = divs[i].textContent;
+    inp.addEventListener('input', () => {
+      divs[i].textContent = inp.value.toUpperCase();
+      card.querySelector('.mv-title-big').style.fontSize = ''; card.querySelector('.mv-title-lines').style.fontSize = ''; card.querySelector('.mv-title').style.gap = '';
+      mvFitTitle(card, TOP5_TITULO_MAX_W);
+    });
+  });
+  w.appendChild(ctl);
 }
 
 // ══════════════════════════════════════════════════════════════════════
