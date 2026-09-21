@@ -13,7 +13,7 @@ echo   WINNING RECAP - PUBLICAR
 echo   ========================
 echo.
 echo   1/4  Fotos que el vigilante (GitHub) encontro solo
-node "tools	raer-del-server.js"
+node "tools\traer-del-server.js"
 if errorlevel 1 goto error
 
 echo.
