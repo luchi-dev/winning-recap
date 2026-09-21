@@ -903,6 +903,19 @@ body {
 }
 .pitch-ideal   .pt-pts { background: #fed13d; }
 .pitch-ganador .pt-pts { background: #4b8fed; }
+/* Altura de cada línea medida píxel a píxel contra el Figma (21-sep-2026):
+   "EQUIPO …" estaba 4-5 px alto y "FECHA N" 6-8 px bajo, o sea con demasiado
+   aire entre las dos. Con dos dígitos (58 px) FECHA apoya en la misma línea de
+   base que la de un dígito. */
+.pitch-ganador .pt-title-1 { position: relative; top: 5px; }
+.pitch-ideal   .pt-title-1 { position: relative; top: 3.5px; }
+.pitch-ganador .pt-title-2 { position: relative; top: -7.5px; }
+.pitch-ideal   .pt-title-2 { position: relative; top: -5.5px; }
+.pitch-ganador .pt-title-2.is-wide { top: -4px; }
+.pitch-ideal   .pt-title-2.is-wide { top: -1px; }
+/* El puntaje quedaba 12 px del borde de arriba y 24 del de abajo (la fuente
+   trae más aire abajo que arriba): se baja para que quede centrado en la pastilla. */
+.card-pitch .pt-pts-n, .card-pitch .pt-pts-u { position: relative; top: 5px; }
 .card-pitch .pt-pts-n { font-size: 46.96px; }
 .card-pitch .pt-pts-u { font-size: 21.604px; margin-left: 7px; -webkit-text-stroke-width: 1.38px; }
 
