@@ -5,12 +5,14 @@ name: Fotos del Recap
 
 on:
   schedule:
-    # Horas en UTC (Argentina = UTC-3). Cada media hora de 15:00 a 01:30 de
-    # Argentina, que es cuando terminan los partidos, y tres pasadas más a la
-    # mañana por los pósters (el scoring a veces cierra de madrugada).
-    - cron: '7,37 18-23 * * *'
-    - cron: '7,37 0-4 * * *'
-    - cron: '7 9,12,15 * * *'
+    # Horas en UTC (Argentina = UTC-3). El despertador suena cada 5 minutos de
+    # 14:00 a 01:00 de Argentina, pero tools/vigilante.js sólo trabaja en los
+    # momentos de posteo (min ~75, pitazo, +30 min, fin del día, cierre de
+    # puntajes); si no es momento, termina en segundos. Dos pasadas más a la
+    # mañana por si el puntaje cerró de madrugada.
+    - cron: '*/5 17-23 * * *'
+    - cron: '*/5 0-3 * * *'
+    - cron: '7 12,15 * * *'
   workflow_dispatch:        # botón "Run workflow" para correrlo a mano
 
 concurrency:
@@ -26,7 +28,7 @@ env:
 jobs:
   fotos:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -49,14 +51,16 @@ jobs:
         run: npm ci --no-audit --no-fund
         working-directory: tools
 
+      # Publica solo cada cosa apenas la encuentra (no espera al final) y, si hay
+      # un partido por terminar, se queda despierto hasta el pitazo.
       - name: Buscar las fotos
         if: steps.mirar.outputs.trabajo == 'true'
         run: node tools/vigilante.js
         env:
           CHROME_PATH: /usr/bin/google-chrome
 
-      - name: Publicar
-        if: steps.mirar.outputs.trabajo == 'true'
+      - name: Publicar lo que haya quedado
+        if: always() && steps.mirar.outputs.trabajo == 'true'
         run: |
           node tools/lista-fotos.js
           aws s3 sync fotos/ $BUCKET/fotos/ --cache-control "no-cache" --only-show-errors --exclude "revisar.html"
