@@ -863,28 +863,32 @@ body {
   box-shadow: 0 8.188px 0 0 rgba(0,0,0,0.25),
               inset 0 -30.599px 0 0 rgba(96,96,96,0.1);
 }
-/* Anchored by its RIGHT edge and shrink-to-fit, so a longer title grows left
-   into the plaque instead of right into the points pill. A fixed 266.679px box
-   let "FECHA 15" (305px of ink) run to x=581 and collide with the pill at 576.9. */
+/* Como en el Figma de Luchi (templates para automatizar, "Equipo Ganador Fecha 1"
+   y el texto suelto "EQUIPO GANADOR FECHA 10"): las dos líneas arrancan SIEMPRE
+   en el mismo borde izquierdo (x=275.9, 29 px adentro del cartel, igual que el
+   margen de la pastilla a la derecha) y van alineadas a la izquierda. Antes el
+   bloque se anclaba por la derecha y con fechas de dos dígitos el borde
+   izquierdo quedaba en escalera y a 8 px del cartel. */
 .card-pitch .pt-title {
-  position: absolute; right: 537.44px; top: 117.8px;
-  text-align: right; white-space: nowrap;
+  position: absolute; left: 275.9px; top: 117.8px;
+  text-align: left; white-space: nowrap;
   paint-order: stroke fill; -webkit-text-stroke-color: #000;
 }
 .card-pitch .pt-title-1 {
   font-family: 'CanaroBlack'; line-height: 67.357px; color: #fff;
-  text-shadow: 0 2.624px 0 #000; -webkit-text-stroke-width: 2.8px;
+  text-shadow: 0 2.624px 0 #000; -webkit-text-stroke-width: 4.6px;   /* Figma: 2.3 px OUTSIDE = 4.6 centrado */
 }
 .pitch-ideal   .pt-title-1 { font-size: 36.446px; }
-.pitch-ganador .pt-title-1 { font-size: 28.45px; -webkit-text-stroke-width: 2.19px; }
+.pitch-ganador .pt-title-1 { font-size: 28.45px; }
 .card-pitch .pt-title-2 {
   font-family: 'CanaroBlack'; font-size: 65.022px; line-height: 59.717px;
-  color: #a2bfe8; text-shadow: 0 2.624px 0 #000; -webkit-text-stroke-width: 4.2px;
+  color: #a2bfe8; text-shadow: 0 2.624px 0 #000; -webkit-text-stroke-width: 4.6px;
 }
-/* Even growing leftward, a two-digit fecha needs 305px against the 296px of
-   plaque available, so it steps down one size. Stroke scales with it. */
+/* "FECHA 10" a tamaño completo mide 315 px y se metería 14 px adentro de la
+   pastilla (que no se mueve: x=576.9). Baja a 58 px: queda de 281 px, con 20 px
+   de aire, casi el mismo ancho que "EQUIPO GANADOR". El borde sigue la escala. */
 .card-pitch .pt-title-2.is-wide {
-  font-size: 60px; line-height: 55.1px; -webkit-text-stroke-width: 3.88px;
+  font-size: 58px; line-height: 55.1px; -webkit-text-stroke-width: 4.6px;
 }
 .card-pitch .pt-pts {
   position: absolute; left: 576.88px; top: 147.52px;
