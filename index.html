@@ -4144,7 +4144,7 @@ function buildGanadoresCard(matchday, data, cfg) {
     '<div class="gn-note"><div class="gn-note-star">*</div>' +
       '<div class="gn-note-txt">PARA DUPLICAR TU PREMIO, DEBÉS OBTENER EL PASS ' +
       '<u>ANTES DEL COMIENZO DE LA FECHA. CONSEGUÍ TU PASS EN LA TIENDA</u></div></div>' +
-    '<img class="gn-wordmark" src="icons/wordmark-ball@4x.png" alt="">';
+    '<img class="gn-wordmark" src="icons/wordmark-original.png" alt="">';
 
   return card;
 }
@@ -5700,7 +5700,7 @@ function buildMvpCard(kind, matchday, rows, kits, titulo) {
       `<div class="mv-title-fecha" style="font-size:${spec.bigSize}px;">${spec.fecha || 'FECHA ' + matchday}</div>` +
     '</div>' +
     rows.map((p, i) => mvRowHtml(p, i, kits)).join('') +
-    '<img class="mv-wordmark" src="icons/wordmark-ball@4x.png" alt="">';
+    '<img class="mv-wordmark" src="icons/wordmark-original.png" alt="">';
 
   return card;
 }
@@ -6136,7 +6136,7 @@ function buildFixturesCard(matchday, matches, stadiums) {
       `<div class="fx-title-2">FECHA ${matchday}</div>` +
     '</div>' +
     matches.map((m, i) => fxRowHtml(m, stadiums, i, matches.length)).join('') +
-    '<img class="fx-wordmark" src="icons/wordmark-ball@4x.png" alt="">';
+    '<img class="fx-wordmark" src="icons/wordmark-original.png" alt="">';
 
   return card;
 }
