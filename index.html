@@ -856,10 +856,13 @@ body {
 }
 
 /* ── Header plaque ── */
+/* En Figma el borde del cartel es OUTSIDE: los 4.666 px van por FUERA de la caja
+   de 586 x 138. Acá el borde cuenta dentro de la caja (border-box), así que la
+   caja se agranda 4.666 por lado (y el radio también) para que mida lo mismo. */
 .card-pitch .pt-plaque {
-  position: absolute; left: 246.83px; top: 112.41px;
-  width: 586.166px; height: 138.18px;
-  background: #fff; border: 4.666px solid #000; border-radius: 31.105px;
+  position: absolute; left: 242.164px; top: 107.744px;
+  width: 595.498px; height: 147.512px;
+  background: #fff; border: 4.666px solid #000; border-radius: 35.771px;
   box-shadow: 0 8.188px 0 0 rgba(0,0,0,0.25),
               inset 0 -30.599px 0 0 rgba(96,96,96,0.1);
 }
@@ -899,7 +902,8 @@ body {
               inset 0 -30.524px 0 0 rgba(255,255,255,0.25);
   font-family: 'CanaroBlack'; color: #f3f3f3; white-space: nowrap;
   text-shadow: 0 1.87px 0 #000;
-  paint-order: stroke fill; -webkit-text-stroke-color: #000; -webkit-text-stroke-width: 3px;
+  /* Figma: borde OUTSIDE de 1.775 px en todo el texto (número y PTS.) = 3.55 centrado. */
+  paint-order: stroke fill; -webkit-text-stroke-color: #000; -webkit-text-stroke-width: 3.55px;
 }
 .pitch-ideal   .pt-pts { background: #fed13d; }
 .pitch-ganador .pt-pts { background: #4b8fed; }
@@ -917,7 +921,7 @@ body {
    trae más aire abajo que arriba): se baja para que quede centrado en la pastilla. */
 .card-pitch .pt-pts-n, .card-pitch .pt-pts-u { position: relative; top: 5px; }
 .card-pitch .pt-pts-n { font-size: 46.96px; }
-.card-pitch .pt-pts-u { font-size: 21.604px; margin-left: 7px; -webkit-text-stroke-width: 1.38px; }
+.card-pitch .pt-pts-u { font-size: 21.604px; margin-left: 7px; }
 
 /* ── Player card (144.015 x 212.891) ── */
 .card-pitch .pp {
