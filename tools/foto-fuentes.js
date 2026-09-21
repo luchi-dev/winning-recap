@@ -365,6 +365,7 @@ const claveFoto = u => sinAcentos(u.split('?')[0].replace(/^https?:\/\/(www\.)?/
     const opciones = []; let k = 0; const huellas = [];
     for (const c of cands) {
       if (opciones.length >= OPCIONES) break;
+      if (c.nota < 0 && opciones.length) break;   // puntaje negativo = no es de este partido; mejor menos opciones que una de cualquier cosa
       const full = pedir();
       if (!bajar(c.u, full)) continue;
       let ok = true; try { await sharp(full).metadata(); } catch (e) { ok = false; }
