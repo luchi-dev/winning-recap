@@ -1,0 +1,17 @@
+# Este repo guarda SOLO el codigo del Recap. Todo lo demas queda afuera:
+# las fotos viven en S3, y las claves y pruebas no se suben nunca.
+/*
+!/.gitignore
+!/.gitattributes
+!/.github/
+!/index.html
+!/historial.json
+!/especiales.json
+!/publicar.bat
+!/Abrir Recap.bat
+!/tools/
+/tools/*
+!/tools/*.js
+!/tools/package.json
+!/tools/package-lock.json
+!/tools/iloveneuquen-stub.html

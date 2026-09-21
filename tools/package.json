@@ -1,0 +1,14 @@
+{
+  "name": "recap-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Herramientas del generador de placas del recap",
+  "scripts": {
+    "fotos": "node bajar-fotos.js"
+  },
+  "dependencies": {
+    "@imgly/background-removal-node": "^1.4.5",
+    "puppeteer-core": "^24.0.0",
+    "sharp": "^0.32.6"
+  }
+}

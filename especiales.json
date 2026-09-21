@@ -1,0 +1,21 @@
+{
+  "_": "Contenido especial por fecha. Clave: <torneo>-<temporada>-<fecha>. El texto de cada especial lo manda Luchi por escrito y se carga acá. Subir 'v' cada vez que se cambia un especial: descarta lo que se haya editado a mano en el navegador.",
+  "724-2026-10": [
+    {
+      "tipo": "mejor-clasico",
+      "v": 4,
+      "home_id": 2549,
+      "away_id": 540,
+      "portada": { "linea": "", "titulo1": "¿CUÁL ES EL MEJOR", "titulo2": "SAN LORENZO–BOCA DE LA HISTORIA?",
+                   "palabra_local": "SAN LORENZO", "palabra_visita": "BOCA", "color_local": "#e2201d", "color_visita": "#4972c6" },
+      "slides": [
+        { "titulo": "EL DE LOS SIETE", "dato": "Apertura 2006 | agosto de 2006 · Estadio Pedro Bidegain (Nuevo Gasómetro)",
+          "local_id": 2549, "visita_id": 540, "goles_local": 1, "goles_visita": 7 },
+        { "titulo": "EL DE SALTA", "dato": "Copa Sudamericana 2004, octavos de final | septiembre de 2004 · Estadio Padre Ernesto Martearena, Salta",
+          "local_id": 540, "visita_id": 2549, "goles_local": 2, "goles_visita": 1 },
+        { "titulo": "EL DE LA SUPERCOPA", "dato": "Supercopa Argentina 2015 (final) | febrero de 2016 · Estadio Mario Alberto Kempes, Córdoba",
+          "local_id": 540, "visita_id": 2549, "goles_local": 0, "goles_visita": 4 }
+      ]
+    }
+  ]
+}

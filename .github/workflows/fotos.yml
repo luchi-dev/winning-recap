@@ -1,0 +1,64 @@
+# Busca solo las fotos del Recap (fotos de partido y caras de Transfermarkt) y
+# las publica en winning.com.ar/iloveneuquen. Corre en los servers de GitHub,
+# no en la compu de nadie. El que decide qué falta es tools/vigilante.js.
+name: Fotos del Recap
+
+on:
+  schedule:
+    # Horas en UTC (Argentina = UTC-3). Cada media hora de 15:00 a 01:30 de
+    # Argentina, que es cuando terminan los partidos, y tres pasadas más a la
+    # mañana por los pósters (el scoring a veces cierra de madrugada).
+    - cron: '7,37 18-23 * * *'
+    - cron: '7,37 0-4 * * *'
+    - cron: '7 9,12,15 * * *'
+  workflow_dispatch:        # botón "Run workflow" para correrlo a mano
+
+concurrency:
+  group: fotos
+  cancel-in-progress: false
+
+env:
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+
+jobs:
+  fotos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Traer lo que ya está publicado
+        run: |
+          mkdir -p fotos fotos-partido
+          aws s3 cp $BUCKET/vigilante.json vigilante.json --only-show-errors || echo "(todavía no hay vigilante.json)"
+          aws s3 cp $BUCKET/fotos-partido/elegidas.json fotos-partido/elegidas.json --only-show-errors
+          aws s3 sync $BUCKET/fotos/ fotos/ --only-show-errors
+
+      - name: Mirar si falta algo
+        id: mirar
+        run: node tools/vigilante.js --mirar
+
+      - name: Instalar herramientas
+        if: steps.mirar.outputs.trabajo == 'true'
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+
+      - name: Buscar las fotos
+        if: steps.mirar.outputs.trabajo == 'true'
+        run: node tools/vigilante.js
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+
+      - name: Publicar
+        if: steps.mirar.outputs.trabajo == 'true'
+        run: |
+          node tools/lista-fotos.js
+          aws s3 sync fotos/ $BUCKET/fotos/ --cache-control "no-cache" --only-show-errors --exclude "revisar.html"
+          aws s3 sync fotos-partido/ $BUCKET/fotos-partido/ --cache-control "no-cache" --only-show-errors --exclude "*" --include "*.jpg" --include "elegidas.json" --exclude "_*"
+          aws s3 cp vigilante.json $BUCKET/vigilante.json --cache-control "no-cache" --only-show-errors
