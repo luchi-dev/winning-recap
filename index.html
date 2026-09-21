@@ -5928,16 +5928,48 @@ async function loadDestacado(matchday) {
   if (rapidos.length) elegir(rapidos[0].player_id, rapidos[0].player_name, rapidos[0].team_id);
 }
 
+/* MVPs DEL DÍA: una fecha se juega en varios días y se postea un top 5 por
+   cada uno. La vista de puntos no trae game_id, así que el día de cada jugador
+   sale de cruzar player_match_stats con los partidos de ese día (hora
+   argentina = kickoff − 3 h). Devuelve [{ dia, nombre, rows, faltan }]. */
+const MV_DIAS = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+async function mvCargarDias(matchday) {
+  const fixR = await db.from('v_fixtures').select('game_id, kickoff_ts, opta_period')
+    .eq('competition_id', currentComp).eq('season_id', currentSeason).eq('matchday', matchday);
+  const dias = {};
+  (fixR.data || []).forEach(f => {
+    const d = new Date(new Date(f.kickoff_ts).getTime() - 3 * 3600e3);
+    const k = d.toISOString().slice(0, 10);
+    (dias[k] = dias[k] || { dia: k, nombre: MV_DIAS[d.getUTCDay()], juegos: [], faltan: 0 }).juegos.push(f.game_id);
+    if (f.opta_period !== 'FullTime') dias[k].faltan++;
+  });
+  const jugados = Object.values(dias).filter(d => d.faltan < d.juegos.length).sort((a, b) => a.dia < b.dia ? -1 : 1);
+  if (jugados.length < 2) return [];   // fecha de un solo día: es la misma placa que MVPs de la fecha
+  const [ptsR, pmsR] = await Promise.all([
+    db.from(MV_VIEW).select('player_id, player_name, position_code, jersey_number, team_id, total_points, is_starter, normalized_minutes')
+      .eq('competition_id', currentComp).eq('season_id', currentSeason).eq('matchday', matchday),
+    db.schema('winning_lpf').from('player_match_stats').select('game_id, player_id').in('game_id', jugados.flatMap(d => d.juegos)),
+  ]);
+  if (ptsR.error) throw ptsR.error;
+  const juegoDe = {}; (pmsR.data || []).forEach(r => { juegoDe[r.player_id] = r.game_id; });
+  jugados.forEach(d => {
+    d.rows = (ptsR.data || []).filter(p => d.juegos.includes(juegoDe[p.player_id]))
+      .sort((a, b) => b.total_points - a.total_points).slice(0, 5);
+  });
+  return jugados.filter(d => d.rows.length);
+}
+
 async function loadMvpCards(matchday) {
   const container = document.getElementById('mvpContainer');
   container.innerHTML = '<div class="spinner">Cargando MVPs...</div>';
 
-  let mvps, subs;
+  let mvps, subs, dias = [];
   try {
     [mvps, subs] = await Promise.all([
       mvFetchTop(matchday, { limit: 5 }),
       mvFetchTop(matchday, { limit: 5, benchOnly: true }),
     ]);
+    try { dias = await mvCargarDias(matchday); } catch (e) { console.warn('MVPs del día', e); }
   } catch (err) {
     console.error('MVP load failed:', err);
     container.innerHTML =
@@ -5946,13 +5978,14 @@ async function loadMvpCards(matchday) {
   }
 
   // Qué jugadores de estas dos placas tienen recorte. Va antes de dibujar.
-  await fotoPreloadIds(mvps.concat(subs).map(p => p.player_id));
+  const todos = mvps.concat(subs, ...dias.map(d => d.rows));
+  await fotoPreloadIds(todos.map(p => p.player_id));
 
   // Kit art + colors + home/away kit choice. Best-effort: a failure here
   // degrades every row to the legacy badge, never loses the card.
   let kits = {};
   try {
-    const teamIds = [...new Set(mvps.concat(subs).map(p => p.team_id).filter(id => id != null))];
+    const teamIds = [...new Set(todos.map(p => p.team_id).filter(id => id != null))];
     kits = await mvFetchKits(matchday, teamIds);
   } catch (err) {
     console.warn('Jersey kit data unavailable — MVP rows fall back to badges:', err);
@@ -5979,6 +6012,28 @@ async function loadMvpCards(matchday) {
       document.fonts.ready.then(() => mvFitTitle(card));   // width depends on the face
     }
   });
+
+  // MVPs del día: una placa por cada día de la fecha que ya tiene partidos jugados.
+  if (dias.length) {
+    const section = document.createElement('div');
+    section.className = 'match-section';
+    section.innerHTML = '<h3>MVPs DEL DÍA</h3>';
+    const row = document.createElement('div');
+    row.className = 'cards-row';
+    dias.forEach(d => {
+      const archivo = 'mvps_f' + matchday + '_' + d.nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      const titulo = { big: 'MVPs', small: 'DEL', fecha: d.nombre, file: archivo };
+      const card = buildMvpCard('mvp', matchday, d.rows, kits, titulo);
+      const w = createCardWrapper(card, archivo);
+      const nota = document.createElement('div'); nota.className = 'rn-sinfoto';
+      nota.textContent = 'fecha ' + matchday + ' · ' + d.dia.split('-').reverse().slice(0, 2).join('/') + ' · ' + d.juegos.length + ' partido(s)' + (d.faltan ? ' · OJO: faltan terminar ' + d.faltan : '');
+      w.appendChild(nota);
+      row.appendChild(w);
+    });
+    section.appendChild(row);
+    container.appendChild(section);
+    row.querySelectorAll('.card-mvp').forEach(card => { mvFitTitle(card); document.fonts.ready.then(() => mvFitTitle(card)); });
+  }
 
   if (!container.children.length) {
     container.innerHTML = '<div class="spinner">Sin datos de jugadores para esta fecha.</div>';
