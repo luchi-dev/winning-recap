@@ -13,6 +13,10 @@ Un texto de dos líneas, nada más:
 
 Sin cierre ni pregunta final. No repitas los nombres de los ganadores: ya están en la placa. No nombres al usuario ganador ni a los otros cinco de ninguna forma.
 
+El encabezado ("🏆 GANADORES DE LA FECHA N | CLAUSURA 2026") lo agrega el sistema arriba de tus dos líneas: no lo escribas vos.
+
+Son seis ganadores (3 del fantasy y 3 del prode). Cuando hables de alguno, decí de cuál juego y de qué puesto es ("el ganador del fantasy", "el segundo del prode"), nunca "los ganadores" a secas si te referís a algunos y no a los seis.
+
 ESTILO: ESCRIBIR EN MÁXIMAS
 
 Cada frase arranca por la conclusión, con el protagonista primero: qué significa lo que pasó. El detalle va después o se cae. Sin adornos, sin emojis, sin hashtags. Cada línea es una o dos frases cortas.

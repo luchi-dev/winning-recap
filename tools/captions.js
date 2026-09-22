@@ -524,7 +524,8 @@ function guardar(md, datos, res, resGanadores) {
   const antes = todo[clave] || {};
   const entrada = { ...antes, v: (antes.v || 0) + 1, escrito: new Date().toISOString(), modelo: MODEL };
   if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim() }));
-  if (resGanadores) entrada.ganadores = [{ titulo: 'Ganadores de la fecha', texto: resGanadores.linea1.trim() + '\n\n' + resGanadores.linea2.trim() }];
+  // El encabezado lo pone el código, no el editor: anuncia de qué es el posteo, como el título del 11 Ideal.
+  if (resGanadores) entrada.ganadores = [{ titulo: 'Ganadores de la fecha', texto: `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}\n\n` + resGanadores.linea1.trim() + '\n\n' + resGanadores.linea2.trim() }];
   todo[clave] = entrada;
   fs.writeFileSync(ARCHIVO, JSON.stringify(todo, null, 2) + '\n');
 
@@ -532,7 +533,7 @@ function guardar(md, datos, res, resGanadores) {
   fs.mkdirSync(DIR, { recursive: true });
   const seccionGanadores = resGanadores ? [
     '## 5. Texto de la placa de Ganadores', '',
-    '```', resGanadores.linea1.trim(), '', resGanadores.linea2.trim(), '```', '',
+    '```', `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}`, '', resGanadores.linea1.trim(), '', resGanadores.linea2.trim(), '```', '',
     'Nota del editor: ' + resGanadores.nota, '',
   ] : [];
   if (!res) {
