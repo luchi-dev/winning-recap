@@ -433,8 +433,19 @@ async function datosGanadores(md) {
   const fechas = [md - 2, md - 1, md].filter(f => f >= 1);
   const por = {};
   for (const f of fechas) {
-    const filas = await api(`v_fantasy_player_match_points?competition_id=eq.${COMPETITION}&season_id=eq.${SEASON}&matchday=eq.${f}&select=player_id,player_name,total_points,team_id&limit=3000`);
-    filas.forEach(r => { const p = por[r.player_id] = por[r.player_id] || { nombre: r.player_name, team_id: r.team_id, puntos: {} }; p.puntos[f] = r1(r.total_points); });
+    const filas = await api(`v_fantasy_player_match_points?competition_id=eq.${COMPETITION}&season_id=eq.${SEASON}&matchday=eq.${f}&select=player_id,player_name,total_points,team_id,game_id&limit=3000`);
+    filas.forEach(r => { const p = por[r.player_id] = por[r.player_id] || { nombre: r.player_name, team_id: r.team_id, puntos: {}, games: {} }; p.puntos[f] = r1(r.total_points); p.games[f] = r.game_id; });
+  }
+  // Goles y asistencias fecha a fecha de los jugadores del equipo del ganador (para el puente A).
+  const wPlayers = (((await recap(md)).winner_team || {}).players || []).map(p => p.player_id);
+  const golesDe = {};
+  if (wPlayers.length) {
+    const games = [...new Set(wPlayers.flatMap(id => Object.values((por[id] || {}).games || {})))].filter(Boolean);
+    const stats = games.length ? await api(`player_match_stats?player_id=in.(${wPlayers.join(',')})&game_id=in.(${games.join(',')})&select=player_id,game_id,goals,goal_assist`, LPF).catch(() => []) : [];
+    stats.forEach(s => {
+      const f = Object.keys((por[s.player_id] || {}).games || {}).find(k => por[s.player_id].games[k] === s.game_id);
+      if (f) (golesDe[s.player_id] = golesDe[s.player_id] || {})[f] = { goles: Number(s.goals) || 0, asistencias: Number(s.goal_assist) || 0 };
+    });
   }
   const idealDe = {};
   for (const f of fechas) idealDe[f] = (((await recap(f)).winning_team || {}).players || []).map(p => p.player_id);
@@ -442,7 +453,7 @@ async function datosGanadores(md) {
   const equipos = teamIds.length ? await api(`teams?id=in.(${teamIds.join(',')})&select=id,name`) : [];
   const club = id => (equipos.find(t => t.id === id) || {}).name || '';
   const lista = Object.entries(por).map(([id, p]) => ({
-    nombre: p.nombre, club: club(p.team_id),
+    player_id: Number(id), nombre: p.nombre, club: club(p.team_id),
     puntos_por_fecha: p.puntos,
     suma: r1(Object.values(p.puntos).reduce((a, b) => a + b, 0)),
     jugo_las_tres: Object.keys(p.puntos).length === fechas.length,
@@ -453,9 +464,22 @@ async function datosGanadores(md) {
   const parejos = lista.filter(p => p.jugo_las_tres && p.minimo >= 12).sort((a, b) => b.suma - a.suma);
   const repetidos = lista.filter(p => p.en_11_ideal.length >= 2).sort((a, b) => b.en_11_ideal.length - a.en_11_ideal.length);
 
+  // El equipo del ganador del fantasy, con la racha de cada jugador: el puente A.
+  const porId = Object.fromEntries(lista.map(p => [p.player_id, p]));
+  const w = (await recap(md)).winner_team || {};
+  const equipoGanador = (w.players || []).map(p => {
+    const r = porId[p.player_id] || {};
+    const g = golesDe[p.player_id] || {};
+    const golesSeguidos = fechas.filter(f => (g[f] || {}).goles > 0).length;
+    return { nombre: p.player_name, club: r.club || p.team_short_name, puntos_esta_fecha: r1(p.total_points), capitan: p.is_captain === true,
+      puntos_por_fecha: r.puntos_por_fecha || {}, goles_y_asistencias_por_fecha: g, fechas_con_gol_de_las_ultimas_tres: golesSeguidos,
+      en_11_ideal: r.en_11_ideal || [], en_racha: !!(r.jugo_las_tres && r.minimo >= 12) || (r.en_11_ideal || []).length >= 2 || golesSeguidos >= 2 };
+  }).sort((a, b) => b.puntos_esta_fecha - a.puntos_esta_fecha);
+
   return {
     torneo: TORNEO, fecha: md, hoy: new Date(Date.now() - 3 * HORA).toISOString().slice(0, 10),
     ganadores,
+    equipo_del_ganador_del_fantasy: equipoGanador,
     nombres_de_usuario_de_los_ganadores_NO_NOMBRAR: nombres,
     censo_hinchadas: { total_usuarios_con_club: totalHinchas, clubes_mas_grandes: (censo || []).slice(0, 8).map(c => ({ club: c.team_name, pct: Number(c.fan_pct) })) },
     rachas: {
@@ -473,25 +497,41 @@ async function datosGanadores(md) {
 
 const ESQUEMA_GANADORES = {
   type: 'object', additionalProperties: false,
-  required: ['linea1', 'linea2', 'nota'],
+  required: ['versiones', 'nota'],
   properties: {
-    linea1: { type: 'string', description: 'la conclusión sobre los seis ganadores, o que no hubo nada llamativo' },
-    linea2: { type: 'string', description: 'un dato útil para la próxima fecha, como dato y no como recomendación' },
+    versiones: {
+      type: 'array', items: {
+        type: 'object', additionalProperties: false,
+        required: ['puente', 'linea1', 'linea2'],
+        properties: {
+          puente: { type: 'string', enum: ['A', 'B'], description: 'A: un jugador que el ganador tenía; B: por el tema' },
+          linea1: { type: 'string', description: 'la conclusión sobre los ganadores, o que no hubo nada llamativo' },
+          linea2: { type: 'string', description: 'el dato conectado con la línea 1, como dato y no como recomendación' },
+        },
+      },
+    },
     nota: { type: 'string', description: 'qué datos usaste y cuáles faltaban' },
   },
 };
+const TITULO_PUENTE = { A: 'Opción A · puente: un jugador que el ganador tenía', B: 'Opción B · puente: por el tema' };
 
 function problemasGanadores(res, datos) {
   const p = [];
-  const l1 = (res.linea1 || '').trim(), l2 = (res.linea2 || '').trim();
-  if (!l1 || !l2) p.push('faltan las dos líneas');
-  if (/\?\s*$/.test(l2) || /\?\s*$/.test(l1)) p.push('sin pregunta final');
-  if (/#\w/.test(l1 + l2)) p.push('sin hashtags');
-  if (/\b(pon[eé]|sum[aá]|conviene|recomend|met[eé]lo|comprá|comprar)\b/i.test(l2)) p.push('la línea 2 es un dato, no una recomendación');
-  (datos.nombres_de_usuario_de_los_ganadores_NO_NOMBRAR || []).forEach(n => {
-    const limpio = n.replace(/^@/, '').replace(/_+$/, '');
-    if (limpio.length >= 4 && (l1 + ' ' + l2).toLowerCase().includes(limpio.toLowerCase())) p.push('no nombrar a los ganadores (' + n + ')');
+  const vs = (res && res.versiones) || [];
+  if (vs.length !== 2) p.push('tienen que ser exactamente 2 versiones (vinieron ' + vs.length + ')');
+  vs.forEach((v, i) => {
+    const l1 = (v.linea1 || '').trim(), l2 = (v.linea2 || '').trim(), q = 'versión ' + (i + 1) + ': ';
+    if (!l1 || !l2) p.push(q + 'faltan las dos líneas');
+    if (/\?\s*$/.test(l2) || /\?\s*$/.test(l1)) p.push(q + 'sin pregunta final');
+    if (/#\w/.test(l1 + l2)) p.push(q + 'sin hashtags');
+    if (/\b(pon[eé]|sum[aá]|conviene|recomend|met[eé]lo|comprá|comprar)\b/i.test(l2)) p.push(q + 'la línea 2 es un dato, no una recomendación');
+    (datos.nombres_de_usuario_de_los_ganadores_NO_NOMBRAR || []).forEach(n => {
+      const limpio = n.replace(/^@/, '').replace(/_+$/, '');
+      if (limpio.length >= 4 && (l1 + ' ' + l2).toLowerCase().includes(limpio.toLowerCase())) p.push(q + 'no nombrar a los ganadores (' + n + ')');
+    });
   });
+  const conRacha = (datos.equipo_del_ganador_del_fantasy || []).some(j => j.en_racha);
+  if (vs.length === 2 && vs[0].puente === vs[1].puente && conRacha) p.push('las dos versiones tienen que usar puentes distintos (A y B)');
   return p;
 }
 
@@ -525,7 +565,10 @@ function guardar(md, datos, res, resGanadores) {
   const entrada = { ...antes, v: (antes.v || 0) + 1, escrito: new Date().toISOString(), modelo: MODEL };
   if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim() }));
   // El encabezado lo pone el código, no el editor: anuncia de qué es el posteo, como el título del 11 Ideal.
-  if (resGanadores) entrada.ganadores = [{ titulo: 'Ganadores de la fecha', texto: `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}\n\n` + resGanadores.linea1.trim() + '\n\n' + resGanadores.linea2.trim() }];
+  if (resGanadores) entrada.ganadores = resGanadores.versiones.map(v => ({
+    titulo: TITULO_PUENTE[v.puente] || 'Ganadores de la fecha',
+    texto: `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}\n\n` + v.linea1.trim() + '\n\n' + v.linea2.trim(),
+  }));
   todo[clave] = entrada;
   fs.writeFileSync(ARCHIVO, JSON.stringify(todo, null, 2) + '\n');
 
@@ -533,7 +576,7 @@ function guardar(md, datos, res, resGanadores) {
   fs.mkdirSync(DIR, { recursive: true });
   const seccionGanadores = resGanadores ? [
     '## 5. Texto de la placa de Ganadores', '',
-    '```', `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}`, '', resGanadores.linea1.trim(), '', resGanadores.linea2.trim(), '```', '',
+    ...resGanadores.versiones.flatMap(v => [`### ${TITULO_PUENTE[v.puente] || 'Versión'}`, '', '```', `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}`, '', v.linea1.trim(), '', v.linea2.trim(), '```', '']),
     'Nota del editor: ' + resGanadores.nota, '',
   ] : [];
   if (!res) {

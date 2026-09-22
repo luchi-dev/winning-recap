@@ -4433,7 +4433,7 @@ function gnRerender() {
   const escritos = capEscritos('ganadores', gnMatchday);
   if (escritos.length) {
     const panel = document.createElement('div');
-    panel.className = 'cap-panel';
+    panel.className = 'cap-panel' + (escritos.length > 1 ? ' is-escritos' : '');   // dos opciones, una al lado de la otra
     escritos.forEach(c => panel.appendChild(capCaja('ganadores', gnMatchday, c.red, gnEscape(c.titulo), c.texto)));
     row.appendChild(panel);
   }

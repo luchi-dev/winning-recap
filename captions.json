@@ -4,8 +4,12 @@
     "v": 2,
     "ganadores": [
       {
-        "titulo": "Ganadores de la fecha",
-        "texto": "🏆 GANADORES DE LA FECHA 10 | CLAUSURA 2026\n\nEl ganador del fantasy y el del prode se anotaron en Winning la semana anterior y ganaron en su primera fecha.\n\nLucas Zelarayán y Gonzalo Montiel son los únicos jugadores con 12 puntos o más en cada una de las últimas tres fechas."
+        "titulo": "Opción A · puente: un jugador que el ganador tenía",
+        "texto": "🏆 GANADORES DE LA FECHA 10 | CLAUSURA 2026\n\nEl ganador del fantasy se anotó en Winning la semana anterior y ganó en su primera fecha, con Ronaldo Martínez en el equipo.\n\nRonaldo Martínez hizo gol en las tres fechas que jugó con Vélez y ya estuvo dos veces en el 11 Ideal."
+      },
+      {
+        "titulo": "Opción B · puente: lo nuevo pagó, lo constante también",
+        "texto": "🏆 GANADORES DE LA FECHA 10 | CLAUSURA 2026\n\nGanar en tu primera fecha se puede: el ganador del fantasy y el del prode se anotaron la semana anterior.\n\nLo que también paga es la constancia: Lucas Zelarayán y Gonzalo Montiel son los únicos con 12 puntos o más en cada una de las últimas tres fechas."
       }
     ],
     "ideal": [
