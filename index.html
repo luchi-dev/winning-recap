@@ -3665,7 +3665,7 @@ function buildCard3(match, matchday) {
     for (let a = 0; a < e.assists; a++) events += `<img class="ev-icon" src="icons/assist.png">`;
     for (let y = 0; y < e.yellow_cards; y++) events += `<img class="ev-icon" src="icons/yellow-card.png">`;
     if (e.red_cards > 0) events += `<img class="ev-icon" src="icons/red-card.png">`;
-    for (let ps = 0; ps < (e.penalty_saves || 0); ps++) events += `<img class="ev-icon" src="icons/saved.png">`;
+    // El penal atajado no lleva ícono (a Luchi no le gusta icons/saved.png, 22-sep-2026).
     for (let og = 0; og < e.own_goals; og++) events += `<img class="ev-icon" src="icons/own-goal.png">`;
 
     return `
@@ -3748,7 +3748,7 @@ function buildEventIconsHtml(events, clase) {
   for (let i = 0; i < (e.assists || 0); i++) out += `<img class="${c}" src="icons/assist.png">`;
   for (let i = 0; i < (e.yellow_cards || 0); i++) out += `<img class="${c}" src="icons/yellow-card.png">`;
   if ((e.red_cards || 0) > 0) out += `<img class="${c}" src="icons/red-card.png">`;
-  for (let i = 0; i < (e.penalty_saves || 0); i++) out += `<img class="${c}" src="icons/saved.png">`;
+  // El penal atajado no lleva ícono (a Luchi no le gusta icons/saved.png, 22-sep-2026).
   for (let i = 0; i < (e.own_goals || 0); i++) out += `<img class="${c}" src="icons/own-goal.png">`;
   return out;
 }
