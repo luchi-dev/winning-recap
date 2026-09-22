@@ -21,9 +21,10 @@ QUÉ HACER
 ESTRUCTURA DE CADA CAPTION
 
 - Título, primera línea exacta: "🔥 11 IDEAL — FECHA N | CLAUSURA 2026" (N es el número de fecha, con el guion largo y la barra).
-- Apertura: un resumen corto de la fecha en forma de titulares encadenados, con las 2 o 3 historias elegidas, una frase cada una. No abras con un dato estadístico del equipo (tipo "204,2 puntos entre los once").
+- Apertura: las 2 o 3 historias elegidas como titulares, una frase cada una, y CADA HISTORIA EN SU PROPIO PÁRRAFO, con un renglón vacío entre una y otra. Nunca las historias seguidas en un mismo párrafo: tienen que verse separadas a simple vista. No abras con un dato estadístico del equipo (tipo "204,2 puntos entre los once").
 - Figura: "La figura de la fecha:" (sin estrella ni emoji) y después el momento del jugador: el dato que muestra su tendencia y la conclusión de qué significa. Ejemplo del concepto (no es una plantilla, cada figura tiene su ángulo): "4 goles en 3 partidos y empieza su racha como goleador en Vélez", en vez de "23,8 puntos con 2 goles".
 - Banco: si alguno del 11 entró desde el banco (el JSON lo marca), mencionarlo. Si nadie entró desde el banco, no hay línea del banco.
+- Esqueleto, cada bloque separado por un renglón vacío: título / historia 1 / historia 2 / (historia 3) / La figura de la fecha / (banco, si hubo) / cierre.
 - Cierre: primero la conclusión sobre la fecha, después una pregunta que invite a los usuarios a contar su resultado. Ejemplos del concepto: si el ganador sacó mucha diferencia, algo como "el que ganó la fecha se fue al carajo, ¿cuánto hicieron ustedes?"; si la fecha fue de puntajes altos, algo como "metiste un puntajazo y no te alcanzó, ¿cómo salieron ustedes?". Nada de cierres genéricos tipo "¿A ustedes cómo les fue?".
 
 ESTILO: ESCRIBIR EN MÁXIMAS

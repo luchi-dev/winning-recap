@@ -310,6 +310,10 @@ function problemas(res, md) {
     if (/#\w/.test(t)) p.push(`el caption ${i + 1} tiene hashtags`);
     if (t.includes('⭐')) p.push(`el caption ${i + 1} tiene la estrella; "La figura de la fecha:" va sin estrella`);
     if (!/La figura de la fecha:/.test(t)) p.push(`al caption ${i + 1} le falta "La figura de la fecha:"`);
+    // La apertura va con una historia por párrafo: antes de la figura tiene que haber
+    // al menos dos bloques separados por renglón vacío (sin contar el título).
+    const apertura = t.split(/La figura de la fecha:/)[0].split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).slice(1);
+    if (apertura.length < 2) p.push(`el caption ${i + 1} tiene las historias de la apertura en un solo párrafo: va una historia por párrafo, con un renglón vacío entre ellas`);
     if (!/\?\s*$/.test(t)) p.push(`el caption ${i + 1} tiene que terminar con la pregunta a ustedes`);
   });
   return p;
