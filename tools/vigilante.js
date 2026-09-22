@@ -6,8 +6,13 @@
  *   node vigilante.js --mirar    sólo dice qué haría (no baja nada)
  *
  * Corre en GitHub Actions (.github/workflows/fotos.yml), no en la compu de
- * nadie. El despertador suena cada 5 minutos, pero acá sólo se trabaja en los
- * momentos que definió Luchi según cuándo postea cada placa:
+ * nadie. Es un vigilante DE GUARDIA: mientras haya fútbol que mirar (un partido
+ * en las próximas 2 h, en juego o recién terminado, o una fecha esperando que
+ * cierre el puntaje) la corrida se queda despierta mirando el fixture cada
+ * minuto, y antes de que GitHub la corte (6 h) lanza ella misma la siguiente.
+ * El cron de GitHub sólo sirve para arrancar la guardia: el 21-sep-2026 sonó 1
+ * vez de 131 y se perdió Lanús-Estudiantes y el cierre de la fecha 10.
+ * Sólo se trabaja en los momentos que definió Luchi según cuándo postea:
  *
  *   MINUTO ~75 DEL PARTIDO  pre-búsqueda: foto del partido (los goles y festejos
  *                           ya están publicados) y caras del Top 5, para que al
@@ -48,7 +53,10 @@ const DIAS_PARTIDO = 3;            // pasado esto, un partido ya no se toca
 const DIAS_FECHA = 5;              // ni los pósters de una fecha (el scoring cierra hasta 13 h después)
 const INTENTOS_CARA = 2, ENTRE_CARA = 30 * MIN;
 const MAX_CARAS = 30;              // por pasada
-const CORRIDA_MAX = 85 * MIN;      // el job de GitHub corta a los 90
+const CORRIDA_MAX = 5 * HORA + 40 * MIN;   // el job de GitHub corta a las 6 h: antes de eso se lanza el relevo
+const GUARDIA_ANTES = 2 * HORA;    // desde cuánto antes del kickoff se queda despierto
+const GUARDIA_DESPUES = 45 * MIN;  // hasta cuánto después del pitazo (cubre el reintento de los 30 min)
+const ESPERA_PUNTAJE = 16 * HORA;  // cuánto se espera el cierre del puntaje tras el último partido
 
 const MIRAR = process.argv.includes('--mirar');
 const dormir = ms => new Promise(r => setTimeout(r, ms));
@@ -81,6 +89,14 @@ function publicar() {
     aws('s3', 'cp', 'vigilante.json', B + '/vigilante.json', ...nc),
   ].every(Boolean);
   log(ok ? 'publicado en el sitio' : 'OJO: falló la publicación');
+}
+
+/* Lanza la próxima corrida (sólo en GitHub: hace falta GH_TOKEN y el repo). La
+   nueva queda en cola por el grupo de concurrencia y arranca cuando ésta termina. */
+function relevo() {
+  if (!process.env.GITHUB_REPOSITORY) return;
+  const r = spawnSync('gh', ['workflow', 'run', 'fotos.yml', '--repo', process.env.GITHUB_REPOSITORY], { encoding: 'utf8' });
+  log(r.status === 0 ? 'relevo lanzado: la próxima corrida sigue la guardia' : 'OJO: no pude lanzar el relevo: ' + (r.stderr || '').trim().slice(0, 150));
 }
 
 function avisar(clave, valor) {
@@ -138,6 +154,7 @@ async function postersDe(md) {
 }
 
 // ── Una pasada: ver qué momento es y hacerlo ──────────────────────────
+const postersHechos = {};   // fechas cuyo equipo ideal ya apareció (en esta corrida)
 async function pasada(estado) {
   const ahora = Date.now();
   for (const c of [puntosCache, torneoCache]) Object.keys(c).forEach(k => delete c[k]);   // los puntos cambian mientras se espera el pitazo
@@ -204,18 +221,32 @@ async function pasada(estado) {
     if (!js.every(terminado) || ahora - new Date(js[js.length - 1].kickoff_ts) > DIAS_FECHA * DIA) continue;
     const posters = await postersDe(md);
     if (!posters) { if (!estado._avisoCierre) log('fecha ' + md + ': terminaron todos los partidos, todavía no cerró el puntaje'); estado._avisoCierre = true; continue; }
+    postersHechos[md] = true;
     const pts = await puntosDeLaFecha(md, js.map(j => j.game_id));
     [...posters, ...pts.slice(0, 5), ...pts.filter(p => p.is_starter === false).slice(0, 5)].forEach(p => pedirCara(p, md, 'cierre de la fecha ' + md));
   }
 
   const listaCaras = [...caras.values()].slice(0, MAX_CARAS);
   const esperando = fx.filter(j => reciente(j) && !terminado(j) && min2T(j) >= PRE_DESDE && min2T(j) < ESPERA_MAX);
+  // ¿Hay que quedarse de guardia? Partidos por empezar (2 h), en juego o recién
+  // terminados (45 min), o una fecha ya jugada cuyo puntaje todavía no cerró.
+  const vigilar = [];
+  fx.forEach(j => {
+    const k = new Date(j.kickoff_ts).getTime();
+    if (!terminado(j) && k - ahora < GUARDIA_ANTES && ahora - k < 4 * HORA) vigilar.push('partido: ' + nombre(j));
+    else if (terminado(j) && !P(j.game_id).cerrado && ahora - k < 3 * HORA + GUARDIA_DESPUES) vigilar.push('reintento: ' + nombre(j));
+  });
+  for (const md of [...new Set(fx.map(j => j.matchday))]) {
+    const js = fx.filter(j => j.matchday === md);
+    const ultimo = Math.max(...js.map(j => new Date(j.kickoff_ts).getTime()));
+    if (js.every(terminado) && ahora - ultimo < ESPERA_PUNTAJE && !postersHechos[md]) vigilar.push('cierre del puntaje de la fecha ' + md);
+  }
   fotos.forEach(f => log('momento: ' + f.motivo));
   const motivos = [...new Set(listaCaras.map(c => c.motivo))];
   motivos.forEach(m => log('momento: caras de ' + m + ' → ' + listaCaras.filter(c => c.motivo === m).map(c => c.nombre).join(', ')));
 
   const hayTrabajo = fotos.length > 0 || listaCaras.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
-  if (MIRAR) return { hayTrabajo, esperando };
+  if (MIRAR) return { hayTrabajo, esperando, vigilar };
 
   // ── A trabajar ──
   const guardar = () => fs.writeFileSync(ESTADO, JSON.stringify({ partidos: estado.partidos, caras: estado.caras }, null, 1));
@@ -245,7 +276,7 @@ async function pasada(estado) {
   Object.keys(estado.partidos).forEach(k => { const e = estado.partidos[k]; if ((e.final || e.pre || 0) < viejo) delete estado.partidos[k]; });
   Object.keys(estado.caras).forEach(k => { if (estado.caras[k].t < viejo) delete estado.caras[k]; });
   guardar();
-  return { hayTrabajo, esperando };
+  return { hayTrabajo, esperando, vigilar };
 }
 
 (async () => {
@@ -255,15 +286,24 @@ async function pasada(estado) {
   // El estado viejo contaba intentos ({n,t}); ya no se usa.
   Object.keys(estado.partidos).forEach(k => { if ('n' in estado.partidos[k]) delete estado.partidos[k]; });
 
-  let hubo = false, vueltas = 0;
+  let hubo = false, vueltas = 0, ultimoAviso = '';
   for (;;) {
     const r = await pasada(estado);
     hubo = hubo || r.hayTrabajo;
-    if (MIRAR) { if (!r.hayTrabajo && !r.esperando.length) log('no es momento de nada'); avisar('trabajo', r.hayTrabajo || r.esperando.length > 0); return; }
-    if (!r.esperando.length) break;
-    if (Date.now() - inicio > CORRIDA_MAX) { log('corto acá: la próxima corrida sigue esperando'); break; }
-    if (!r.hayTrabajo && vueltas++ % 10 === 0) log('esperando el pitazo de ' + r.esperando.map(nombre).join(' y ') + '…');
-    await dormir(30e3);
+    if (MIRAR) {
+      if (r.vigilar.length) log('de guardia por: ' + r.vigilar.join(' · '));
+      if (!r.hayTrabajo && !r.vigilar.length) log('no es momento de nada');
+      avisar('trabajo', r.hayTrabajo || r.vigilar.length > 0); return;
+    }
+    if (!r.vigilar.length) break;
+    if (Date.now() - inicio > CORRIDA_MAX) { log('llevo ' + Math.round((Date.now() - inicio) / HORA * 10) / 10 + ' h: paso la guardia'); relevo(); break; }
+    const aviso = r.vigilar.join(' · ');
+    if (aviso !== ultimoAviso || vueltas++ % 30 === 0) log('de guardia por: ' + aviso);
+    ultimoAviso = aviso;
+    // Con un pitazo por venir se mira cada 30 s; el resto del tiempo, cada minuto;
+    // esperando sólo el cierre del puntaje, cada 5 minutos.
+    const soloPuntaje = r.vigilar.every(v => v.startsWith('cierre'));
+    await dormir(r.esperando.length ? 30e3 : soloPuntaje ? 5 * MIN : MIN);
   }
   if (!hubo) log('no es momento de nada');
   avisar('trabajo', hubo);
