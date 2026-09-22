@@ -55,8 +55,30 @@ function mezclarElegidas() {
   console.log('   elegidas.json: ' + (n ? n + ' partido(s) actualizados desde el server' : 'nada nuevo'));
 }
 
+/* captions.json: los escribe tools/captions.js en GitHub al cierre de cada fecha.
+   Se mezcla fecha por fecha; gana la versión 'v' más alta. Los informes
+   (captions/fecha-N.md) se traen si acá no están. */
+function mezclarCaptions() {
+  const tmp = path.join(os.tmpdir(), 'captions-server.json');
+  if (aws('s3', 'cp', BUCKET + '/captions.json', tmp, '--only-show-errors').status !== 0) { console.log('   captions.json: no hay en el server'); return; }
+  const local = path.join(RAIZ, 'captions.json');
+  let mio = {}, suyo = {};
+  try { mio = JSON.parse(fs.readFileSync(local, 'utf8')); } catch (e) {}
+  try { suyo = JSON.parse(fs.readFileSync(tmp, 'utf8')); } catch (e) { return; }
+  const tomadas = [];
+  for (const k of Object.keys(suyo)) {
+    if (k === '_') { if (!mio._) mio._ = suyo._; continue; }
+    if (!mio[k] || (suyo[k].v || 0) > (mio[k].v || 0)) { mio[k] = suyo[k]; tomadas.push(k); }
+  }
+  if (tomadas.length) fs.writeFileSync(local, JSON.stringify(mio, null, 2) + '\n');
+  console.log('   captions.json: ' + (tomadas.length ? 'fecha(s) ' + tomadas.map(k => k.split('-').pop()).join(', ') + ' actualizadas desde el server' : 'nada nuevo'));
+  fs.mkdirSync(path.join(RAIZ, 'captions'), { recursive: true });
+  try { traerFaltantes('captions', rel => /\.(md|json)$/i.test(rel)); } catch (e) { console.log('   captions/: no hay en el server'); }
+}
+
 try {
   traerFaltantes('fotos', rel => /\.png$/i.test(rel));
   traerFaltantes('fotos-partido', rel => /\.jpg$/i.test(rel) && !rel.startsWith('_'));
   mezclarElegidas();
+  mezclarCaptions();
 } catch (e) { console.error('   ' + e.message); process.exit(1); }

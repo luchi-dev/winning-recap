@@ -25,6 +25,9 @@
  *   FIN DEL DÍA             caras de los MVPs del día.
  *   CIERRE DE PUNTAJES      caras de Equipo Ideal, Ganador de la fecha, MVPs y
  *                           Super Suplentes, apenas existe el equipo ideal.
+ *                           Y los captions del 11 Ideal escritos como editor
+ *                           (tools/captions.js → captions.json), si hay
+ *                           ANTHROPIC_API_KEY. Dos intentos por fecha.
  *
  * Fuera de esos momentos dice "no es momento" y termina. La cuenta de lo hecho
  * se lleva en vigilante.json. Una cara se intenta 2 veces como mucho; las
@@ -87,6 +90,9 @@ function publicar() {
     aws('s3', 'sync', 'fotos/', B + '/fotos/', ...nc, '--exclude', 'revisar.html'),
     aws('s3', 'sync', 'fotos-partido/', B + '/fotos-partido/', ...nc, '--exclude', '*', '--include', '*.jpg', '--include', 'elegidas.json', '--exclude', '_*'),
     aws('s3', 'cp', 'vigilante.json', B + '/vigilante.json', ...nc),
+    // Los captions escritos por captions.js (si no hay, sync no hace nada)
+    !fs.existsSync(path.join(RAIZ, 'captions.json')) || aws('s3', 'cp', 'captions.json', B + '/captions.json', ...nc),
+    !fs.existsSync(path.join(RAIZ, 'captions')) || aws('s3', 'sync', 'captions/', B + '/captions/', ...nc),
   ].every(Boolean);
   log(ok ? 'publicado en el sitio' : 'OJO: falló la publicación');
 }
@@ -216,6 +222,7 @@ async function pasada(estado) {
   }
 
   // CIERRE DE PUNTAJES: pósters, MVPs y Super Suplentes de la fecha
+  const captionsPendientes = [];
   for (const md of [...new Set(fx.map(j => j.matchday))]) {
     const js = fx.filter(j => j.matchday === md);
     if (!js.every(terminado) || ahora - new Date(js[js.length - 1].kickoff_ts) > DIAS_FECHA * DIA) continue;
@@ -224,6 +231,9 @@ async function pasada(estado) {
     postersHechos[md] = true;
     const pts = await puntosDeLaFecha(md, js.map(j => j.game_id));
     [...posters, ...pts.slice(0, 5), ...pts.filter(p => p.is_starter === false).slice(0, 5)].forEach(p => pedirCara(p, md, 'cierre de la fecha ' + md));
+    // Captions del 11 Ideal escritos como editor: una vez por fecha, dos intentos como mucho.
+    const c = estado.captions[md] || {};
+    if (process.env.ANTHROPIC_API_KEY && !c.ok && (c.n || 0) < 2) captionsPendientes.push(md);
   }
 
   const listaCaras = [...caras.values()].slice(0, MAX_CARAS);
@@ -244,12 +254,13 @@ async function pasada(estado) {
   fotos.forEach(f => log('momento: ' + f.motivo));
   const motivos = [...new Set(listaCaras.map(c => c.motivo))];
   motivos.forEach(m => log('momento: caras de ' + m + ' → ' + listaCaras.filter(c => c.motivo === m).map(c => c.nombre).join(', ')));
+  captionsPendientes.forEach(md => log('momento: captions del 11 Ideal de la fecha ' + md));
 
-  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
+  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0 || captionsPendientes.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
   if (MIRAR) return { hayTrabajo, esperando, vigilar };
 
   // ── A trabajar ──
-  const guardar = () => fs.writeFileSync(ESTADO, JSON.stringify({ partidos: estado.partidos, caras: estado.caras }, null, 1));
+  const guardar = () => fs.writeFileSync(ESTADO, JSON.stringify({ partidos: estado.partidos, caras: estado.caras, captions: estado.captions }, null, 1));
   for (const f of fotos) {
     const p = P(f.j.game_id);
     if (!f.nada) correr('foto-fuentes.js', [f.j.matchday, '--comp', COMPETITION, '--game', f.j.game_id, ...(f.forzar ? ['--forzar'] : [])]);
@@ -270,6 +281,14 @@ async function pasada(estado) {
     log('caras: ' + ok + '/' + listaCaras.length + ' bajadas');
     publicar();
   }
+  // Captions del 11 Ideal: el editor (Claude) lee los medios y escribe; tarda unos minutos.
+  for (const md of captionsPendientes) {
+    const ok = correr('captions.js', [md]);
+    estado.captions[md] = { n: ((estado.captions[md] || {}).n || 0) + 1, t: Date.now(), ok };
+    guardar();
+    log('captions de la fecha ' + md + ': ' + (ok ? 'escritos' : 'fallaron (se reintenta en la próxima corrida)'));
+    if (ok) publicar();
+  }
 
   // Limpieza: lo de hace más de un mes ya no sirve.
   const viejo = Date.now() - 30 * DIA;
@@ -282,7 +301,7 @@ async function pasada(estado) {
 (async () => {
   const inicio = Date.now();
   const estado = leer(ESTADO, {});
-  estado.partidos = estado.partidos || {}; estado.caras = estado.caras || {};
+  estado.partidos = estado.partidos || {}; estado.caras = estado.caras || {}; estado.captions = estado.captions || {};
   // El estado viejo contaba intentos ({n,t}); ya no se usa.
   Object.keys(estado.partidos).forEach(k => { if ('n' in estado.partidos[k]) delete estado.partidos[k]; });
 

@@ -7,6 +7,7 @@
     "fotos": "node bajar-fotos.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
     "@imgly/background-removal-node": "^1.4.5",
     "puppeteer-core": "^24.0.0",
     "sharp": "^0.32.6"

@@ -1,0 +1,56 @@
+# Escribe a mano los captions del 11 Ideal de una fecha (botón "Run workflow").
+# Normalmente no hace falta: tools/vigilante.js los escribe solo al cierre de
+# puntajes de cada fecha (ver fotos.yml). Esto sirve para rehacer una fecha,
+# cargar una vieja, o probar sin esperar a que cierre la próxima.
+name: Captions del 11 Ideal
+
+on:
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: 'Número de fecha del Clausura 2026'
+        required: true
+        type: number
+
+concurrency:
+  group: fotos          # no pisarse con la guardia de fotos, que también publica captions.json
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+jobs:
+  captions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Traer los captions ya publicados (para no pisar otras fechas)
+        run: |
+          mkdir -p captions
+          aws s3 cp $BUCKET/captions.json captions.json --only-show-errors || echo "(todavía no hay captions.json)"
+          aws s3 sync $BUCKET/captions/ captions/ --only-show-errors
+
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+
+      - name: Escribir los captions de la fecha
+        run: node tools/captions.js ${{ inputs.fecha }}
+
+      - name: Publicar
+        run: |
+          aws s3 cp captions.json $BUCKET/captions.json --cache-control "no-cache" --only-show-errors
+          aws s3 sync captions/ $BUCKET/captions/ --cache-control "no-cache" --only-show-errors
+          echo "Listo: https://winning.com.ar/iloveneuquen/index.html (fecha ${{ inputs.fecha }})"

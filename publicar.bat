@@ -26,7 +26,7 @@ echo   3/4  Pagina y assets
 node "tools\lista-fotos.js"
 %AWS% s3 sync . %BUCKET%/ --profile iloveneuquen --cache-control "no-cache" ^
   --exclude "*" ^
-  --include "index.html" --include "historial.json" --include "especiales.json" --include "background.png" --include "logo-white.png" ^
+  --include "index.html" --include "historial.json" --include "especiales.json" --include "captions.json" --include "captions/*" --include "background.png" --include "logo-white.png" ^
   --include "badges/*" --include "escudos/*" --include "jerseys/*" --include "fonts/*" --include "icons/*" --include "fotos/*" ^
   --include "fotos-partido/*.jpg" --include "fotos-partido/elegidas.json" ^
   --exclude "fotos-partido/_*" --exclude "fotos/_*" --exclude "fotos/README.md" --exclude "fotos/revisar.html" --exclude "*/.gitignore"

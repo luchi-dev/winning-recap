@@ -4493,10 +4493,42 @@ async function loadGanadores(matchday) {
 //     Avellaneda"). Eso es criterio editorial, no un dato de la base.
 //   - Lo que costaba el equipo en palos: fantasy.player_prices no es legible
 //     con la anon key (401). Hace falta exponer una vista para automatizarlo.
+//
+// CAPTIONS ESCRITOS (captions.json). Desde la fecha 10 del Clausura 2026 el
+// caption del 11 Ideal se escribe como editor (historias de la fecha leídas
+// en los medios, figura con su racha, cierre con el análisis de puntajes) y
+// se carga en captions.json con la clave "<torneo>-<temporada>-<fecha>",
+// varias versiones por fecha. Si la fecha está ahí, la caja de Instagram
+// muestra esas versiones (una caja por caption, editables y con Copiar) en
+// vez del template de arriba. Si no está, sigue el template.
 // ══════════════════════════════════════════════════════════════════════
 
 const CAP_STORE = 'winning.recap.captions.v2';
 const CAP_MAX_TWEET = 280;
+
+let capEscritosCache = null;
+async function capCargarEscritos() {
+  if (capEscritosCache) return capEscritosCache;
+  capEscritosCache = {};
+  try {
+    // En winning.com.ar un archivo que no existe devuelve la home con 200: por eso el try.
+    const r = await fetch('captions.json?v=' + Date.now());
+    capEscritosCache = JSON.parse(await r.text()) || {};
+  } catch (e) { console.warn('captions.json no disponible', e); }
+  return capEscritosCache;
+}
+/* Las versiones escritas del caption del 11 Ideal para esta fecha, o [] si no hay. */
+function capEscritos(kind, matchday) {
+  const fecha = (capEscritosCache || {})[currentComp + '-' + currentSeason + '-' + matchday];
+  const lista = fecha && fecha[kind];
+  if (!Array.isArray(lista) || !lista.length) return [];
+  const v = fecha.v || 1;
+  return lista.filter(c => c && c.texto).map((c, i) => ({
+    titulo: c.titulo || ('Caption ' + (i + 1)),
+    texto: c.texto,
+    red: 'ig' + (i + 1) + ':v' + v,   // con 'v' nueva se descarta lo editado a mano en el navegador
+  }));
+}
 
 let capConfig = {};
 try { capConfig = JSON.parse(localStorage.getItem(CAP_STORE) || '{}'); } catch (e) { capConfig = {}; }
@@ -4704,12 +4736,23 @@ function capCaja(kind, matchday, red, titulo, textoBase) {
   return caja;
 }
 
-/** Las dos cajas que van al lado del póster. */
+/** Las cajas que van al lado del póster. Si la fecha tiene captions escritos
+    (captions.json), una caja por versión en vez de la de Instagram del template. */
 function capPanel(kind, matchday, team, lineup) {
   const t = capGenerar(kind, matchday, team, lineup);
   const panel = document.createElement('div');
   panel.className = 'cap-panel';
-  panel.appendChild(capCaja(kind, matchday, 'ig', 'Instagram', t.ig));
+  const escritos = capEscritos(kind, matchday);
+  if (escritos.length) {
+    escritos.forEach(c => panel.appendChild(capCaja(kind, matchday, c.red, 'Instagram · ' + gnEscape(c.titulo), c.texto)));
+    const informe = document.createElement('div');
+    informe.className = 'cap-cuenta';
+    informe.style.textAlign = 'left';
+    informe.innerHTML = `Escritos solos al cierre de la fecha. <a href="captions/fecha-${matchday}.md" target="_blank" style="color:#92B1DC">Informe: historias, fuentes y análisis</a>`;
+    panel.appendChild(informe);
+  } else {
+    panel.appendChild(capCaja(kind, matchday, 'ig', 'Instagram', t.ig));
+  }
   panel.appendChild(capCaja(kind, matchday, 'tweet', 'X / Twitter', t.tweet));
   return panel;
 }
@@ -5506,6 +5549,7 @@ async function renderPitchPosters(matchday, data) {
   const ctx = await peFetchContext(matchday, ids);
   await capCargarEquipos();
   await capCargarSuplentes(matchday, ids);
+  await capCargarEscritos();
   if (token !== ptRenderToken) return;
 
   specs.forEach(spec => {

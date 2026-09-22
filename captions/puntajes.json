@@ -1,0 +1,294 @@
+{
+ "fechas": {
+  "1": {
+   "equipos": 3899,
+   "promedio": 77.9,
+   "mediana": 77.5,
+   "p90": 102.1,
+   "p99": 122.7,
+   "maximo": 146.8,
+   "segundo": 145.9,
+   "diferencia_1_2": 0.9,
+   "mas_de_100": 466,
+   "mas_de_120": 54,
+   "top3": [
+    {
+     "usuario": "matypallares",
+     "equipo": "Talleres RE",
+     "puntos": 146.8
+    },
+    {
+     "usuario": "sebas84",
+     "equipo": "El Rey Diablo 18",
+     "puntos": 145.9
+    },
+    {
+     "usuario": "alejitogranate",
+     "equipo": "Cholartown",
+     "puntos": 144.8
+    }
+   ]
+  },
+  "2": {
+   "equipos": 6271,
+   "promedio": 86.8,
+   "mediana": 86.5,
+   "p90": 111.6,
+   "p99": 132.8,
+   "maximo": 159.1,
+   "segundo": 152.1,
+   "diferencia_1_2": 7,
+   "mas_de_100": 1536,
+   "mas_de_120": 288,
+   "top3": [
+    {
+     "usuario": "paloma6",
+     "equipo": "Equipo de paloma6",
+     "puntos": 159.1
+    },
+    {
+     "usuario": "maziexe",
+     "equipo": "FC burrito",
+     "puntos": 152.1
+    },
+    {
+     "usuario": "gunchy",
+     "equipo": "Gunchyneta",
+     "puntos": 150.9
+    }
+   ]
+  },
+  "3": {
+   "equipos": 7368,
+   "promedio": 83.7,
+   "mediana": 83.3,
+   "p90": 107.7,
+   "p99": 130.3,
+   "maximo": 172.2,
+   "segundo": 163.5,
+   "diferencia_1_2": 8.7,
+   "mas_de_100": 1394,
+   "mas_de_120": 222,
+   "top3": [
+    {
+     "usuario": "kbza2812",
+     "equipo": "Equipo de kbza2812",
+     "puntos": 172.2
+    },
+    {
+     "usuario": "afr.07",
+     "equipo": "Porcelana FC",
+     "puntos": 163.5
+    },
+    {
+     "usuario": "benja247",
+     "equipo": "Equipo de benja247",
+     "puntos": 159.6
+    }
+   ]
+  },
+  "4": {
+   "equipos": 10772,
+   "promedio": 100.3,
+   "mediana": 100,
+   "p90": 127.1,
+   "p99": 150.1,
+   "maximo": 176.5,
+   "segundo": 176.4,
+   "diferencia_1_2": 0.1,
+   "mas_de_100": 5388,
+   "mas_de_120": 1947,
+   "top3": [
+    {
+     "usuario": "alvarocabj",
+     "equipo": "Equipo de alvarocabj",
+     "puntos": 176.5
+    },
+    {
+     "usuario": "alejitogranate",
+     "equipo": "Cholartown",
+     "puntos": 176.4
+    },
+    {
+     "usuario": "tomasgmz",
+     "equipo": "Between Rivers",
+     "puntos": 173
+    }
+   ]
+  },
+  "5": {
+   "equipos": 16749,
+   "promedio": 75.6,
+   "mediana": 75,
+   "p90": 101.4,
+   "p99": 123.6,
+   "maximo": 164.8,
+   "segundo": 156.3,
+   "diferencia_1_2": 8.4,
+   "mas_de_100": 1907,
+   "mas_de_120": 258,
+   "top3": [
+    {
+     "usuario": "facucai",
+     "equipo": "INDEPENDIENTE FC",
+     "puntos": 164.8
+    },
+    {
+     "usuario": "lejan1889",
+     "equipo": "LOS GUERREROS",
+     "puntos": 156.3
+    },
+    {
+     "usuario": "equipocoti",
+     "equipo": "Equipo coti",
+     "puntos": 145.9
+    }
+   ]
+  },
+  "6": {
+   "equipos": 22725,
+   "promedio": 83.9,
+   "mediana": 84.2,
+   "p90": 109.5,
+   "p99": 130.2,
+   "maximo": 162.3,
+   "segundo": 153.6,
+   "diferencia_1_2": 8.7,
+   "mas_de_100": 4806,
+   "mas_de_120": 811,
+   "top3": [
+    {
+     "usuario": "tommy153",
+     "equipo": "Equipo de tommy153",
+     "puntos": 162.3
+    },
+    {
+     "usuario": "demmeb",
+     "equipo": "demmeb FC",
+     "puntos": 153.6
+    },
+    {
+     "usuario": "brunom27",
+     "equipo": "Equipo de brunom27",
+     "puntos": 153.1
+    }
+   ]
+  },
+  "7": {
+   "equipos": 29951,
+   "promedio": 87.2,
+   "mediana": 86.9,
+   "p90": 115,
+   "p99": 138.2,
+   "maximo": 175.8,
+   "segundo": 169.1,
+   "diferencia_1_2": 6.7,
+   "mas_de_100": 8220,
+   "mas_de_120": 1925,
+   "top3": [
+    {
+     "usuario": "polze_",
+     "equipo": "Equipo de Polze",
+     "puntos": 175.8
+    },
+    {
+     "usuario": "riversanti",
+     "equipo": "La Mazorca.",
+     "puntos": 169.1
+    },
+    {
+     "usuario": "lachuchuneta",
+     "equipo": "chuchuneta",
+     "puntos": 168.7
+    }
+   ]
+  },
+  "8": {
+   "equipos": 35372,
+   "promedio": 82.4,
+   "mediana": 81.8,
+   "p90": 111.5,
+   "p99": 133.1,
+   "maximo": 162.8,
+   "segundo": 161.3,
+   "diferencia_1_2": 1.5,
+   "mas_de_100": 7568,
+   "mas_de_120": 1650,
+   "top3": [
+    {
+     "usuario": "cam1998",
+     "equipo": "Facu Te Amo",
+     "puntos": 162.8
+    },
+    {
+     "usuario": "montiel",
+     "equipo": "Viuda De Piscu",
+     "puntos": 161.3
+    },
+    {
+     "usuario": "cordobes97",
+     "equipo": "Equipo de cordobes97",
+     "puntos": 161.3
+    }
+   ]
+  },
+  "9": {
+   "equipos": 39895,
+   "promedio": 94.6,
+   "mediana": 93.9,
+   "p90": 128.7,
+   "p99": 154.7,
+   "maximo": 187.2,
+   "segundo": 186.5,
+   "diferencia_1_2": 0.7,
+   "mas_de_100": 16202,
+   "mas_de_120": 6638,
+   "top3": [
+    {
+     "usuario": "cherno",
+     "equipo": "cherno",
+     "puntos": 187.2
+    },
+    {
+     "usuario": "nicoferreira99",
+     "equipo": "Equipo de nicoferreira99",
+     "puntos": 186.5
+    },
+    {
+     "usuario": "tomiamondarain",
+     "equipo": "tomiamondarain",
+     "puntos": 185.7
+    }
+   ]
+  },
+  "10": {
+   "equipos": 42970,
+   "promedio": 91.4,
+   "mediana": 91.6,
+   "p90": 117.7,
+   "p99": 138.2,
+   "maximo": 176.2,
+   "segundo": 169.8,
+   "diferencia_1_2": 6.4,
+   "mas_de_100": 14714,
+   "mas_de_120": 3527,
+   "top3": [
+    {
+     "usuario": "bautiscarella_",
+     "equipo": "bomba",
+     "puntos": 176.2
+    },
+    {
+     "usuario": "talan33",
+     "equipo": "talan33",
+     "puntos": 169.8
+    },
+    {
+     "usuario": "lauta_snr",
+     "equipo": "BOSTERMO FC",
+     "puntos": 163.9
+    }
+   ]
+  }
+ }
+}

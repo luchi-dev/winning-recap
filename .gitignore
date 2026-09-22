@@ -7,6 +7,8 @@
 !/index.html
 !/historial.json
 !/especiales.json
+!/captions.json
+!/captions/
 !/publicar.bat
 !/Abrir Recap.bat
 !/tools/
@@ -15,3 +17,4 @@
 !/tools/package.json
 !/tools/package-lock.json
 !/tools/iloveneuquen-stub.html
+!/tools/captions-brief.md
