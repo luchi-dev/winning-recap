@@ -1368,6 +1368,12 @@ body {
   display: flex; flex-direction: column; gap: 14px;
   flex: 1 1 380px; min-width: 340px; max-width: 560px;
 }
+/* Captions escritos (captions.json): las versiones una al lado de la otra, en dos columnas. */
+.cap-panel.is-escritos {
+  display: grid; grid-template-columns: repeat(2, minmax(300px, 1fr)); align-items: start;
+  flex: 1 1 720px; max-width: none;
+}
+.cap-panel.is-escritos .cap-informe { grid-column: 1 / -1; }
 .cap-caja {
   background: #16161f; border: 1px solid #2b2b3a; border-radius: 8px; padding: 10px 12px;
 }
@@ -4744,16 +4750,17 @@ function capPanel(kind, matchday, team, lineup) {
   panel.className = 'cap-panel';
   const escritos = capEscritos(kind, matchday);
   if (escritos.length) {
+    panel.classList.add('is-escritos');
     escritos.forEach(c => panel.appendChild(capCaja(kind, matchday, c.red, 'Instagram · ' + gnEscape(c.titulo), c.texto)));
     const informe = document.createElement('div');
-    informe.className = 'cap-cuenta';
+    informe.className = 'cap-cuenta cap-informe';
     informe.style.textAlign = 'left';
     informe.innerHTML = `Escritos solos al cierre de la fecha. <a href="captions/fecha-${matchday}.md" target="_blank" style="color:#92B1DC">Informe: historias, fuentes y análisis</a>`;
     panel.appendChild(informe);
   } else {
     panel.appendChild(capCaja(kind, matchday, 'ig', 'Instagram', t.ig));
   }
-  panel.appendChild(capCaja(kind, matchday, 'tweet', 'X / Twitter', t.tweet));
+  // La caja de X / Twitter se sacó (22-sep-2026): sólo se usa el caption de Instagram.
   return panel;
 }
 
