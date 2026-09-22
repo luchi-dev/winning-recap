@@ -2,6 +2,12 @@
   "_": "Captions escritos (no los del template) por fecha. Clave: <torneo>-<temporada>-<fecha>. Cada entrada de 'ideal' es una versión del caption del 11 Ideal para Instagram: 'titulo' es el ángulo (solo para la caja), 'texto' es lo que se copia. Subir 'v' cada vez que se cambia el texto: descarta lo que se haya editado a mano en el navegador. Si una fecha no está acá, la página arma el caption con el template de siempre. Los escribe tools/captions.js al cierre de cada fecha.",
   "724-2026-10": {
     "v": 2,
+    "ganadores": [
+      {
+        "titulo": "Ganadores de la fecha",
+        "texto": "Los dos ganadores de la fecha se anotaron en Winning la semana anterior y ganaron en su primera fecha: uno el fantasy, el otro el prode.\n\nLucas Zelarayán y Gonzalo Montiel son los únicos jugadores con 12 puntos o más en cada una de las últimas tres fechas."
+      }
+    ],
     "ideal": [
       {
         "titulo": "Caption 1 · Tabla Anual + invicto de Boca + Vélez escolta · cierre: nadie tenía al 11",

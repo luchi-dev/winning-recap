@@ -4424,9 +4424,19 @@ function gnRerender() {
   section.innerHTML = '<h3>GANADORES DE LA FECHA</h3>';
 
   const row = document.createElement('div');
-  row.className = 'cards-row';
+  row.className = 'cards-row cap-fila';
   const card = buildGanadoresCard(gnMatchday, gnData, gnConfig);
   row.appendChild(createCardWrapper(card, 'ganadores_fecha' + gnMatchday));
+
+  // Texto corto para acompañar la placa (captions.json, clave 'ganadores'):
+  // dos líneas escritas al cierre de la fecha por tools/captions.js.
+  const escritos = capEscritos('ganadores', gnMatchday);
+  if (escritos.length) {
+    const panel = document.createElement('div');
+    panel.className = 'cap-panel';
+    escritos.forEach(c => panel.appendChild(capCaja('ganadores', gnMatchday, c.red, gnEscape(c.titulo), c.texto)));
+    row.appendChild(panel);
+  }
 
   section.appendChild(row);
   container.appendChild(section);
@@ -4449,6 +4459,7 @@ async function loadGanadores(matchday) {
 
   try {
     gnData = await gnFetchWinners(matchday);
+    await capCargarEscritos();   // el texto que acompaña la placa, si la fecha lo tiene
   } catch (err) {
     console.error('Ganadores load failed:', err);
     container.innerHTML =

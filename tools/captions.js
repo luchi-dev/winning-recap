@@ -2,8 +2,17 @@
 /**
  * captions.js — escribe los captions del 11 Ideal de una fecha como editor.
  *
- *   node captions.js <fecha>              escribe captions.json y captions/fecha-N.md
- *   node captions.js <fecha> --solo-datos sólo arma y muestra los datos (sin llamar a Claude)
+ *   node captions.js <fecha>                  escribe captions.json y captions/fecha-N.md
+ *   node captions.js <fecha> --solo-datos     sólo arma y muestra los datos (sin llamar a Claude)
+ *   node captions.js <fecha> --solo-ganadores rehace sólo el texto de la placa de Ganadores
+ *
+ * Escribe dos cosas por fecha:
+ *   - 'ideal': los 4 captions del 11 Ideal (brief en captions-brief.md, con
+ *     búsqueda web: lee los medios).
+ *   - 'ganadores': el texto de dos líneas que acompaña la placa de Ganadores
+ *     de la fecha (brief en captions-ganadores-brief.md, sin búsqueda web:
+ *     sale todo de la base: provincia y club de los 6 ganadores, censo de
+ *     hinchadas y jugadores en racha).
  *
  * Lo que hace, en el orden en que lo haría un editor el lunes a la mañana:
  *   1. Junta de la base (clave pública) el 11 Ideal, los resultados, la figura
@@ -37,6 +46,7 @@ const ARCHIVO = path.join(RAIZ, 'captions.json');
 const DIR = path.join(RAIZ, 'captions');
 const CACHE = path.join(DIR, 'puntajes.json');
 const BRIEF = path.join(__dirname, 'captions-brief.md');
+const BRIEF_GANADORES = path.join(__dirname, 'captions-ganadores-brief.md');
 
 const MODEL = process.env.CAPTIONS_MODEL || 'claude-opus-5';
 const MAX_BUSQUEDAS = 12, MAX_NOTAS = 15;
@@ -384,19 +394,155 @@ async function escribirConClaude(datos) {
   return final;
 }
 
+// ── Ganadores de la fecha: los 6 ganadores y los jugadores en racha ───
+const PROVINCIAS = { BA: 'Buenos Aires', CABA: 'Ciudad de Buenos Aires', COR: 'Córdoba', SF: 'Santa Fe', MEN: 'Mendoza', TUC: 'Tucumán', ER: 'Entre Ríos', SAL: 'Salta', MIS: 'Misiones', CHA: 'Chaco', COR2: 'Corrientes', SDE: 'Santiago del Estero', SJ: 'San Juan', JUJ: 'Jujuy', RN: 'Río Negro', NQN: 'Neuquén', FOR: 'Formosa', CHU: 'Chubut', SL: 'San Luis', CAT: 'Catamarca', LR: 'La Rioja', LP: 'La Pampa', SC: 'Santa Cruz', TF: 'Tierra del Fuego' };
+
+async function datosGanadores(md) {
+  const [fantasy, prode, censo] = await Promise.all([
+    rpc('get_global_leaderboard_round', { p_season_part_id: SEASON_PART, p_matchday: md, p_limit: 3, p_offset: 0 }, 'tournaments'),
+    rpc('get_prediction_leaderboard_round', { p_season_part_id: SEASON_PART, p_matchday: md, p_limit: 3, p_offset: 0 }, 'predictions'),
+    rpc('get_censo_hinchadas', {}),
+  ]);
+  const totalHinchas = (censo || []).reduce((a, c) => a + (Number(c.fan_count) || 0), 0);
+  const pctClub = id => { const c = (censo || []).find(x => x.team_id === id); return c ? Number(c.fan_pct) : null; };
+
+  const perfil = async (fila, juego) => {
+    const p = await rpc('get_user_full_profile', { p_user_id: fila.user_id, p_season_part_id: SEASON_PART }).catch(() => ({}));
+    const fs_ = p.fantasy_stats || {}, ps = p.prode_stats || {};
+    const alta = (p.created_at || '').slice(0, 10);
+    const diasAntes = alta ? Math.round((Date.now() - new Date(alta)) / (24 * HORA)) : null;
+    return {
+      juego, puesto: fila.rank, puntos_de_la_fecha: r1(fila.matchday_points),
+      provincia: PROVINCIAS[p.province_code] || p.province_code || null,
+      hincha_de: p.supported_team_name || null,
+      pct_de_usuarios_hinchas_de_ese_club: pctClub(p.supported_team_id),
+      se_anoto_el: alta || null,
+      dias_desde_que_se_anoto: diasAntes,
+      fantasy: { puntos_totales_torneo: r1(fs_.total_points), puesto_general: fs_.global_rank || null,
+        primera_fecha_con_puntos: Number(fs_.total_points) && Math.abs(Number(fs_.total_points) - Number(fila.matchday_points)) < 0.05 && juego === 'fantasy' ? md : undefined },
+      prode: { puntos_totales_torneo: ps.total_points ?? null, fechas_jugadas: p.prode_matchdays || [] },
+    };
+  };
+  const ganadores = [];
+  for (const f of (fantasy || [])) ganadores.push(await perfil(f, 'fantasy'));
+  for (const f of (prode || [])) ganadores.push(await perfil(f, 'prode'));
+  ganadores.forEach(g => { if (g.fantasy.primera_fecha_con_puntos === undefined) delete g.fantasy.primera_fecha_con_puntos; });
+  const nombres = [...(fantasy || []), ...(prode || [])].map(f => f.display_name).filter(Boolean);
+
+  // Jugadores en racha: las últimas tres fechas (o menos si el torneo recién empieza)
+  const fechas = [md - 2, md - 1, md].filter(f => f >= 1);
+  const por = {};
+  for (const f of fechas) {
+    const filas = await api(`v_fantasy_player_match_points?competition_id=eq.${COMPETITION}&season_id=eq.${SEASON}&matchday=eq.${f}&select=player_id,player_name,total_points,team_id&limit=3000`);
+    filas.forEach(r => { const p = por[r.player_id] = por[r.player_id] || { nombre: r.player_name, team_id: r.team_id, puntos: {} }; p.puntos[f] = r1(r.total_points); });
+  }
+  const idealDe = {};
+  for (const f of fechas) idealDe[f] = (((await recap(f)).winning_team || {}).players || []).map(p => p.player_id);
+  const teamIds = [...new Set(Object.values(por).map(p => p.team_id))].filter(Boolean);
+  const equipos = teamIds.length ? await api(`teams?id=in.(${teamIds.join(',')})&select=id,name`) : [];
+  const club = id => (equipos.find(t => t.id === id) || {}).name || '';
+  const lista = Object.entries(por).map(([id, p]) => ({
+    nombre: p.nombre, club: club(p.team_id),
+    puntos_por_fecha: p.puntos,
+    suma: r1(Object.values(p.puntos).reduce((a, b) => a + b, 0)),
+    jugo_las_tres: Object.keys(p.puntos).length === fechas.length,
+    minimo: Math.min(...Object.values(p.puntos)),
+    en_11_ideal: fechas.filter(f => idealDe[f].includes(Number(id))),
+  }));
+  const top = lista.filter(p => p.jugo_las_tres).sort((a, b) => b.suma - a.suma).slice(0, 8);
+  const parejos = lista.filter(p => p.jugo_las_tres && p.minimo >= 12).sort((a, b) => b.suma - a.suma);
+  const repetidos = lista.filter(p => p.en_11_ideal.length >= 2).sort((a, b) => b.en_11_ideal.length - a.en_11_ideal.length);
+
+  return {
+    torneo: TORNEO, fecha: md, hoy: new Date(Date.now() - 3 * HORA).toISOString().slice(0, 10),
+    ganadores,
+    nombres_de_usuario_de_los_ganadores_NO_NOMBRAR: nombres,
+    censo_hinchadas: { total_usuarios_con_club: totalHinchas, clubes_mas_grandes: (censo || []).slice(0, 8).map(c => ({ club: c.team_name, pct: Number(c.fan_pct) })) },
+    rachas: {
+      fechas_miradas: fechas,
+      mas_puntos_sumados: top,
+      doce_o_mas_en_todas: parejos,
+      repitieron_en_el_11_ideal: repetidos,
+    },
+    datos_no_disponibles: [
+      'tenencia: cuántos usuarios tenían a cada jugador (no se puede leer)',
+      'distribución de provincias de todos los usuarios (sólo se sabe la de los ganadores)',
+    ],
+  };
+}
+
+const ESQUEMA_GANADORES = {
+  type: 'object', additionalProperties: false,
+  required: ['linea1', 'linea2', 'nota'],
+  properties: {
+    linea1: { type: 'string', description: 'la conclusión sobre los seis ganadores, o que no hubo nada llamativo' },
+    linea2: { type: 'string', description: 'un dato útil para la próxima fecha, como dato y no como recomendación' },
+    nota: { type: 'string', description: 'qué datos usaste y cuáles faltaban' },
+  },
+};
+
+function problemasGanadores(res, datos) {
+  const p = [];
+  const l1 = (res.linea1 || '').trim(), l2 = (res.linea2 || '').trim();
+  if (!l1 || !l2) p.push('faltan las dos líneas');
+  if (/\?\s*$/.test(l2) || /\?\s*$/.test(l1)) p.push('sin pregunta final');
+  if (/#\w/.test(l1 + l2)) p.push('sin hashtags');
+  if (/\b(pon[eé]|sum[aá]|conviene|recomend|met[eé]lo|comprá|comprar)\b/i.test(l2)) p.push('la línea 2 es un dato, no una recomendación');
+  (datos.nombres_de_usuario_de_los_ganadores_NO_NOMBRAR || []).forEach(n => {
+    const limpio = n.replace(/^@/, '').replace(/_+$/, '');
+    if (limpio.length >= 4 && (l1 + ' ' + l2).toLowerCase().includes(limpio.toLowerCase())) p.push('no nombrar a los ganadores (' + n + ')');
+  });
+  return p;
+}
+
+async function escribirGanadoresConClaude(datos) {
+  const Anthropic = require('@anthropic-ai/sdk').default || require('@anthropic-ai/sdk');
+  if (!process.env.ANTHROPIC_API_KEY) throw new Error('falta ANTHROPIC_API_KEY en el ambiente');
+  const client = new Anthropic({ maxRetries: 3, timeout: 10 * 60e3 });
+  const brief = fs.readFileSync(BRIEF_GANADORES, 'utf8');
+  const messages = [{ role: 'user', content: `Fecha ${datos.fecha} del ${TORNEO}. Hoy es ${datos.hoy}. Datos de la base:\n\n\`\`\`json\n${JSON.stringify(datos, null, 1)}\n\`\`\`\n\nEscribí las dos líneas y devolvé el JSON pedido.` }];
+  const params = { model: MODEL, max_tokens: 8000, thinking: { type: 'adaptive' }, system: brief, output_config: { format: { type: 'json_schema', schema: ESQUEMA_GANADORES } } };
+  for (let intento = 1; intento <= 2; intento++) {
+    log(`Claude (${MODEL}), texto de ganadores, intento ${intento}...`);
+    const msg = await client.messages.stream({ ...params, messages }).finalMessage();
+    if (msg.stop_reason === 'refusal') throw new Error('Claude no quiso escribir el texto de ganadores (refusal)');
+    const res = extraerJSON(textoDe(msg));
+    const fallas = res ? problemasGanadores(res, datos) : ['la respuesta no es JSON'];
+    if (!fallas.length) return res;
+    log('el texto de ganadores tiene problemas: ' + fallas.join('; '));
+    if (intento === 2) throw new Error('el texto de ganadores siguió con problemas: ' + fallas.join('; '));
+    messages.push({ role: 'assistant', content: msg.content });
+    messages.push({ role: 'user', content: 'Corregí estos problemas y devolvé el JSON completo de nuevo:\n- ' + fallas.join('\n- ') });
+  }
+}
+
 // ── Guardar ───────────────────────────────────────────────────────────
-function guardar(md, datos, res) {
+function guardar(md, datos, res, resGanadores) {
   const clave = `${COMPETITION}-${SEASON}-${md}`;
   const todo = leer(ARCHIVO, {});
   if (!todo._) todo._ = "Captions escritos (no los del template) por fecha. Clave: <torneo>-<temporada>-<fecha>. Cada entrada de 'ideal' es una versión del caption del 11 Ideal para Instagram: 'titulo' es el ángulo (solo para la caja), 'texto' es lo que se copia. Subir 'v' cada vez que se cambia el texto: descarta lo que se haya editado a mano en el navegador. Si una fecha no está acá, la página arma el caption con el template de siempre. Los escribe tools/captions.js al cierre de cada fecha.";
   const antes = todo[clave] || {};
-  todo[clave] = {
-    v: (antes.v || 0) + 1,
-    escrito: new Date().toISOString(),
-    modelo: MODEL,
-    ideal: res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim() })),
-  };
+  const entrada = { ...antes, v: (antes.v || 0) + 1, escrito: new Date().toISOString(), modelo: MODEL };
+  if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim() }));
+  if (resGanadores) entrada.ganadores = [{ titulo: 'Ganadores de la fecha', texto: resGanadores.linea1.trim() + '\n\n' + resGanadores.linea2.trim() }];
+  todo[clave] = entrada;
   fs.writeFileSync(ARCHIVO, JSON.stringify(todo, null, 2) + '\n');
+
+  const informe = path.join(DIR, `fecha-${md}.md`);
+  fs.mkdirSync(DIR, { recursive: true });
+  const seccionGanadores = resGanadores ? [
+    '## 5. Texto de la placa de Ganadores', '',
+    '```', resGanadores.linea1.trim(), '', resGanadores.linea2.trim(), '```', '',
+    'Nota del editor: ' + resGanadores.nota, '',
+  ] : [];
+  if (!res) {
+    // Sólo se rehizo el texto de ganadores: se reemplaza esa sección del informe, si existe.
+    let viejo = ''; try { viejo = fs.readFileSync(informe, 'utf8'); } catch (e) { viejo = `# Captions 11 Ideal — Fecha ${md} | ${TORNEO}\n\n`; }
+    const sinSeccion = viejo.replace(/\n## 5\. Texto de la placa de Ganadores[\s\S]*$/, '\n');
+    fs.writeFileSync(informe, sinSeccion.replace(/\s*$/, '\n\n') + seccionGanadores.join('\n'));
+    log(`guardado: captions.json (${clave} v${entrada.v}, ganadores) y ${path.relative(RAIZ, informe)}`);
+    return;
+  }
 
   const f = datos.figura_de_la_fecha;
   const a = datos.analisis_de_puntajes;
@@ -437,26 +583,41 @@ function guardar(md, datos, res) {
     '', `Datos no disponibles: ${datos.datos_no_disponibles.join('; ')}.`, '',
     '## 4. Los 4 captions', '',
     ...res.captions.flatMap((c, i) => [`### Caption ${i + 1} — ${c.titulo}`, '', '```', c.texto.trim(), '```', '']),
+    ...seccionGanadores,
   ].filter(x => x !== null);
-  fs.mkdirSync(DIR, { recursive: true });
-  const informe = path.join(DIR, `fecha-${md}.md`);
   fs.writeFileSync(informe, lineas.join('\n'));
-  log(`guardado: captions.json (${clave} v${todo[clave].v}) y ${path.relative(RAIZ, informe)}`);
+  log(`guardado: captions.json (${clave} v${entrada.v}) y ${path.relative(RAIZ, informe)}`);
 }
 
 // ── Main ──────────────────────────────────────────────────────────────
 (async () => {
   const md = Number(process.argv[2]);
-  if (!md) { console.error('uso: node captions.js <fecha> [--solo-datos]'); process.exit(2); }
+  if (!md) { console.error('uso: node captions.js <fecha> [--solo-datos] [--solo-ganadores]'); process.exit(2); }
   const soloDatos = process.argv.includes('--solo-datos');
+  const soloGanadores = process.argv.includes('--solo-ganadores');
   try {
+    // Texto de la placa de Ganadores (barato: sin búsqueda web). Si falla no
+    // tira abajo los captions del 11 Ideal: queda en el log y se rehace con --solo-ganadores.
+    let resGanadores = null;
+    const ganadores = async () => {
+      log('fecha ' + md + ': datos de los ganadores y rachas...');
+      const dg = await datosGanadores(md);
+      if (soloDatos) { console.log(JSON.stringify(dg, null, 1)); return null; }
+      return escribirGanadoresConClaude(dg);
+    };
+    if (soloGanadores) {
+      resGanadores = await ganadores();
+      if (resGanadores) guardar(md, null, null, resGanadores);
+      return;
+    }
     log('fecha ' + md + ': juntando los datos de la base...');
     const datos = await datosDeLaFecha(md);
     log(`11 Ideal: ${datos.once_ideal.map(p => p.nombre).join(', ')}`);
     log(`figura: ${datos.figura_de_la_fecha.nombre} (${ar(datos.figura_de_la_fecha.esta_fecha.puntos)})`);
-    if (soloDatos) { console.log(JSON.stringify(datos, null, 1)); return; }
+    if (soloDatos) { console.log(JSON.stringify(datos, null, 1)); await ganadores(); return; }
     const res = await escribirConClaude(datos);
-    guardar(md, datos, res);
+    try { resGanadores = await ganadores(); } catch (e) { log('OJO: el texto de ganadores falló: ' + (e.message || e) + ' (rehacer con --solo-ganadores)'); }
+    guardar(md, datos, res, resGanadores);
   } catch (e) {
     console.error('[captions] ' + (e.message || e));
     process.exit(1);
