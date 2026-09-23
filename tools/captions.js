@@ -290,10 +290,11 @@ const ESQUEMA = {
     captions: {
       type: 'array', items: {
         type: 'object', additionalProperties: false,
-        required: ['titulo', 'texto'],
+        required: ['titulo', 'texto', 'texto_corto'],
         properties: {
           titulo: { type: 'string', description: 'qué historias combina y qué cierre usa, para la caja del editor' },
           texto: { type: 'string', description: 'el caption completo para Instagram, con saltos de línea entre párrafos' },
+          texto_corto: { type: 'string', description: 'el mismo caption, mismas historias, figura y cierre, con menos palabras (60% del largo o menos)' },
         },
       },
     },
@@ -325,6 +326,16 @@ function problemas(res, md) {
     const apertura = t.split(/La figura de la fecha:/)[0].split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).slice(1);
     if (apertura.length < 2) p.push(`el caption ${i + 1} tiene las historias de la apertura en un solo párrafo: va una historia por párrafo, con un renglón vacío entre ellas`);
     if (!/\?\s*$/.test(t)) p.push(`el caption ${i + 1} tiene que terminar con la pregunta a ustedes`);
+    // La versión corta: mismo caption con menos palabras (mismo título, misma figura, misma pregunta).
+    const c2 = (c.texto_corto || '').trim();
+    if (!c2) p.push(`al caption ${i + 1} le falta la versión corta (texto_corto)`);
+    else {
+      if (!c2.startsWith(titulo)) p.push(`la versión corta del caption ${i + 1} tiene que empezar con "${titulo}"`);
+      if (!/La figura de la fecha:/.test(c2)) p.push(`a la versión corta del caption ${i + 1} le falta "La figura de la fecha:"`);
+      if (!/\?\s*$/.test(c2)) p.push(`la versión corta del caption ${i + 1} tiene que terminar con la pregunta a ustedes`);
+      if (c2.length > t.length * 0.75) p.push(`la versión corta del caption ${i + 1} no es corta: tiene ${c2.length} caracteres contra ${t.length} de la completa; apuntá al 60%`);
+      if (/#\w|⭐/.test(c2)) p.push(`la versión corta del caption ${i + 1} tiene hashtags o estrella`);
+    }
   });
   return p;
 }
@@ -563,7 +574,7 @@ function guardar(md, datos, res, resGanadores) {
   if (!todo._) todo._ = "Captions escritos (no los del template) por fecha. Clave: <torneo>-<temporada>-<fecha>. Cada entrada de 'ideal' es una versión del caption del 11 Ideal para Instagram: 'titulo' es el ángulo (solo para la caja), 'texto' es lo que se copia. Subir 'v' cada vez que se cambia el texto: descarta lo que se haya editado a mano en el navegador. Si una fecha no está acá, la página arma el caption con el template de siempre. Los escribe tools/captions.js al cierre de cada fecha.";
   const antes = todo[clave] || {};
   const entrada = { ...antes, v: (antes.v || 0) + 1, escrito: new Date().toISOString(), modelo: MODEL };
-  if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim() }));
+  if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim(), texto_corto: (c.texto_corto || '').trim() || undefined }));
   // El encabezado lo pone el código, no el editor: anuncia de qué es el posteo, como el título del 11 Ideal.
   if (resGanadores) entrada.ganadores = resGanadores.versiones.map(v => ({
     titulo: TITULO_PUENTE[v.puente] || 'Ganadores de la fecha',
@@ -626,7 +637,8 @@ function guardar(md, datos, res, resGanadores) {
     ] : ['(no se pudieron leer los puntajes de los usuarios)']),
     '', `Datos no disponibles: ${datos.datos_no_disponibles.join('; ')}.`, '',
     '## 4. Los 4 captions', '',
-    ...res.captions.flatMap((c, i) => [`### Caption ${i + 1} — ${c.titulo}`, '', '```', c.texto.trim(), '```', '']),
+    ...res.captions.flatMap((c, i) => [`### Caption ${i + 1} — ${c.titulo}`, '', '```', c.texto.trim(), '```', '',
+      ...(c.texto_corto ? ['Versión corta:', '', '```', c.texto_corto.trim(), '```', ''] : [])]),
     ...seccionGanadores,
   ].filter(x => x !== null);
   fs.writeFileSync(informe, lineas.join('\n'));

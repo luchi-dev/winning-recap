@@ -50,3 +50,4 @@ Devolvé exactamente el JSON que pide el esquema de salida, con:
 2. Los datos de la figura, en prosa corta, con el ángulo elegido.
 3. El análisis de puntajes en prosa corta: qué extremo detectaste (o que no hubo ninguno, o qué datos no estaban).
 4. Exactamente 4 captions de Instagram con distintas combinaciones de historias y ángulos de cierre. Cada caption es un texto completo listo para copiar, con saltos de línea entre párrafos.
+5. Para cada caption, además, una VERSIÓN CORTA (texto_corto): el mismo caption con menos palabras. Mismo título, mismas historias en el mismo orden (una por párrafo), misma figura, mismo cierre con la misma pregunta. No se saca ninguna historia ni ningún dato central: se acortan las frases, se cae el detalle de color y las frases de conclusión secundarias. Apuntá al 60% del largo de la versión completa.

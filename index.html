@@ -1389,6 +1389,12 @@ body {
 }
 .cap-btn:hover { background: #2c2c2c; color: #fff; }
 .cap-btn.is-ok { background: #2f6b41; border-color: #2f6b41; color: #fff; }
+/* Botones Completa / Corta: el activo se ve como pestaña elegida */
+.cap-versiones { display: inline-flex; gap: 0; margin-right: 6px; }
+.cap-versiones .cap-btn { border-radius: 0; }
+.cap-versiones .cap-btn:first-child { border-radius: 4px 0 0 4px; }
+.cap-versiones .cap-btn:last-child { border-radius: 0 4px 4px 0; }
+.cap-btn.is-activa { background: #92B1DC; border-color: #92B1DC; color: #0d0d13; font-weight: 700; }
 .cap-txt {
   width: 100%; box-sizing: border-box; resize: vertical; overflow: hidden;
   min-height: 90px; border: 1px solid #333; border-radius: 6px;
@@ -4543,6 +4549,7 @@ function capEscritos(kind, matchday) {
   return lista.filter(c => c && c.texto).map((c, i) => ({
     titulo: c.titulo || ('Caption ' + (i + 1)),
     texto: c.texto,
+    texto_corto: c.texto_corto || null,   // misma idea con menos palabras (botón "Corta")
     red: 'ig' + (i + 1) + ':v' + v,   // con 'v' nueva se descarta lo editado a mano en el navegador
   }));
 }
@@ -4704,16 +4711,23 @@ function capGenerar(kind, matchday, team, lineup) {
     : capTextoGanador(matchday, team, lineup);
 }
 
-/** Caja editable con copiar y restaurar. */
-function capCaja(kind, matchday, red, titulo, textoBase) {
-  const clave = capClave(kind, matchday, red);
+/** Caja editable con copiar y restaurar. Con `versiones` ([{id, label, texto}])
+    aparecen botones para cambiar entre variantes del mismo caption (Completa /
+    Corta); cada variante guarda su edición aparte. */
+function capCaja(kind, matchday, red, titulo, textoBase, versiones) {
   const caja = document.createElement('div');
   caja.className = 'cap-caja';
+  const vs = (versiones && versiones.length > 1) ? versiones : null;
+  let actual = vs ? vs[0] : null;
+  const claveDe = () => capClave(kind, matchday, red + (actual ? ':' + actual.id : ''));
+  const baseDe = () => (actual ? actual.texto : textoBase);
+  let clave = claveDe();
 
   const esTweet = red === 'tweet';
   caja.innerHTML =
     `<div class="cap-head">${titulo}` +
       `<span class="cap-acciones">` +
+        (vs ? `<span class="cap-versiones">` + vs.map((v, i) => `<button class="cap-btn cap-ver${i === 0 ? ' is-activa' : ''}" data-ver="${v.id}">${v.label}</button>`).join('') + `</span>` : '') +
         `<button class="cap-btn cap-copiar">Copiar</button>` +
         `<button class="cap-btn cap-reset" title="Volver al texto original">Restaurar</button>` +
       `</span>` +
@@ -4722,7 +4736,7 @@ function capCaja(kind, matchday, red, titulo, textoBase) {
     (esTweet ? `<div class="cap-cuenta"></div>` : '');
 
   const ta = caja.querySelector('.cap-txt');
-  ta.value = capConfig[clave] != null ? capConfig[clave] : textoBase;
+  ta.value = capConfig[clave] != null ? capConfig[clave] : baseDe();
 
   const contar = () => {
     if (!esTweet) return;
@@ -4746,8 +4760,17 @@ function capCaja(kind, matchday, red, titulo, textoBase) {
   });
 
   caja.querySelector('.cap-reset').addEventListener('click', () => {
-    ta.value = textoBase; delete capConfig[clave]; capGuardar(); contar(); ajustarAlto();
+    ta.value = baseDe(); delete capConfig[clave]; capGuardar(); contar(); ajustarAlto();
   });
+
+  // Cambio de versión (Completa / Corta): cada una con su texto y su edición guardada.
+  caja.querySelectorAll('.cap-ver').forEach(btn => btn.addEventListener('click', () => {
+    actual = vs.find(v => v.id === btn.dataset.ver) || vs[0];
+    clave = claveDe();
+    caja.querySelectorAll('.cap-ver').forEach(b => b.classList.toggle('is-activa', b === btn));
+    ta.value = capConfig[clave] != null ? capConfig[clave] : baseDe();
+    contar(); ajustarAlto();
+  }));
 
   requestAnimationFrame(() => { contar(); ajustarAlto(); });
   return caja;
@@ -4762,7 +4785,8 @@ function capPanel(kind, matchday, team, lineup) {
   const escritos = capEscritos(kind, matchday);
   if (escritos.length) {
     panel.classList.add('is-escritos');
-    escritos.forEach(c => panel.appendChild(capCaja(kind, matchday, c.red, 'Instagram · ' + gnEscape(c.titulo), c.texto)));
+    escritos.forEach(c => panel.appendChild(capCaja(kind, matchday, c.red, 'Instagram · ' + gnEscape(c.titulo), c.texto,
+      c.texto_corto ? [{ id: 'completa', label: 'Completa', texto: c.texto }, { id: 'corta', label: 'Corta', texto: c.texto_corto }] : null)));
     const informe = document.createElement('div');
     informe.className = 'cap-cuenta cap-informe';
     informe.style.textAlign = 'left';
