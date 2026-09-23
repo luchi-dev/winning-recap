@@ -1,15 +1,17 @@
 {
   "_": "Captions escritos (no los del template) por fecha. Clave: <torneo>-<temporada>-<fecha>. Cada entrada de 'ideal' es una versión del caption del 11 Ideal para Instagram: 'titulo' es el ángulo (solo para la caja), 'texto' es lo que se copia y 'texto_corto' es el mismo caption con menos palabras (botón Corta). 'ganadores' son las dos opciones del texto de la placa de Ganadores. Subir 'v' cada vez que se cambia el texto: descarta lo que se haya editado a mano en el navegador. Si una fecha no está acá, la página arma el caption con el template de siempre. Los escribe tools/captions.js al cierre de cada fecha.",
   "724-2026-10": {
-    "v": 3,
+    "v": 4,
     "ganadores": [
       {
-        "titulo": "Opción A · puente: un jugador que el ganador tenía",
-        "texto": "🏆 GANADORES DE LA FECHA 10 | CLAUSURA 2026\n\nEl ganador del fantasy se anotó en Winning la semana anterior y ganó en su primera fecha, con Ronaldo Martínez en el equipo.\n\nRonaldo Martínez hizo gol en las tres fechas que jugó con Vélez y ya estuvo dos veces en el 11 Ideal."
+        "tipo": "nadie-gano-dos-veces",
+        "titulo": "Opción A · récord: nadie ganó dos veces",
+        "texto": "🏆 GANADORES DE LA FECHA 10 | CLAUSURA 2026\n\nEl ganador del fantasy y el del prode se anotaron en Winning la semana anterior y ganaron en su primera fecha.\n\nDiez fechas y todavía nadie ganó dos veces, ni en el fantasy ni en el prode: veintitrés ganadores distintos, con tres empates en la punta del prode."
       },
       {
-        "titulo": "Opción B · puente: lo nuevo pagó, lo constante también",
-        "texto": "🏆 GANADORES DE LA FECHA 10 | CLAUSURA 2026\n\nGanar en tu primera fecha se puede: el ganador del fantasy y el del prode se anotaron la semana anterior.\n\nLo que también paga es la constancia: Lucas Zelarayán y Gonzalo Montiel son los únicos con 12 puntos o más en cada una de las últimas tres fechas."
+        "tipo": "primera-vez-provincia",
+        "titulo": "Opción B · primera vez: un ganador de Mendoza",
+        "texto": "🏆 GANADORES DE LA FECHA 10 | CLAUSURA 2026\n\nLos seis del podio son debutantes: ninguno había estado antes ni en un top 10 de una fecha.\n\nPor primera vez en el torneo el prode lo gana alguien de Mendoza: hasta ahora habían ganado desde Buenos Aires, CABA, Santa Fe, Entre Ríos, Tucumán y Córdoba."
       }
     ],
     "ideal": [

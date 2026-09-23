@@ -1,0 +1,1767 @@
+{
+ "fechas": {
+  "1": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "17772705-36d8-4190-9432-9e8f10d50ff3",
+     "usuario": "matypallares",
+     "puntos": 146.8
+    },
+    {
+     "rank": 2,
+     "user_id": "13cf016b-4fd0-45b7-b2af-49bbc402a7a6",
+     "usuario": "sebas84",
+     "puntos": 145.9
+    },
+    {
+     "rank": 3,
+     "user_id": "71b63291-baa3-4cf4-8dd8-598a31c717ea",
+     "usuario": "alejitogranate",
+     "puntos": 144.8
+    },
+    {
+     "rank": 4,
+     "user_id": "40641401-0b4e-41db-b7a0-a8cc2a921ca2",
+     "usuario": "alecdma",
+     "puntos": 136
+    },
+    {
+     "rank": 5,
+     "user_id": "c9fc1536-b6dc-405c-a031-fce24b521b7f",
+     "usuario": "goncho",
+     "puntos": 135
+    },
+    {
+     "rank": 6,
+     "user_id": "215b54cd-c60f-4aed-9886-947e386cc2e1",
+     "usuario": "losbepis",
+     "puntos": 133.8
+    },
+    {
+     "rank": 7,
+     "user_id": "7b392528-e427-4e4f-a139-342e2a0a49da",
+     "usuario": "santicuervo2003",
+     "puntos": 133.7
+    },
+    {
+     "rank": 8,
+     "user_id": "b341be8c-c1a5-400e-bc9b-cc00ca514cc8",
+     "usuario": "fdallan6",
+     "puntos": 133.3
+    },
+    {
+     "rank": 9,
+     "user_id": "232554f7-5b8e-4bac-a563-fc538f5a1e02",
+     "usuario": "juantictooou",
+     "puntos": 132.6
+    },
+    {
+     "rank": 10,
+     "user_id": "2594946c-ed89-40c4-9ae1-b9f4a95d6a68",
+     "usuario": "hugo1979",
+     "puntos": 131.8
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "bb2624ab-6b10-4203-b690-5ded3f8d6df0",
+     "usuario": "alejorodriguezzz",
+     "puntos": 40
+    },
+    {
+     "rank": 2,
+     "user_id": "ff342a9a-4b98-48ba-89eb-20052aa0061e",
+     "usuario": "quemero87",
+     "puntos": 39
+    },
+    {
+     "rank": 3,
+     "user_id": "8db10821-8cdc-41c3-a96d-ee26168db5d9",
+     "usuario": "poloo8",
+     "puntos": 37
+    },
+    {
+     "rank": 4,
+     "user_id": "3ea35c16-a6ee-497f-a0ee-be7d51a7b119",
+     "usuario": "fedetevez",
+     "puntos": 36
+    },
+    {
+     "rank": 4,
+     "user_id": "2cd9c02c-8baa-43fe-af87-3e027d7fc9cc",
+     "usuario": "monaldo",
+     "puntos": 36
+    },
+    {
+     "rank": 6,
+     "user_id": "fc9d96cd-8282-4bee-9e9e-501e31795c0b",
+     "usuario": "alecard",
+     "puntos": 35
+    },
+    {
+     "rank": 6,
+     "user_id": "2cd0494a-7af9-4a84-9d96-54c98a4feb5e",
+     "usuario": "matutemur",
+     "puntos": 35
+    },
+    {
+     "rank": 6,
+     "user_id": "ef891e91-3367-4798-ab5f-b32895aa2fcb",
+     "usuario": "santibianchi",
+     "puntos": 35
+    },
+    {
+     "rank": 6,
+     "user_id": "4a2344ea-c1d9-494e-ae49-43ade7a04433",
+     "usuario": "xeneize_tdf",
+     "puntos": 35
+    },
+    {
+     "rank": 10,
+     "user_id": "1c15df0c-7856-4c3a-a556-091d404df63d",
+     "usuario": "pelligra.jr",
+     "puntos": 34
+    }
+   ]
+  },
+  "2": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "7b9c2d64-f5a1-46b8-8dca-af816731772f",
+     "usuario": "paloma6",
+     "puntos": 159.1
+    },
+    {
+     "rank": 2,
+     "user_id": "1986b3ed-e328-4ee3-be31-d99dd664a666",
+     "usuario": "maziexe",
+     "puntos": 152.1
+    },
+    {
+     "rank": 3,
+     "user_id": "cad1dc52-f003-40d2-a3d0-3b0ec41a2ec8",
+     "usuario": "gunchy",
+     "puntos": 150.9
+    },
+    {
+     "rank": 4,
+     "user_id": "ab035b56-65d0-4006-b85a-2490e007e590",
+     "usuario": "renzojlopez",
+     "puntos": 150
+    },
+    {
+     "rank": 5,
+     "user_id": "0e2b7345-1e88-4eea-ba3d-081f32a48ad9",
+     "usuario": "nicxbj",
+     "puntos": 149.3
+    },
+    {
+     "rank": 6,
+     "user_id": "f5336d7d-5aad-4154-a45a-ab15775033ac",
+     "usuario": "tienegatorei",
+     "puntos": 147.3
+    },
+    {
+     "rank": 7,
+     "user_id": "01c21356-275a-4e3c-8c08-91d4bf322c48",
+     "usuario": "tralicef",
+     "puntos": 146.9
+    },
+    {
+     "rank": 8,
+     "user_id": "168e00c7-d1f1-47ba-a186-bb88367ff520",
+     "usuario": "diegote",
+     "puntos": 146.7
+    },
+    {
+     "rank": 9,
+     "user_id": "d61f5af5-af28-4f5a-b3a3-ea53aadcf12e",
+     "usuario": "matu19",
+     "puntos": 145.5
+    },
+    {
+     "rank": 10,
+     "user_id": "f75ed4d8-5226-4c6e-bb26-a6b01365a3bf",
+     "usuario": "ancelotti",
+     "puntos": 145.4
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "3d45a8e5-6e84-42aa-8672-d7e1fa863ad2",
+     "usuario": "fortinerosoy1994",
+     "puntos": 44
+    },
+    {
+     "rank": 2,
+     "user_id": "20aa7fd3-b038-4826-9762-e497b0cfa55b",
+     "usuario": "ps2001",
+     "puntos": 42
+    },
+    {
+     "rank": 3,
+     "user_id": "608568ff-4185-4ea2-8958-a512e6cdfe88",
+     "usuario": "nickko12",
+     "puntos": 41
+    },
+    {
+     "rank": 3,
+     "user_id": "9fe07f51-fb53-49f9-8da0-a92f89c3d5b3",
+     "usuario": "miskoskicab",
+     "puntos": 41
+    },
+    {
+     "rank": 5,
+     "user_id": "be92ca9c-13ea-473f-a36f-462eaeb3f9d5",
+     "usuario": "elloco",
+     "puntos": 40
+    },
+    {
+     "rank": 5,
+     "user_id": "736c1a0b-25a4-44e4-85cc-fbf5c5417c47",
+     "usuario": "wildecai84",
+     "puntos": 40
+    },
+    {
+     "rank": 5,
+     "user_id": "6d00c7a4-6e5b-4e39-a218-30a05cd038e4",
+     "usuario": "lucasbley",
+     "puntos": 40
+    },
+    {
+     "rank": 8,
+     "user_id": "3588a688-f7b8-4344-b814-219b9dc94ef4",
+     "usuario": "maustac",
+     "puntos": 39
+    },
+    {
+     "rank": 8,
+     "user_id": "3bb98da2-5f8f-4b42-b9e2-e29d77f926a3",
+     "usuario": "ponton",
+     "puntos": 39
+    },
+    {
+     "rank": 10,
+     "user_id": "fbd042d3-1ab3-4df7-9248-4251c8f0338c",
+     "usuario": "pipicardella",
+     "puntos": 38
+    }
+   ]
+  },
+  "3": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "549bae06-cc9d-43b0-813f-2b0eb2bb496f",
+     "usuario": "kbza2812",
+     "puntos": 172.2
+    },
+    {
+     "rank": 2,
+     "user_id": "3d325bb0-63e0-44a1-93ea-2c4b25edd0a0",
+     "usuario": "afr.07",
+     "puntos": 163.5
+    },
+    {
+     "rank": 3,
+     "user_id": "203bf60f-4142-41cc-9930-d2c7489a2c2e",
+     "usuario": "benja247",
+     "puntos": 159.6
+    },
+    {
+     "rank": 4,
+     "user_id": "ba42e8f0-0e41-4736-b5e6-b5281314d25b",
+     "usuario": "taion89",
+     "puntos": 154.3
+    },
+    {
+     "rank": 5,
+     "user_id": "d8f28200-7754-4ff9-a09f-826b04279da2",
+     "usuario": "ignabe2",
+     "puntos": 151.5
+    },
+    {
+     "rank": 6,
+     "user_id": "e8f1a227-8844-43a1-9446-1cb4b59e8c31",
+     "usuario": "trabaneta",
+     "puntos": 150
+    },
+    {
+     "rank": 7,
+     "user_id": "ed29b9cd-f537-4d94-9374-4b8aea2b8c77",
+     "usuario": "emanuel",
+     "puntos": 147.8
+    },
+    {
+     "rank": 8,
+     "user_id": "72334f7c-aa00-4568-8921-d34e72c5656a",
+     "usuario": "chapismo",
+     "puntos": 146.7
+    },
+    {
+     "rank": 9,
+     "user_id": "0c3beff2-535d-4600-94ab-63e9f93f02ee",
+     "usuario": "rome22",
+     "puntos": 146
+    },
+    {
+     "rank": 10,
+     "user_id": "6dba6a22-9625-48d4-b5b1-29d5f4124829",
+     "usuario": "cholita",
+     "puntos": 145.5
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "f0459c22-9c07-487c-95c7-6ffdb56ea741",
+     "usuario": "juchii",
+     "puntos": 32
+    },
+    {
+     "rank": 2,
+     "user_id": "9684c8ff-8b5c-4920-90d9-296eb4d4817d",
+     "usuario": "luciano91218",
+     "puntos": 30
+    },
+    {
+     "rank": 3,
+     "user_id": "e1da994f-0ab9-44d3-a9b5-395433e51f3a",
+     "usuario": "tiago05",
+     "puntos": 29
+    },
+    {
+     "rank": 3,
+     "user_id": "88463579-db84-4f98-bd1a-adf93f9abe21",
+     "usuario": "eljapone",
+     "puntos": 29
+    },
+    {
+     "rank": 5,
+     "user_id": "d34a0402-d5b7-41ec-af8f-b77be68fda69",
+     "usuario": "aletina",
+     "puntos": 28
+    },
+    {
+     "rank": 6,
+     "user_id": "7fb009bd-87ef-4bb0-9771-505babff782a",
+     "usuario": "nanduxdena",
+     "puntos": 27
+    },
+    {
+     "rank": 6,
+     "user_id": "ecb31c58-136b-49b6-b172-0b45cf299687",
+     "usuario": "frandv1",
+     "puntos": 27
+    },
+    {
+     "rank": 6,
+     "user_id": "1f1745a6-428a-4eec-b8ea-5c8aebc0979d",
+     "usuario": "niconico",
+     "puntos": 27
+    },
+    {
+     "rank": 9,
+     "user_id": "8704cbde-99d8-4e89-8778-ec58d2bf09fb",
+     "usuario": "dantej",
+     "puntos": 26
+    },
+    {
+     "rank": 9,
+     "user_id": "5b8fa168-1ec3-4ca8-9fa5-b1e0b18f58ab",
+     "usuario": "luiis.cab",
+     "puntos": 26
+    }
+   ]
+  },
+  "4": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "43ddde29-f88b-46c3-87b4-77c6d1423536",
+     "usuario": "alvarocabj",
+     "puntos": 176.5
+    },
+    {
+     "rank": 2,
+     "user_id": "71b63291-baa3-4cf4-8dd8-598a31c717ea",
+     "usuario": "alejitogranate",
+     "puntos": 176.4
+    },
+    {
+     "rank": 3,
+     "user_id": "05efde79-1e1b-456c-b5a4-ed56690d8092",
+     "usuario": "tomasgmz",
+     "puntos": 173
+    },
+    {
+     "rank": 4,
+     "user_id": "6b6ab825-5618-40d2-a25c-c99bb068717b",
+     "usuario": "armando_elmago",
+     "puntos": 172.2
+    },
+    {
+     "rank": 5,
+     "user_id": "fb99d024-9b5e-41bb-80ee-7538325d464f",
+     "usuario": "lucamura07",
+     "puntos": 172
+    },
+    {
+     "rank": 6,
+     "user_id": "5c14cd36-9e06-48a5-987e-1104258dcb7e",
+     "usuario": "unchalo",
+     "puntos": 169.1
+    },
+    {
+     "rank": 7,
+     "user_id": "07bd6202-dcf0-40d7-aa04-958b47b29732",
+     "usuario": "ioooow",
+     "puntos": 168.3
+    },
+    {
+     "rank": 8,
+     "user_id": "97e7cb3b-8ea5-477f-b5bf-7b43c1d2a034",
+     "usuario": "santino.iri",
+     "puntos": 167.7
+    },
+    {
+     "rank": 9,
+     "user_id": "8b51d540-b652-4dd8-bf32-f2d48874c684",
+     "usuario": "fede1712",
+     "puntos": 167.5
+    },
+    {
+     "rank": 10,
+     "user_id": "dfbb2c58-9279-4c33-9a4e-6a8d1ef3e9af",
+     "usuario": "floki11",
+     "puntos": 167.3
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "ea2959e8-9768-44f0-a8b3-993b5538d108",
+     "usuario": "nicoca",
+     "puntos": 42
+    },
+    {
+     "rank": 2,
+     "user_id": "51f80c1e-7502-40c9-9ef5-380130aadc14",
+     "usuario": "tamara16",
+     "puntos": 39
+    },
+    {
+     "rank": 3,
+     "user_id": "0c8d1832-27c1-4e49-ae32-08df269c95ec",
+     "usuario": "juliaan",
+     "puntos": 38
+    },
+    {
+     "rank": 4,
+     "user_id": "10081442-9988-46be-9bc6-e8cc7b5f1426",
+     "usuario": "selustark",
+     "puntos": 37
+    },
+    {
+     "rank": 5,
+     "user_id": "41037e9f-b277-40ce-a0d6-d50193950065",
+     "usuario": "tomi73",
+     "puntos": 35
+    },
+    {
+     "rank": 5,
+     "user_id": "a7187edd-74d6-4f95-aac5-d9b72be25783",
+     "usuario": "gordoleo",
+     "puntos": 35
+    },
+    {
+     "rank": 5,
+     "user_id": "b2a457e5-3915-4a30-ad16-0088302f8b46",
+     "usuario": "elfede",
+     "puntos": 35
+    },
+    {
+     "rank": 5,
+     "user_id": "e126d2c5-8f47-4b3a-9f37-490e79268abb",
+     "usuario": "alejosa",
+     "puntos": 35
+    },
+    {
+     "rank": 9,
+     "user_id": "0a037d1e-a2dd-415c-888c-92b025956201",
+     "usuario": "alexlasardina",
+     "puntos": 34
+    },
+    {
+     "rank": 9,
+     "user_id": "433f4057-49ed-46c0-9f4e-d0b835ed6d33",
+     "usuario": "santimo",
+     "puntos": 34
+    }
+   ]
+  },
+  "5": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "6beccc0a-46f0-4349-8426-1a9bd18938eb",
+     "usuario": "facucai",
+     "puntos": 164.8
+    },
+    {
+     "rank": 2,
+     "user_id": "aaadd087-3de0-41a0-b686-4da4cbf5f909",
+     "usuario": "lejan1889",
+     "puntos": 156.3
+    },
+    {
+     "rank": 3,
+     "user_id": "91c1a9d7-5add-4fc6-9353-9e4586b75299",
+     "usuario": "equipocoti",
+     "puntos": 145.9
+    },
+    {
+     "rank": 4,
+     "user_id": "026f8119-ff1c-455a-a6cf-bd3b5ab0c1d1",
+     "usuario": "mazzita12",
+     "puntos": 145.8
+    },
+    {
+     "rank": 5,
+     "user_id": "b48c4564-d385-4ff4-b667-3db7bc2bbb2a",
+     "usuario": "nafer09",
+     "puntos": 144.9
+    },
+    {
+     "rank": 6,
+     "user_id": "05348c46-bc61-4975-b368-0d6d4fd8a79e",
+     "usuario": "bidon.7",
+     "puntos": 144.6
+    },
+    {
+     "rank": 7,
+     "user_id": "b87a90f1-6466-4bd5-b724-bfda68b79eb8",
+     "usuario": "viejo.grandetero",
+     "puntos": 143.6
+    },
+    {
+     "rank": 8,
+     "user_id": "e61c361e-5910-43e1-a9c2-70fc63b37439",
+     "usuario": "roli1992",
+     "puntos": 142.3
+    },
+    {
+     "rank": 9,
+     "user_id": "6e35d05c-eae0-4bc7-be88-24fe561fb6c7",
+     "usuario": "jony.1107",
+     "puntos": 141.8
+    },
+    {
+     "rank": 10,
+     "user_id": "70eb5740-9e92-44f7-99f6-120d2a52968f",
+     "usuario": "enzoa73",
+     "puntos": 141.6
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "ff0cf0df-b138-4d2f-94a7-c59527354213",
+     "usuario": "jerito",
+     "puntos": 39
+    },
+    {
+     "rank": 2,
+     "user_id": "05e02a7d-3b72-4bb5-a4bb-6acad99bfa4d",
+     "usuario": "djmanson",
+     "puntos": 38
+    },
+    {
+     "rank": 2,
+     "user_id": "917fe17c-239e-4856-a42d-a6206bb080e7",
+     "usuario": "danihg",
+     "puntos": 38
+    },
+    {
+     "rank": 4,
+     "user_id": "aff31af2-5c35-475e-ad10-e61ebb264059",
+     "usuario": "delacunaalcajon",
+     "puntos": 37
+    },
+    {
+     "rank": 4,
+     "user_id": "633ad56d-29fb-42fc-af77-e48bc7977285",
+     "usuario": "tomaswal",
+     "puntos": 37
+    },
+    {
+     "rank": 6,
+     "user_id": "462313ad-854a-4ba1-82c3-1d1489a0bc59",
+     "usuario": "feedeq12",
+     "puntos": 35
+    },
+    {
+     "rank": 6,
+     "user_id": "a028ef0c-9353-41d4-b811-739ec7519ae7",
+     "usuario": "alvarengacoudet",
+     "puntos": 35
+    },
+    {
+     "rank": 8,
+     "user_id": "afd520a7-6b5a-44c0-adde-80c3289cd543",
+     "usuario": "mfonta",
+     "puntos": 34
+    },
+    {
+     "rank": 8,
+     "user_id": "e6bd2b3c-e3e6-4816-8b23-5ebba8617865",
+     "usuario": "ariel123445",
+     "puntos": 34
+    },
+    {
+     "rank": 8,
+     "user_id": "eabf4a8c-0ac5-4bee-a9a7-48981367dfcf",
+     "usuario": "bochademetal",
+     "puntos": 34
+    }
+   ]
+  },
+  "6": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "2f2afc81-ccb2-43c7-a202-04771f47b9aa",
+     "usuario": "tommy153",
+     "puntos": 162.3
+    },
+    {
+     "rank": 2,
+     "user_id": "85644391-91d9-4530-b0a5-265c4c607987",
+     "usuario": "demmeb",
+     "puntos": 153.6
+    },
+    {
+     "rank": 3,
+     "user_id": "840b200b-a9de-4302-8aa5-61861392725c",
+     "usuario": "brunom27",
+     "puntos": 153.1
+    },
+    {
+     "rank": 4,
+     "user_id": "da5b6150-82d7-4c26-8f15-6b5c30ab0791",
+     "usuario": "cirocavs",
+     "puntos": 152.3
+    },
+    {
+     "rank": 5,
+     "user_id": "aa9e5583-0873-4407-aafb-fc62807368e5",
+     "usuario": "arguellocab",
+     "puntos": 151.6
+    },
+    {
+     "rank": 6,
+     "user_id": "7d8a9fc8-2bfa-4b53-ae71-ff6836213379",
+     "usuario": "maestrulli1997",
+     "puntos": 149.1
+    },
+    {
+     "rank": 7,
+     "user_id": "3c80a3f1-dfda-4ac5-a78c-b6867d491feb",
+     "usuario": "cyralarro2",
+     "puntos": 148.5
+    },
+    {
+     "rank": 8,
+     "user_id": "80425d2d-8f52-4967-be51-dac689e73d48",
+     "usuario": "nacho_alc",
+     "puntos": 148.5
+    },
+    {
+     "rank": 9,
+     "user_id": "30545a75-9791-43b7-9680-c980297e810b",
+     "usuario": "agusssss",
+     "puntos": 148.2
+    },
+    {
+     "rank": 10,
+     "user_id": "bd587f6a-76e4-4652-a1a4-7e92be4dd6e2",
+     "usuario": "losguerreros89",
+     "puntos": 148.1
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "268545c1-439b-42cd-8706-879562a874db",
+     "usuario": "santigelp",
+     "puntos": 33
+    },
+    {
+     "rank": 1,
+     "user_id": "ac7b766b-1c5b-4ecf-895b-751df18de2b8",
+     "usuario": "facaking",
+     "puntos": 33
+    },
+    {
+     "rank": 3,
+     "user_id": "a9cf68aa-e3f8-4ad6-be3d-50eceffab3b2",
+     "usuario": "bocacha",
+     "puntos": 32
+    },
+    {
+     "rank": 3,
+     "user_id": "bc700313-f41b-4f86-9831-c46d5ce54f93",
+     "usuario": "lucascentral",
+     "puntos": 32
+    },
+    {
+     "rank": 5,
+     "user_id": "9539f582-2c94-4e84-9cd5-667a5fe75cb7",
+     "usuario": "gonznf",
+     "puntos": 31
+    },
+    {
+     "rank": 5,
+     "user_id": "848bf643-5500-4be4-9a0d-859290e3ad14",
+     "usuario": "rey.alto",
+     "puntos": 31
+    },
+    {
+     "rank": 7,
+     "user_id": "e7a18b13-0375-4f39-b720-cfdd1e611234",
+     "usuario": "feliii",
+     "puntos": 30
+    },
+    {
+     "rank": 7,
+     "user_id": "ece44d75-1ed6-4e96-b10c-d93dc0ba5a36",
+     "usuario": "luks89",
+     "puntos": 30
+    },
+    {
+     "rank": 7,
+     "user_id": "54aca580-3bca-4eaf-90fb-a0a8f0d7b466",
+     "usuario": "patoquemero6",
+     "puntos": 30
+    },
+    {
+     "rank": 7,
+     "user_id": "a068e20c-639a-4172-8f12-65b4695a81a1",
+     "usuario": "martincsd",
+     "puntos": 30
+    }
+   ]
+  },
+  "7": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "c450593a-38d8-434d-b972-66c71f736dc9",
+     "usuario": "polze_",
+     "puntos": 175.8
+    },
+    {
+     "rank": 2,
+     "user_id": "db1c5689-28e6-48a4-a15c-92faeb4f367e",
+     "usuario": "riversanti",
+     "puntos": 169.1
+    },
+    {
+     "rank": 3,
+     "user_id": "a2319362-a156-4d2d-83fc-27079fe1041a",
+     "usuario": "lachuchuneta",
+     "puntos": 168.7
+    },
+    {
+     "rank": 4,
+     "user_id": "d508a3e6-e554-4843-a433-104db1dbf6a0",
+     "usuario": "matyenzo",
+     "puntos": 167.2
+    },
+    {
+     "rank": 5,
+     "user_id": "9ae9c66f-d9db-46c7-ac08-e9dc4ec2b845",
+     "usuario": "pepe23",
+     "puntos": 166.8
+    },
+    {
+     "rank": 6,
+     "user_id": "658191c5-dd8a-48a7-97d1-8d65b17bfa82",
+     "usuario": "russell.up",
+     "puntos": 166.1
+    },
+    {
+     "rank": 7,
+     "user_id": "b4b5a650-6b6e-43c1-bf01-deb0400e8193",
+     "usuario": "kituchi20",
+     "puntos": 163.4
+    },
+    {
+     "rank": 8,
+     "user_id": "adce6798-0ae2-405b-83c8-ea9e98ccbf1a",
+     "usuario": "anashe22",
+     "puntos": 162.6
+    },
+    {
+     "rank": 9,
+     "user_id": "12627e7b-84a8-402a-8ce1-777227e8e315",
+     "usuario": "locosxelgrandt",
+     "puntos": 161.6
+    },
+    {
+     "rank": 10,
+     "user_id": "390bdaa9-4b94-4ec7-a086-a6c5c85de4fe",
+     "usuario": "nacho23",
+     "puntos": 161.1
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "9dffcddc-65d9-476b-a8be-c6cce77a360d",
+     "usuario": "lucafantelli",
+     "puntos": 40
+    },
+    {
+     "rank": 2,
+     "user_id": "12627e7b-84a8-402a-8ce1-777227e8e315",
+     "usuario": "locosxelgrandt",
+     "puntos": 38
+    },
+    {
+     "rank": 3,
+     "user_id": "3028cb15-2fa6-47d0-8545-23f4ade67c9b",
+     "usuario": "chapitafc",
+     "puntos": 37
+    },
+    {
+     "rank": 4,
+     "user_id": "3440de8e-6ef0-499d-a786-4c34b1aae1e3",
+     "usuario": "hernydatacenter",
+     "puntos": 36
+    },
+    {
+     "rank": 4,
+     "user_id": "83f5cf16-96c6-4a4e-9902-41da03fac0a7",
+     "usuario": "palermito",
+     "puntos": 36
+    },
+    {
+     "rank": 4,
+     "user_id": "ca32d0e9-ff14-48a1-92af-cdbab879cf37",
+     "usuario": "otamendismo",
+     "puntos": 36
+    },
+    {
+     "rank": 4,
+     "user_id": "f5336d7d-5aad-4154-a45a-ab15775033ac",
+     "usuario": "tienegatorei",
+     "puntos": 36
+    },
+    {
+     "rank": 8,
+     "user_id": "d08e0418-ccac-43f0-b28d-3107de5a0a27",
+     "usuario": "gonzaezequiel24",
+     "puntos": 35
+    },
+    {
+     "rank": 8,
+     "user_id": "4aaff9a4-3afa-4c23-bda9-25775f0e03d5",
+     "usuario": "encen11",
+     "puntos": 35
+    },
+    {
+     "rank": 8,
+     "user_id": "f575c0f8-4e5a-4817-a4c7-62562d11cb53",
+     "usuario": "cocoquet",
+     "puntos": 35
+    }
+   ]
+  },
+  "8": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "f522dc91-d96b-4b3a-83f5-cec4cb0045bd",
+     "usuario": "cam1998",
+     "puntos": 162.8
+    },
+    {
+     "rank": 2,
+     "user_id": "d6cef931-ee7a-42e0-abc3-53b5e7e91f59",
+     "usuario": "montiel",
+     "puntos": 161.3
+    },
+    {
+     "rank": 3,
+     "user_id": "0e32210f-ceab-45bf-a011-49e7506b4e30",
+     "usuario": "cordobes97",
+     "puntos": 161.3
+    },
+    {
+     "rank": 4,
+     "user_id": "8525056c-41e0-490d-abd8-aa8fc58b45b1",
+     "usuario": "guli247",
+     "puntos": 160.7
+    },
+    {
+     "rank": 5,
+     "user_id": "7137f7e1-783b-4fd0-b231-4a2957ae6259",
+     "usuario": "candebo",
+     "puntos": 160.7
+    },
+    {
+     "rank": 6,
+     "user_id": "afa7d2d7-6623-4026-8d3e-75c429ddd37c",
+     "usuario": "polasape",
+     "puntos": 159.2
+    },
+    {
+     "rank": 7,
+     "user_id": "b48c4564-d385-4ff4-b667-3db7bc2bbb2a",
+     "usuario": "nafer09",
+     "puntos": 158.9
+    },
+    {
+     "rank": 8,
+     "user_id": "b54709ac-6a4f-4fb6-87f2-b68f69a16a6d",
+     "usuario": "alansi7o",
+     "puntos": 158.8
+    },
+    {
+     "rank": 9,
+     "user_id": "cb461037-0c3f-4a7e-81bc-dd7d8b8d7a5d",
+     "usuario": "ezee99",
+     "puntos": 158.7
+    },
+    {
+     "rank": 10,
+     "user_id": "f728ef38-5c38-47fd-a853-89eafef71f24",
+     "usuario": "fran18",
+     "puntos": 157.8
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "dc4bf6f3-b5f6-4682-8464-e8950e9b4b1f",
+     "usuario": "lolo737",
+     "puntos": 41
+    },
+    {
+     "rank": 1,
+     "user_id": "0f0f727d-334f-4f54-af56-7a6b60af8587",
+     "usuario": "tiziiii",
+     "puntos": 41
+    },
+    {
+     "rank": 3,
+     "user_id": "714c7e83-743a-470b-8ad3-e61e030dc2da",
+     "usuario": "dalailama",
+     "puntos": 40
+    },
+    {
+     "rank": 3,
+     "user_id": "f8d67de6-25b3-4222-b023-2d0e40d656b7",
+     "usuario": "juancai7",
+     "puntos": 40
+    },
+    {
+     "rank": 5,
+     "user_id": "501a4d75-0aae-4c7f-81da-c1f8a0953bba",
+     "usuario": "jonitocche",
+     "puntos": 38
+    },
+    {
+     "rank": 5,
+     "user_id": "465fd983-4267-4bba-b460-6221a6408428",
+     "usuario": "emisayno",
+     "puntos": 38
+    },
+    {
+     "rank": 7,
+     "user_id": "b3898be8-465f-4a22-979c-6f643c7c1222",
+     "usuario": "tadaviich",
+     "puntos": 37
+    },
+    {
+     "rank": 7,
+     "user_id": "6f203761-b3b4-44c5-9e40-968e314f0bf2",
+     "usuario": "malafamabuenavid",
+     "puntos": 37
+    },
+    {
+     "rank": 7,
+     "user_id": "7416ef43-4517-456b-a611-666dc42135df",
+     "usuario": "agustin_encina7",
+     "puntos": 37
+    },
+    {
+     "rank": 10,
+     "user_id": "4d90eaaf-7052-416a-9afe-dbc5935f9d53",
+     "usuario": "elaura",
+     "puntos": 36
+    }
+   ]
+  },
+  "9": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "68df29d8-dcd0-4955-b4d7-9f0f839ac906",
+     "usuario": "cherno",
+     "puntos": 187.2
+    },
+    {
+     "rank": 2,
+     "user_id": "2e3515e1-cc19-40f8-84f5-91c61c2f7194",
+     "usuario": "nicoferreira99",
+     "puntos": 186.5
+    },
+    {
+     "rank": 3,
+     "user_id": "cfe345d7-8706-4ef3-89b7-132ba03b0263",
+     "usuario": "tomiamondarain",
+     "puntos": 185.7
+    },
+    {
+     "rank": 4,
+     "user_id": "deb674d0-55a2-4564-87cc-24b27ac934d5",
+     "usuario": "diegogc2004",
+     "puntos": 183
+    },
+    {
+     "rank": 5,
+     "user_id": "05348c46-bc61-4975-b368-0d6d4fd8a79e",
+     "usuario": "bidon.7",
+     "puntos": 181.9
+    },
+    {
+     "rank": 6,
+     "user_id": "ac1ac837-a991-4ae6-9908-ef0283ddb841",
+     "usuario": "marianoeche",
+     "puntos": 181.4
+    },
+    {
+     "rank": 7,
+     "user_id": "2a89c66e-f9f9-493d-bef3-e0295bcc530d",
+     "usuario": "juanfri12",
+     "puntos": 181.4
+    },
+    {
+     "rank": 8,
+     "user_id": "89509311-547a-444d-8787-6e4040fa15cb",
+     "usuario": "cebollamasdiez",
+     "puntos": 180.5
+    },
+    {
+     "rank": 9,
+     "user_id": "26097594-2f72-4035-bcc3-40baa1142010",
+     "usuario": "arpita912",
+     "puntos": 180.2
+    },
+    {
+     "rank": 10,
+     "user_id": "88619579-2275-43e8-9c6c-bafa592fd51b",
+     "usuario": "peraltamanu",
+     "puntos": 180.1
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "17c822b3-9be6-4073-ba45-076503149dab",
+     "usuario": "santulo98",
+     "puntos": 45
+    },
+    {
+     "rank": 1,
+     "user_id": "5d245f4a-a250-42d9-9d43-20df66d36b20",
+     "usuario": "cuberas",
+     "puntos": 45
+    },
+    {
+     "rank": 3,
+     "user_id": "806ec303-2aec-4703-9c36-3beb20289130",
+     "usuario": "maxig1985",
+     "puntos": 44
+    },
+    {
+     "rank": 3,
+     "user_id": "7f661f46-ebd1-4606-a763-7b0fa6bffa2a",
+     "usuario": "nicolasio",
+     "puntos": 44
+    },
+    {
+     "rank": 3,
+     "user_id": "be71ee9f-397c-4977-bc09-61dfdbb45487",
+     "usuario": "jorge.carp17",
+     "puntos": 44
+    },
+    {
+     "rank": 3,
+     "user_id": "2905e21d-428f-4919-a9fd-fb84836d15cd",
+     "usuario": "chacanegri",
+     "puntos": 44
+    },
+    {
+     "rank": 3,
+     "user_id": "f37359b7-49b3-4740-85e8-57537a62340a",
+     "usuario": "elprofejs",
+     "puntos": 44
+    },
+    {
+     "rank": 8,
+     "user_id": "a8e8a2d2-efc3-46a8-9371-122e7a652577",
+     "usuario": "chancasla",
+     "puntos": 43
+    },
+    {
+     "rank": 8,
+     "user_id": "17b4e310-4caf-4d0a-90a2-4c6e5600709f",
+     "usuario": "ramablanco10",
+     "puntos": 43
+    },
+    {
+     "rank": 8,
+     "user_id": "1f764386-7191-42f6-b63f-8d1b1e8fde1e",
+     "usuario": "sabanegro",
+     "puntos": 43
+    }
+   ]
+  },
+  "10": {
+   "fantasy": [
+    {
+     "rank": 1,
+     "user_id": "f20c7746-8d55-48b2-b129-f9172d276a40",
+     "usuario": "bautiscarella_",
+     "puntos": 176.2
+    },
+    {
+     "rank": 2,
+     "user_id": "f651200d-aaef-4eee-9a11-aa101267af6f",
+     "usuario": "talan33",
+     "puntos": 169.8
+    },
+    {
+     "rank": 3,
+     "user_id": "71385381-18ae-44fc-bada-1174b074e13c",
+     "usuario": "lauta_snr",
+     "puntos": 163.9
+    },
+    {
+     "rank": 4,
+     "user_id": "0b943156-ad3d-478d-ac71-d491cfdcc3b3",
+     "usuario": "juanm10",
+     "puntos": 163.8
+    },
+    {
+     "rank": 5,
+     "user_id": "ada86c3d-9428-4993-a278-4bc6148953de",
+     "usuario": "maximoricciardi",
+     "puntos": 162.7
+    },
+    {
+     "rank": 6,
+     "user_id": "30173864-7819-4047-8c93-468002e3c01c",
+     "usuario": "alejoo",
+     "puntos": 161.9
+    },
+    {
+     "rank": 7,
+     "user_id": "152e86c7-2894-4b16-b4f8-41c29be58b75",
+     "usuario": "nicoerman5",
+     "puntos": 161.5
+    },
+    {
+     "rank": 8,
+     "user_id": "d8c41509-9ffd-465a-94d1-0b5b5399ce15",
+     "usuario": "geerobravo",
+     "puntos": 161.1
+    },
+    {
+     "rank": 9,
+     "user_id": "9b07a7c7-f26a-45d7-bb68-f8210c2c2381",
+     "usuario": "niko1984",
+     "puntos": 159.7
+    },
+    {
+     "rank": 10,
+     "user_id": "74c4e996-ffa3-41df-a677-cc7de48d241d",
+     "usuario": "nehuenalmada14",
+     "puntos": 159.1
+    }
+   ],
+   "prode": [
+    {
+     "rank": 1,
+     "user_id": "fc66a8f5-25eb-4d68-bbc7-3bff18160dd7",
+     "usuario": "tongalucero",
+     "puntos": 38
+    },
+    {
+     "rank": 2,
+     "user_id": "2fe131d4-6ea5-4f0e-85eb-c3dd46f47a22",
+     "usuario": "beekqac",
+     "puntos": 37
+    },
+    {
+     "rank": 2,
+     "user_id": "7f0f0f9b-aede-4f16-9978-8a8c96c783f4",
+     "usuario": "tomasv",
+     "puntos": 37
+    },
+    {
+     "rank": 4,
+     "user_id": "aea6ff27-7701-494b-b466-a253425b3e58",
+     "usuario": "tute15",
+     "puntos": 36
+    },
+    {
+     "rank": 5,
+     "user_id": "e801475d-cef7-4964-8ddb-9280f001f885",
+     "usuario": "sergiodaniel12",
+     "puntos": 35
+    },
+    {
+     "rank": 5,
+     "user_id": "55e36586-78a2-4bb4-82de-3b43d1190ef7",
+     "usuario": "fumineenri",
+     "puntos": 35
+    },
+    {
+     "rank": 7,
+     "user_id": "16b80050-a5db-487c-9a82-0a6c2b4bff37",
+     "usuario": "colocanayon",
+     "puntos": 34
+    },
+    {
+     "rank": 7,
+     "user_id": "843e2b3e-122d-4b58-b3ce-e1f73534e567",
+     "usuario": "lokexpas",
+     "puntos": 34
+    },
+    {
+     "rank": 7,
+     "user_id": "f87c2eac-fea9-45d7-a9eb-12c5f3b7afab",
+     "usuario": "vottita",
+     "puntos": 34
+    },
+    {
+     "rank": 7,
+     "user_id": "71cdd37c-88e4-4561-b43b-36a41e26d8c1",
+     "usuario": "govir19",
+     "puntos": 34
+    }
+   ]
+  }
+ },
+ "perfiles": {
+  "17772705-36d8-4190-9432-9e8f10d50ff3": {
+   "usuario": "matypallares",
+   "provincia": "Ciudad de Buenos Aires",
+   "club": "Talleres de Remedios de Escalada",
+   "club_id": 55,
+   "alta": "2026-07-22",
+   "fantasy_total": 1074.4,
+   "fantasy_puesto_general": 464,
+   "prode_total": 89,
+   "prode_fechas": [
+    1,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "bb2624ab-6b10-4203-b690-5ded3f8d6df0": {
+   "usuario": "alejorodriguezzz",
+   "provincia": "Santa Fe",
+   "club": "Camioneros",
+   "club_id": 44,
+   "alta": "2026-06-09",
+   "fantasy_total": 589.5,
+   "fantasy_puesto_general": 9999,
+   "prode_total": 69,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "7b9c2d64-f5a1-46b8-8dca-af816731772f": {
+   "usuario": "paloma6",
+   "provincia": "San Juan",
+   "club": "Acassuso",
+   "club_id": 1,
+   "alta": "2026-03-31",
+   "fantasy_total": 1148,
+   "fantasy_puesto_general": 161,
+   "prode_total": 159,
+   "prode_fechas": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "3d45a8e5-6e84-42aa-8672-d7e1fa863ad2": {
+   "usuario": "fortinerosoy1994",
+   "provincia": "Ciudad de Buenos Aires",
+   "club": "Vélez Sarsfield",
+   "club_id": 570,
+   "alta": "2026-07-28",
+   "fantasy_total": 758.6,
+   "fantasy_puesto_general": 4623,
+   "prode_total": 61,
+   "prode_fechas": [
+    2,
+    5
+   ]
+  },
+  "549bae06-cc9d-43b0-813f-2b0eb2bb496f": {
+   "usuario": "kbza2812",
+   "provincia": "Neuquén",
+   "club": "Talleres",
+   "club_id": 1071,
+   "alta": "2026-03-04",
+   "fantasy_total": 1164.4,
+   "fantasy_puesto_general": 123,
+   "prode_total": 84,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  "f0459c22-9c07-487c-95c7-6ffdb56ea741": {
+   "usuario": "juchii",
+   "provincia": "Buenos Aires",
+   "club": "Racing Club",
+   "club_id": 986,
+   "alta": "2026-07-23",
+   "fantasy_total": 844.3,
+   "fantasy_puesto_general": 2849,
+   "prode_total": 176,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ]
+  },
+  "43ddde29-f88b-46c3-87b4-77c6d1423536": {
+   "usuario": "alvarocabj",
+   "provincia": "Tucumán",
+   "club": "Boca Juniors",
+   "club_id": 540,
+   "alta": "2026-03-30",
+   "fantasy_total": 1156.1,
+   "fantasy_puesto_general": 143,
+   "prode_total": 163,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "ea2959e8-9768-44f0-a8b3-993b5538d108": {
+   "usuario": "nicoca",
+   "provincia": "Ciudad de Buenos Aires",
+   "club": "Racing Club",
+   "club_id": 986,
+   "alta": "2026-07-27",
+   "fantasy_total": 642.9,
+   "fantasy_puesto_general": 8061,
+   "prode_total": 66,
+   "prode_fechas": [
+    2,
+    4
+   ]
+  },
+  "6beccc0a-46f0-4349-8426-1a9bd18938eb": {
+   "usuario": "facucai",
+   "provincia": "Jujuy",
+   "club": "Independiente",
+   "club_id": 1243,
+   "alta": "2026-04-08",
+   "fantasy_total": 1235.2,
+   "fantasy_puesto_general": 19,
+   "prode_total": 171,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "ff0cf0df-b138-4d2f-94a7-c59527354213": {
+   "usuario": "jerito",
+   "provincia": "Entre Ríos",
+   "club": "River Plate",
+   "club_id": 608,
+   "alta": "2026-07-24",
+   "fantasy_total": 836.9,
+   "fantasy_puesto_general": 2983,
+   "prode_total": 171,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "2f2afc81-ccb2-43c7-a202-04771f47b9aa": {
+   "usuario": "tommy153",
+   "provincia": "Ciudad de Buenos Aires",
+   "club": "Defensa y Justicia",
+   "club_id": 8625,
+   "alta": "2026-08-21",
+   "fantasy_total": 542.2,
+   "fantasy_puesto_general": 12286,
+   "prode_total": 30,
+   "prode_fechas": [
+    6,
+    7
+   ]
+  },
+  "268545c1-439b-42cd-8706-879562a874db": {
+   "usuario": "santigelp",
+   "provincia": "Buenos Aires",
+   "club": "Gimnasia LP",
+   "club_id": 1392,
+   "alta": "2026-03-30",
+   "fantasy_total": 1117.7,
+   "fantasy_puesto_general": 273,
+   "prode_total": 187,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "c450593a-38d8-434d-b972-66c71f736dc9": {
+   "usuario": "polze_",
+   "provincia": "Buenos Aires",
+   "club": "River Plate",
+   "club_id": 608,
+   "alta": "2026-04-21",
+   "fantasy_total": 1141.7,
+   "fantasy_puesto_general": 185,
+   "prode_total": 164,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ]
+  },
+  "9dffcddc-65d9-476b-a8be-c6cce77a360d": {
+   "usuario": "lucafantelli",
+   "provincia": "Santa Fe",
+   "club": "Colón",
+   "club_id": 7,
+   "alta": "2026-08-23",
+   "fantasy_total": 343,
+   "fantasy_puesto_general": 26578,
+   "prode_total": 42,
+   "prode_fechas": [
+    6,
+    7
+   ]
+  },
+  "f522dc91-d96b-4b3a-83f5-cec4cb0045bd": {
+   "usuario": "cam1998",
+   "provincia": "Entre Ríos",
+   "club": "Boca Juniors",
+   "club_id": 540,
+   "alta": "2026-08-09",
+   "fantasy_total": 580.2,
+   "fantasy_puesto_general": 10411,
+   "prode_total": 63,
+   "prode_fechas": [
+    5,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "dc4bf6f3-b5f6-4682-8464-e8950e9b4b1f": {
+   "usuario": "lolo737",
+   "provincia": "Tucumán",
+   "club": "Atlético Tucumán",
+   "club_id": 4671,
+   "alta": "2026-07-22",
+   "fantasy_total": 836.7,
+   "fantasy_puesto_general": 2987,
+   "prode_total": 86,
+   "prode_fechas": [
+    1,
+    4,
+    8,
+    9,
+    10,
+    11
+   ]
+  },
+  "68df29d8-dcd0-4955-b4d7-9f0f839ac906": {
+   "usuario": "cherno",
+   "provincia": "Ciudad de Buenos Aires",
+   "club": "River Plate",
+   "club_id": 608,
+   "alta": "2026-03-05",
+   "fantasy_total": 1275.8,
+   "fantasy_puesto_general": 9,
+   "prode_total": 208,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "17c822b3-9be6-4073-ba45-076503149dab": {
+   "usuario": "santulo98",
+   "provincia": "Córdoba",
+   "club": "Talleres",
+   "club_id": 1071,
+   "alta": "2026-09-06",
+   "fantasy_total": null,
+   "fantasy_puesto_general": null,
+   "prode_total": 59,
+   "prode_fechas": [
+    8,
+    9,
+    10,
+    11
+   ]
+  },
+  "f20c7746-8d55-48b2-b129-f9172d276a40": {
+   "usuario": "bautiscarella_",
+   "provincia": "Buenos Aires",
+   "club": "Boca Juniors",
+   "club_id": 540,
+   "alta": "2026-09-14",
+   "fantasy_total": 176.2,
+   "fantasy_puesto_general": 38549,
+   "prode_total": 16,
+   "prode_fechas": [
+    9,
+    10,
+    11
+   ]
+  },
+  "f651200d-aaef-4eee-9a11-aa101267af6f": {
+   "usuario": "talan33",
+   "provincia": "Córdoba",
+   "club": "Talleres",
+   "club_id": 1071,
+   "alta": "2026-08-16",
+   "fantasy_total": 577.5,
+   "fantasy_puesto_general": 10535,
+   "prode_total": 77,
+   "prode_fechas": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "71385381-18ae-44fc-bada-1174b074e13c": {
+   "usuario": "lauta_snr",
+   "provincia": "Buenos Aires",
+   "club": "Boca Juniors",
+   "club_id": 540,
+   "alta": "2026-07-22",
+   "fantasy_total": 1045.4,
+   "fantasy_puesto_general": 589,
+   "prode_total": 146,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "fc66a8f5-25eb-4d68-bbc7-3bff18160dd7": {
+   "usuario": "tongalucero",
+   "provincia": "Mendoza",
+   "club": "Independiente",
+   "club_id": 1243,
+   "alta": "2026-09-15",
+   "fantasy_total": 118.7,
+   "fantasy_puesto_general": 40100,
+   "prode_total": 38,
+   "prode_fechas": [
+    10,
+    11
+   ]
+  },
+  "7f0f0f9b-aede-4f16-9978-8a8c96c783f4": {
+   "usuario": "tomasv",
+   "provincia": "Buenos Aires",
+   "club": "Boca Juniors",
+   "club_id": 540,
+   "alta": "2026-09-08",
+   "fantasy_total": null,
+   "fantasy_puesto_general": null,
+   "prode_total": 56,
+   "prode_fechas": [
+    9,
+    10,
+    11,
+    15
+   ]
+  },
+  "2fe131d4-6ea5-4f0e-85eb-c3dd46f47a22": {
+   "usuario": "beekqac",
+   "provincia": "Ciudad de Buenos Aires",
+   "club": "Quilmes",
+   "club_id": 32,
+   "alta": "2026-08-25",
+   "fantasy_total": 335.1,
+   "fantasy_puesto_general": 27209,
+   "prode_total": 51,
+   "prode_fechas": [
+    7,
+    10
+   ]
+  },
+  "ac7b766b-1c5b-4ecf-895b-751df18de2b8": {
+   "usuario": "facaking",
+   "provincia": "Ciudad de Buenos Aires",
+   "club": "Independiente",
+   "club_id": 1243,
+   "alta": "2026-08-13",
+   "fantasy_total": 595.3,
+   "fantasy_puesto_general": 9757,
+   "prode_total": 148,
+   "prode_fechas": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  "0f0f727d-334f-4f54-af56-7a6b60af8587": {
+   "usuario": "tiziiii",
+   "provincia": "Buenos Aires",
+   "club": "River Plate",
+   "club_id": 608,
+   "alta": "2026-08-20",
+   "fantasy_total": 611.5,
+   "fantasy_puesto_general": 9132,
+   "prode_total": 112,
+   "prode_fechas": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ]
+  },
+  "5d245f4a-a250-42d9-9d43-20df66d36b20": {
+   "usuario": "cuberas",
+   "provincia": "Buenos Aires",
+   "club": "Rosario Central",
+   "club_id": 745,
+   "alta": "2026-07-23",
+   "fantasy_total": null,
+   "fantasy_puesto_general": null,
+   "prode_total": 168,
+   "prode_fechas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ]
+  }
+ }
+}

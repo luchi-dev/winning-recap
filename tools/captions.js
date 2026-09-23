@@ -11,8 +11,9 @@
  *     búsqueda web: lee los medios).
  *   - 'ganadores': el texto de dos líneas que acompaña la placa de Ganadores
  *     de la fecha (brief en captions-ganadores-brief.md, sin búsqueda web:
- *     sale todo de la base: provincia y club de los 6 ganadores, censo de
- *     hinchadas y jugadores en racha).
+ *     sale todo de la base: provincia, club e historia de los 6 ganadores,
+ *     censo de hinchadas y récords/primeras veces del torneo, verificados
+ *     contra los podios de todas las fechas anteriores).
  *
  * Lo que hace, en el orden en que lo haría un editor el lunes a la mañana:
  *   1. Junta de la base (clave pública) el 11 Ideal, los resultados, la figura
@@ -405,100 +406,148 @@ async function escribirConClaude(datos) {
   return final;
 }
 
-// ── Ganadores de la fecha: los 6 ganadores y los jugadores en racha ───
-const PROVINCIAS = { BA: 'Buenos Aires', CABA: 'Ciudad de Buenos Aires', COR: 'Córdoba', SF: 'Santa Fe', MEN: 'Mendoza', TUC: 'Tucumán', ER: 'Entre Ríos', SAL: 'Salta', MIS: 'Misiones', CHA: 'Chaco', COR2: 'Corrientes', SDE: 'Santiago del Estero', SJ: 'San Juan', JUJ: 'Jujuy', RN: 'Río Negro', NQN: 'Neuquén', FOR: 'Formosa', CHU: 'Chubut', SL: 'San Luis', CAT: 'Catamarca', LR: 'La Rioja', LP: 'La Pampa', SC: 'Santa Cruz', TF: 'Tierra del Fuego' };
+// ── Ganadores de la fecha: los 6 ganadores y los récords de la gente de Winning ──
+// El texto de la placa habla de los usuarios, no de los futbolistas (el equipo
+// ganador ya tiene su propio posteo). La línea 2 es un récord o una primera vez
+// del torneo, verificado contra los podios y los perfiles de todas las fechas
+// anteriores. Los podios y perfiles se cachean en captions/podios.json.
+const PROVINCIAS = { BA: 'Buenos Aires', CABA: 'Ciudad de Buenos Aires', COR: 'Córdoba', SF: 'Santa Fe', MEN: 'Mendoza', TUC: 'Tucumán', ER: 'Entre Ríos', SAL: 'Salta', MIS: 'Misiones', CHA: 'Chaco', COR2: 'Corrientes', CTES: 'Corrientes', SDE: 'Santiago del Estero', SJ: 'San Juan', JUJ: 'Jujuy', RN: 'Río Negro', NEU: 'Neuquén', NQN: 'Neuquén', FOR: 'Formosa', CHU: 'Chubut', SL: 'San Luis', CAT: 'Catamarca', LR: 'La Rioja', LP: 'La Pampa', SC: 'Santa Cruz', TF: 'Tierra del Fuego' };
+const PODIOS = path.join(DIR, 'podios.json');
+const TOP_N = 10;
+
+async function podiosHasta(md) {
+  const cache = leer(PODIOS, {});
+  cache.fechas = cache.fechas || {}; cache.perfiles = cache.perfiles || {};
+  for (let f = 1; f <= md; f++) {
+    if (f < md && cache.fechas[f]) continue;   // una fecha cerrada no cambia; la actual siempre fresca
+    const [fantasy, prode] = await Promise.all([
+      rpc('get_global_leaderboard_round', { p_season_part_id: SEASON_PART, p_matchday: f, p_limit: TOP_N, p_offset: 0 }, 'tournaments'),
+      rpc('get_prediction_leaderboard_round', { p_season_part_id: SEASON_PART, p_matchday: f, p_limit: TOP_N, p_offset: 0 }, 'predictions'),
+    ]);
+    const fila = r => ({ rank: r.rank, user_id: r.user_id, usuario: r.display_name, puntos: r1(r.matchday_points) });
+    cache.fechas[f] = { fantasy: (Array.isArray(fantasy) ? fantasy : []).map(fila), prode: (Array.isArray(prode) ? prode : []).map(fila) };
+  }
+  // Perfil de cada ganador (1°) del torneo y de los 6 del podio de esta fecha
+  const necesarios = new Set();
+  for (const f in cache.fechas) for (const j of ['fantasy', 'prode']) {
+    const lista = cache.fechas[f][j];
+    lista.filter(r => r.rank === 1).forEach(r => necesarios.add(r.user_id));   // todos los 1° (en el prode hay empates en la punta)
+    if (Number(f) === md) lista.slice(0, 3).forEach(r => necesarios.add(r.user_id));
+  }
+  for (const id of necesarios) {
+    if (cache.perfiles[id] && !cache.fechas[md].fantasy.concat(cache.fechas[md].prode).slice(0, 3).some(r => r.user_id === id)) continue;
+    const p = await rpc('get_user_full_profile', { p_user_id: id, p_season_part_id: SEASON_PART }).catch(() => ({}));
+    cache.perfiles[id] = {
+      usuario: p.username || null, provincia: PROVINCIAS[p.province_code] || p.province_code || null,
+      club: p.supported_team_name || null, club_id: p.supported_team_id || null, alta: (p.created_at || '').slice(0, 10) || null,
+      fantasy_total: r1((p.fantasy_stats || {}).total_points), fantasy_puesto_general: (p.fantasy_stats || {}).global_rank || null,
+      prode_total: (p.prode_stats || {}).total_points ?? null, prode_fechas: p.prode_matchdays || [],
+    };
+  }
+  fs.mkdirSync(DIR, { recursive: true });
+  fs.writeFileSync(PODIOS, JSON.stringify(cache, null, 1));
+  return cache;
+}
 
 async function datosGanadores(md) {
-  const [fantasy, prode, censo] = await Promise.all([
-    rpc('get_global_leaderboard_round', { p_season_part_id: SEASON_PART, p_matchday: md, p_limit: 3, p_offset: 0 }, 'tournaments'),
-    rpc('get_prediction_leaderboard_round', { p_season_part_id: SEASON_PART, p_matchday: md, p_limit: 3, p_offset: 0 }, 'predictions'),
+  const [cache, censo, fixtures] = await Promise.all([
+    podiosHasta(md),
     rpc('get_censo_hinchadas', {}),
+    api(`fixtures?competition_id=eq.${COMPETITION}&season_id=eq.${SEASON}&matchday=lte.${md}&select=matchday,kickoff_utc`, LPF).catch(() => []),
   ]);
-  const totalHinchas = (censo || []).reduce((a, c) => a + (Number(c.fan_count) || 0), 0);
+  const inicioDe = {};   // primer partido de cada fecha (hora argentina), para saber si un ganador se anotó "la semana anterior"
+  fixtures.forEach(x => { const d = new Date(new Date(x.kickoff_utc) - 3 * HORA).toISOString().slice(0, 10); if (!inicioDe[x.matchday] || d < inicioDe[x.matchday]) inicioDe[x.matchday] = d; });
+  const dias = (a, b) => Math.round((new Date(b) - new Date(a)) / (24 * HORA));
   const pctClub = id => { const c = (censo || []).find(x => x.team_id === id); return c ? Number(c.fan_pct) : null; };
+  const F = cache.fechas, P = cache.perfiles;
+  const esta = F[md];
+  const anteriores = Object.keys(F).map(Number).filter(f => f < md).sort((a, b) => a - b);
+  const juegos = ['fantasy', 'prode'];
 
-  const perfil = async (fila, juego) => {
-    const p = await rpc('get_user_full_profile', { p_user_id: fila.user_id, p_season_part_id: SEASON_PART }).catch(() => ({}));
-    const fs_ = p.fantasy_stats || {}, ps = p.prode_stats || {};
-    const alta = (p.created_at || '').slice(0, 10);
-    const diasAntes = alta ? Math.round((Date.now() - new Date(alta)) / (24 * HORA)) : null;
-    return {
-      juego, puesto: fila.rank, puntos_de_la_fecha: r1(fila.matchday_points),
-      provincia: PROVINCIAS[p.province_code] || p.province_code || null,
-      hincha_de: p.supported_team_name || null,
-      pct_de_usuarios_hinchas_de_ese_club: pctClub(p.supported_team_id),
-      se_anoto_el: alta || null,
-      dias_desde_que_se_anoto: diasAntes,
-      fantasy: { puntos_totales_torneo: r1(fs_.total_points), puesto_general: fs_.global_rank || null,
-        primera_fecha_con_puntos: Number(fs_.total_points) && Math.abs(Number(fs_.total_points) - Number(fila.matchday_points)) < 0.05 && juego === 'fantasy' ? md : undefined },
-      prode: { puntos_totales_torneo: ps.total_points ?? null, fechas_jugadas: p.prode_matchdays || [] },
-    };
-  };
+  // Los 6 del podio de esta fecha, con su historia en el torneo
   const ganadores = [];
-  for (const f of (fantasy || [])) ganadores.push(await perfil(f, 'fantasy'));
-  for (const f of (prode || [])) ganadores.push(await perfil(f, 'prode'));
-  ganadores.forEach(g => { if (g.fantasy.primera_fecha_con_puntos === undefined) delete g.fantasy.primera_fecha_con_puntos; });
-  const nombres = [...(fantasy || []), ...(prode || [])].map(f => f.display_name).filter(Boolean);
-
-  // Jugadores en racha: las últimas tres fechas (o menos si el torneo recién empieza)
-  const fechas = [md - 2, md - 1, md].filter(f => f >= 1);
-  const por = {};
-  for (const f of fechas) {
-    const filas = await api(`v_fantasy_player_match_points?competition_id=eq.${COMPETITION}&season_id=eq.${SEASON}&matchday=eq.${f}&select=player_id,player_name,total_points,team_id,game_id&limit=3000`);
-    filas.forEach(r => { const p = por[r.player_id] = por[r.player_id] || { nombre: r.player_name, team_id: r.team_id, puntos: {}, games: {} }; p.puntos[f] = r1(r.total_points); p.games[f] = r.game_id; });
-  }
-  // Goles y asistencias fecha a fecha de los jugadores del equipo del ganador (para el puente A).
-  const wPlayers = (((await recap(md)).winner_team || {}).players || []).map(p => p.player_id);
-  const golesDe = {};
-  if (wPlayers.length) {
-    const games = [...new Set(wPlayers.flatMap(id => Object.values((por[id] || {}).games || {})))].filter(Boolean);
-    const stats = games.length ? await api(`player_match_stats?player_id=in.(${wPlayers.join(',')})&game_id=in.(${games.join(',')})&select=player_id,game_id,goals,goal_assist`, LPF).catch(() => []) : [];
-    stats.forEach(s => {
-      const f = Object.keys((por[s.player_id] || {}).games || {}).find(k => por[s.player_id].games[k] === s.game_id);
-      if (f) (golesDe[s.player_id] = golesDe[s.player_id] || {})[f] = { goles: Number(s.goals) || 0, asistencias: Number(s.goal_assist) || 0 };
+  for (const j of juegos) for (const r of esta[j].slice(0, 3)) {
+    const p = P[r.user_id] || {};
+    const podiosAntes = anteriores.filter(f => F[f][j].slice(0, 3).some(x => x.user_id === r.user_id));
+    const top10Antes = anteriores.filter(f => F[f][j].some(x => x.user_id === r.user_id));
+    const otroJuego = j === 'fantasy' ? 'prode' : 'fantasy';
+    const podiosOtro = anteriores.concat([md]).filter(f => F[f][otroJuego].slice(0, 3).some(x => x.user_id === r.user_id));
+    ganadores.push({
+      juego: j, puesto: r.rank, puntos_de_la_fecha: r.puntos,
+      provincia: p.provincia, hincha_de: p.club, pct_de_usuarios_hinchas_de_ese_club: pctClub(p.club_id),
+      se_anoto_el: p.alta, dias_entre_el_alta_y_el_inicio_de_la_fecha: p.alta && inicioDe[md] ? dias(p.alta, inicioDe[md]) : null,
+      primera_fecha_con_puntos_en_fantasy: j === 'fantasy' && Math.abs(Number(p.fantasy_total) - Number(r.puntos)) < 0.05 ? md : null,
+      fechas_de_prode_jugadas: p.prode_fechas, puesto_general_fantasy: p.fantasy_puesto_general,
+      podios_anteriores_en_este_juego: podiosAntes, top10_anteriores_en_este_juego: top10Antes, podios_en_el_otro_juego: podiosOtro,
     });
   }
-  const idealDe = {};
-  for (const f of fechas) idealDe[f] = (((await recap(f)).winning_team || {}).players || []).map(p => p.player_id);
-  const teamIds = [...new Set(Object.values(por).map(p => p.team_id))].filter(Boolean);
-  const equipos = teamIds.length ? await api(`teams?id=in.(${teamIds.join(',')})&select=id,name`) : [];
-  const club = id => (equipos.find(t => t.id === id) || {}).name || '';
-  const lista = Object.entries(por).map(([id, p]) => ({
-    player_id: Number(id), nombre: p.nombre, club: club(p.team_id),
-    puntos_por_fecha: p.puntos,
-    suma: r1(Object.values(p.puntos).reduce((a, b) => a + b, 0)),
-    jugo_las_tres: Object.keys(p.puntos).length === fechas.length,
-    minimo: Math.min(...Object.values(p.puntos)),
-    en_11_ideal: fechas.filter(f => idealDe[f].includes(Number(id))),
-  }));
-  const top = lista.filter(p => p.jugo_las_tres).sort((a, b) => b.suma - a.suma).slice(0, 8);
-  const parejos = lista.filter(p => p.jugo_las_tres && p.minimo >= 12).sort((a, b) => b.suma - a.suma);
-  const repetidos = lista.filter(p => p.en_11_ideal.length >= 2).sort((a, b) => b.en_11_ideal.length - a.en_11_ideal.length);
 
-  // El equipo del ganador del fantasy, con la racha de cada jugador: el puente A.
-  const porId = Object.fromEntries(lista.map(p => [p.player_id, p]));
-  const w = (await recap(md)).winner_team || {};
-  const equipoGanador = (w.players || []).map(p => {
-    const r = porId[p.player_id] || {};
-    const g = golesDe[p.player_id] || {};
-    const golesSeguidos = fechas.filter(f => (g[f] || {}).goles > 0).length;
-    return { nombre: p.player_name, club: r.club || p.team_short_name, puntos_esta_fecha: r1(p.total_points), capitan: p.is_captain === true,
-      puntos_por_fecha: r.puntos_por_fecha || {}, goles_y_asistencias_por_fecha: g, fechas_con_gol_de_las_ultimas_tres: golesSeguidos,
-      en_11_ideal: r.en_11_ideal || [], en_racha: !!(r.jugo_las_tres && r.minimo >= 12) || (r.en_11_ideal || []).length >= 2 || golesSeguidos >= 2 };
-  }).sort((a, b) => b.puntos_esta_fecha - a.puntos_esta_fecha);
+  // Récords y primeras veces del torneo, cada uno con su dato verificado.
+  // "Ganador" = todos los que terminaron 1° (en el prode suele haber empates en la punta).
+  const hechos = [];
+  const primeros = j => Object.keys(F).map(Number).sort((a, b) => a - b).flatMap(f => F[f][j].filter(r => r.rank === 1).map(r => ({ fecha: f, ...r, perfil: P[r.user_id] || {} })));
+  for (const j of juegos) {
+    const lista = primeros(j);
+    const actuales = lista.filter(x => x.fecha === md); if (!actuales.length) continue;
+    const actual = actuales[0];
+    const previos = lista.filter(x => x.fecha < md);
+    const fechasN = new Set(lista.map(x => x.fecha)).size;
+    const unoPorFecha = [...new Map(lista.map(x => [x.fecha, x])).values()];
+    const empates = [...new Set(lista.filter(x => lista.filter(y => y.fecha === x.fecha).length > 1).map(x => x.fecha))];
+    // Empate en la punta en esta fecha
+    if (actuales.length > 1) hechos.push({ tipo: 'empate-en-la-punta', juego: j, dato: `En el ${j} hubo empate en la punta: ${actuales.length} usuarios con ${ar(actual.puntos)} puntos. ${empates.filter(f => f < md).length ? 'Ya había pasado en las fechas ' + empates.filter(f => f < md).join(', ') + '.' : 'Es el primer empate en la punta del torneo.'}` });
+    // Puntaje del ganador comparado con los ganadores anteriores (uno por fecha)
+    const previosPorFecha = unoPorFecha.filter(x => x.fecha < md);
+    const mayores = previosPorFecha.filter(x => x.puntos > actual.puntos).length;
+    const record = previosPorFecha.reduce((m, x) => Math.max(m, x.puntos), 0);
+    hechos.push({ tipo: 'puntaje-ganador', juego: j, dato: `El ganador del ${j} hizo ${ar(actual.puntos)}: ${mayores === 0 ? 'el puntaje ganador más alto del torneo' : `el ${mayores + 1}º puntaje ganador más alto de ${fechasN} fechas`} (récord: ${ar(record > actual.puntos ? record : actual.puntos)} en la fecha ${(record > actual.puntos ? previosPorFecha.find(x => x.puntos === record) : actual).fecha}; el más bajo: ${ar(Math.min(...unoPorFecha.map(x => x.puntos)))}).` });
+    // Repetidos: ¿alguien ganó dos veces?
+    const veces = {}; lista.forEach(x => { veces[x.user_id] = (veces[x.user_id] || 0) + 1; });
+    const dobles = Object.values(veces).filter(n => n > 1).length;
+    hechos.push({ tipo: 'nadie-gano-dos-veces', juego: j, dato: dobles ? `En el ${j} ya hay ${dobles} usuario(s) que ganaron más de una fecha.` : `En ${fechasN} fechas de ${j}, ${Object.keys(veces).length} ganadores distintos${empates.length ? ` (con empate en la punta en las fechas ${empates.join(', ')})` : ''}: nadie ganó dos veces.` });
+    for (const a of actuales) {
+      const quien = actuales.length > 1 ? `Uno de los ganadores del ${j}` : `El ganador del ${j}`;
+      // Provincia y club del ganador: ¿primera vez?
+      const prov = a.perfil.provincia, club = a.perfil.club;
+      if (prov) { const antes = [...new Set(previos.filter(x => x.perfil.provincia === prov).map(x => x.fecha))]; hechos.push({ tipo: 'primera-vez-provincia', juego: j, dato: antes.length ? `${quien} es de ${prov}: ya habían ganado desde ${prov} en las fechas ${antes.join(', ')}.` : `Primer ganador del ${j} de ${prov} en el torneo (provincias de los ganadores anteriores: ${[...new Set(previos.map(x => x.perfil.provincia).filter(Boolean))].join(', ')}).` }); }
+      if (club) { const antes = [...new Set(previos.filter(x => x.perfil.club === club).map(x => x.fecha))]; hechos.push({ tipo: 'primera-vez-club', juego: j, dato: antes.length ? `${quien} es hincha de ${club}: ya habían ganado hinchas de ${club} en las fechas ${antes.join(', ')}.` : `Primer hincha de ${club} que gana el ${j} en el torneo (clubes de los ganadores anteriores: ${[...new Set(previos.map(x => x.perfil.club).filter(Boolean))].join(', ')}).` }); }
+      // Ganador recién anotado: ¿ya había pasado?
+      const nuevo = a.perfil.alta && inicioDe[md] ? dias(a.perfil.alta, inicioDe[md]) : null;
+      if (nuevo !== null && nuevo <= 10) {
+        const otros = [...new Set(previos.filter(x => x.perfil.alta && inicioDe[x.fecha] && dias(x.perfil.alta, inicioDe[x.fecha]) <= 10).map(x => x.fecha))];
+        hechos.push({ tipo: 'ganador-recien-anotado', juego: j, dato: `${quien} se anotó ${nuevo} días antes del inicio de la fecha. ${otros.length ? 'Ya había pasado con ganadores de las fechas ' + otros.join(', ') + '.' : 'Es la primera vez en el torneo que gana alguien recién anotado.'}` });
+      }
+    }
+    // Diferencia con el segundo (con empate en la punta es 0)
+    const segundo = (F[md][j][1] || {}).puntos;
+    if (segundo != null) {
+      const difs = anteriores.map(f => (F[f][j][0] && F[f][j][1]) ? r1(F[f][j][0].puntos - F[f][j][1].puntos) : null).filter(x => x !== null);
+      const dif = r1(actual.puntos - segundo);
+      hechos.push({ tipo: 'diferencia-con-el-segundo', juego: j, dato: `En el ${j} el 1° le sacó ${ar(dif)} al 2° (la mayor del torneo fue ${ar(Math.max(...difs, dif))}, la menor ${ar(Math.min(...difs, dif))}).` });
+    }
+  }
+  // Debutantes en el podio / repetidos
+  const debutantes = ganadores.filter(g => !g.top10_anteriores_en_este_juego.length).length;
+  hechos.push({ tipo: 'debutantes-en-el-podio', dato: debutantes === 6 ? 'Los seis del podio de esta fecha nunca habían estado ni en un top 10 de una fecha.' : `${debutantes} de los seis del podio nunca habían estado en un top 10; los otros ya tenían historia en el torneo.` });
+  const repes = ganadores.filter(g => g.podios_anteriores_en_este_juego.length).map(g => `${g.puesto}° del ${g.juego}, que ya había sido podio en la(s) fecha(s) ${g.podios_anteriores_en_este_juego.join(', ')}`);
+  if (repes.length) hechos.push({ tipo: 'repite-podio', dato: 'Repiten podio: ' + repes.join('; ') + '.' });
+  const dobleJuego = ganadores.filter(g => g.podios_en_el_otro_juego.length).map(g => `${g.puesto}° del ${g.juego}, también podio de ${g.juego === 'fantasy' ? 'prode' : 'fantasy'} en la(s) fecha(s) ${g.podios_en_el_otro_juego.join(', ')}`);
+  if (dobleJuego.length) hechos.push({ tipo: 'podio-en-los-dos-juegos', dato: 'Podio en los dos juegos: ' + dobleJuego.join('; ') + '.' });
+  // Clubes del podio contra el censo
+  const porClub = {}; ganadores.forEach(g => { if (g.hincha_de) porClub[g.hincha_de] = porClub[g.hincha_de] || { n: 0, pct: g.pct_de_usuarios_hinchas_de_ese_club }; if (g.hincha_de) porClub[g.hincha_de].n++; });
+  hechos.push({ tipo: 'clubes-del-podio', dato: 'Clubes de los seis: ' + Object.entries(porClub).map(([c, v]) => `${c} ${v.n} (${v.pct}% de los usuarios)`).join(', ') + '.' });
+
+  // Qué tipos se usaron en las últimas fechas, para no repetir siempre lo mismo
+  const todo = leer(ARCHIVO, {});
+  const usados = anteriores.slice(-3).map(f => ({ fecha: f, tipos: ((todo[`${COMPETITION}-${SEASON}-${f}`] || {}).ganadores || []).map(g => g.tipo).filter(Boolean) })).filter(x => x.tipos.length);
 
   return {
-    torneo: TORNEO, fecha: md, hoy: new Date(Date.now() - 3 * HORA).toISOString().slice(0, 10),
+    torneo: TORNEO, fecha: md, hoy: new Date(Date.now() - 3 * HORA).toISOString().slice(0, 10), fechas_jugadas: Object.keys(F).length,
     ganadores,
-    equipo_del_ganador_del_fantasy: equipoGanador,
-    nombres_de_usuario_de_los_ganadores_NO_NOMBRAR: nombres,
-    censo_hinchadas: { total_usuarios_con_club: totalHinchas, clubes_mas_grandes: (censo || []).slice(0, 8).map(c => ({ club: c.team_name, pct: Number(c.fan_pct) })) },
-    rachas: {
-      fechas_miradas: fechas,
-      mas_puntos_sumados: top,
-      doce_o_mas_en_todas: parejos,
-      repitieron_en_el_11_ideal: repetidos,
-    },
+    nombres_de_usuario_de_los_ganadores_NO_NOMBRAR: [...new Set(esta.fantasy.slice(0, 3).concat(esta.prode.slice(0, 3)).flatMap(r => [r.usuario, (P[r.user_id] || {}).usuario]).filter(Boolean))],
+    records_y_primeras_veces: hechos,
+    tipos_usados_en_fechas_anteriores: usados,
+    censo_hinchadas: { clubes_mas_grandes: (censo || []).slice(0, 8).map(c => ({ club: c.team_name, pct: Number(c.fan_pct) })) },
     datos_no_disponibles: [
       'tenencia: cuántos usuarios tenían a cada jugador (no se puede leer)',
       'distribución de provincias de todos los usuarios (sólo se sabe la de los ganadores)',
@@ -506,6 +555,7 @@ async function datosGanadores(md) {
   };
 }
 
+const TIPOS = ['empate-en-la-punta', 'puntaje-ganador', 'nadie-gano-dos-veces', 'primera-vez-provincia', 'primera-vez-club', 'ganador-recien-anotado', 'diferencia-con-el-segundo', 'debutantes-en-el-podio', 'repite-podio', 'podio-en-los-dos-juegos', 'clubes-del-podio', 'sin-record'];
 const ESQUEMA_GANADORES = {
   type: 'object', additionalProperties: false,
   required: ['versiones', 'nota'],
@@ -513,18 +563,18 @@ const ESQUEMA_GANADORES = {
     versiones: {
       type: 'array', items: {
         type: 'object', additionalProperties: false,
-        required: ['puente', 'linea1', 'linea2'],
+        required: ['tipo', 'titulo', 'linea1', 'linea2'],
         properties: {
-          puente: { type: 'string', enum: ['A', 'B'], description: 'A: un jugador que el ganador tenía; B: por el tema' },
-          linea1: { type: 'string', description: 'la conclusión sobre los ganadores, o que no hubo nada llamativo' },
-          linea2: { type: 'string', description: 'el dato conectado con la línea 1, como dato y no como recomendación' },
+          tipo: { type: 'string', enum: TIPOS, description: 'el tipo de récord o primera vez que usa la línea 2' },
+          titulo: { type: 'string', description: 'para la caja del editor: "Opción A · récord: ..." / "Opción B · primera vez: ..."' },
+          linea1: { type: 'string', description: 'la conclusión sobre los seis ganadores, o que no hubo nada llamativo' },
+          linea2: { type: 'string', description: 'el récord o la primera vez, como dato' },
         },
       },
     },
     nota: { type: 'string', description: 'qué datos usaste y cuáles faltaban' },
   },
 };
-const TITULO_PUENTE = { A: 'Opción A · puente: un jugador que el ganador tenía', B: 'Opción B · puente: por el tema' };
 
 function problemasGanadores(res, datos) {
   const p = [];
@@ -537,12 +587,13 @@ function problemasGanadores(res, datos) {
     if (/#\w/.test(l1 + l2)) p.push(q + 'sin hashtags');
     if (/\b(pon[eé]|sum[aá]|conviene|recomend|met[eé]lo|comprá|comprar)\b/i.test(l2)) p.push(q + 'la línea 2 es un dato, no una recomendación');
     (datos.nombres_de_usuario_de_los_ganadores_NO_NOMBRAR || []).forEach(n => {
-      const limpio = n.replace(/^@/, '').replace(/_+$/, '');
+      const limpio = String(n).replace(/^@/, '').replace(/_+$/, '');
       if (limpio.length >= 4 && (l1 + ' ' + l2).toLowerCase().includes(limpio.toLowerCase())) p.push(q + 'no nombrar a los ganadores (' + n + ')');
     });
   });
-  const conRacha = (datos.equipo_del_ganador_del_fantasy || []).some(j => j.en_racha);
-  if (vs.length === 2 && vs[0].puente === vs[1].puente && conRacha) p.push('las dos versiones tienen que usar puentes distintos (A y B)');
+  if (vs.length === 2 && vs[0].tipo === vs[1].tipo && vs[0].tipo !== 'sin-record') p.push('las dos versiones tienen que usar récords de tipo distinto');
+  const recientes = new Set((datos.tipos_usados_en_fechas_anteriores || []).slice(-1).flatMap(x => x.tipos));
+  vs.forEach((v, i) => { if (recientes.has(v.tipo) && recientes.size < TIPOS.length - 2) p.push(`versión ${i + 1}: el tipo "${v.tipo}" ya se usó en la fecha anterior; elegí otro para que no sea siempre igual`); });
   return p;
 }
 
@@ -577,7 +628,7 @@ function guardar(md, datos, res, resGanadores) {
   if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim(), texto_corto: (c.texto_corto || '').trim() || undefined }));
   // El encabezado lo pone el código, no el editor: anuncia de qué es el posteo, como el título del 11 Ideal.
   if (resGanadores) entrada.ganadores = resGanadores.versiones.map(v => ({
-    titulo: TITULO_PUENTE[v.puente] || 'Ganadores de la fecha',
+    tipo: v.tipo, titulo: v.titulo || 'Ganadores de la fecha',
     texto: `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}\n\n` + v.linea1.trim() + '\n\n' + v.linea2.trim(),
   }));
   todo[clave] = entrada;
@@ -587,7 +638,7 @@ function guardar(md, datos, res, resGanadores) {
   fs.mkdirSync(DIR, { recursive: true });
   const seccionGanadores = resGanadores ? [
     '## 5. Texto de la placa de Ganadores', '',
-    ...resGanadores.versiones.flatMap(v => [`### ${TITULO_PUENTE[v.puente] || 'Versión'}`, '', '```', `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}`, '', v.linea1.trim(), '', v.linea2.trim(), '```', '']),
+    ...resGanadores.versiones.flatMap(v => [`### ${v.titulo || 'Versión'} (${v.tipo})`, '', '```', `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}`, '', v.linea1.trim(), '', v.linea2.trim(), '```', '']),
     'Nota del editor: ' + resGanadores.nota, '',
   ] : [];
   if (!res) {
