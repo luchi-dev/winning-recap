@@ -51,6 +51,7 @@ const BRIEF_GANADORES = path.join(__dirname, 'captions-ganadores-brief.md');
 
 const MODEL = process.env.CAPTIONS_MODEL || 'claude-opus-5';
 const MAX_BUSQUEDAS = 12, MAX_NOTAS = 15;
+const MAX_X = 275;   // X corta en 280; margen por cómo cuenta emojis y acentos
 
 const HORA = 3600e3;
 const hora = () => new Date(Date.now() - 3 * HORA).toISOString().slice(11, 16);
@@ -291,11 +292,12 @@ const ESQUEMA = {
     captions: {
       type: 'array', items: {
         type: 'object', additionalProperties: false,
-        required: ['titulo', 'texto', 'texto_corto'],
+        required: ['titulo', 'texto', 'texto_corto', 'texto_x'],
         properties: {
           titulo: { type: 'string', description: 'qué historias combina y qué cierre usa, para la caja del editor' },
           texto: { type: 'string', description: 'el caption completo para Instagram, con saltos de línea entre párrafos' },
           texto_corto: { type: 'string', description: 'el mismo caption, mismas historias, figura y cierre, con menos palabras (60% del largo o menos)' },
+          texto_x: { type: 'string', description: 'versión para X sin el título (lo pone el sistema): la figura en una frase y el cierre con la pregunta, hasta 220 caracteres' },
         },
       },
     },
@@ -336,6 +338,15 @@ function problemas(res, md) {
       if (!/\?\s*$/.test(c2)) p.push(`la versión corta del caption ${i + 1} tiene que terminar con la pregunta a ustedes`);
       if (c2.length > t.length * 0.75) p.push(`la versión corta del caption ${i + 1} no es corta: tiene ${c2.length} caracteres contra ${t.length} de la completa; apuntá al 60%`);
       if (/#\w|⭐/.test(c2)) p.push(`la versión corta del caption ${i + 1} tiene hashtags o estrella`);
+    }
+    // La versión para X: sin título (lo agrega el sistema), con la pregunta, y que entre en 280 con el título puesto.
+    const cx = (c.texto_x || '').trim();
+    if (!cx) p.push(`al caption ${i + 1} le falta la versión para X (texto_x)`);
+    else {
+      if (cx.startsWith('🔥')) p.push(`la versión para X del caption ${i + 1} no lleva el título: lo agrega el sistema`);
+      if (!/\?\s*$/.test(cx)) p.push(`la versión para X del caption ${i + 1} tiene que terminar con la pregunta a ustedes`);
+      if (titulo.length + 2 + cx.length > MAX_X) p.push(`la versión para X del caption ${i + 1} es larga: con el título suma ${titulo.length + 2 + cx.length} caracteres y X permite 280; apuntá a 220 sin título`);
+      if (/#\w|⭐/.test(cx)) p.push(`la versión para X del caption ${i + 1} tiene hashtags o estrella`);
     }
   });
   return p;
@@ -563,12 +574,13 @@ const ESQUEMA_GANADORES = {
     versiones: {
       type: 'array', items: {
         type: 'object', additionalProperties: false,
-        required: ['tipo', 'titulo', 'linea1', 'linea2'],
+        required: ['tipo', 'titulo', 'linea1', 'linea2', 'texto_x'],
         properties: {
           tipo: { type: 'string', enum: TIPOS, description: 'el tipo de récord o primera vez que usa la línea 2' },
           titulo: { type: 'string', description: 'para la caja del editor: "Opción A · récord: ..." / "Opción B · primera vez: ..."' },
           linea1: { type: 'string', description: 'la conclusión sobre los seis ganadores, o que no hubo nada llamativo' },
           linea2: { type: 'string', description: 'el récord o la primera vez, como dato' },
+          texto_x: { type: 'string', description: 'versión para X sin el encabezado (lo pone el sistema): una sola línea con lo esencial de las dos, hasta 200 caracteres' },
         },
       },
     },
@@ -586,9 +598,13 @@ function problemasGanadores(res, datos) {
     if (/\?\s*$/.test(l2) || /\?\s*$/.test(l1)) p.push(q + 'sin pregunta final');
     if (/#\w/.test(l1 + l2)) p.push(q + 'sin hashtags');
     if (/\b(pon[eé]|sum[aá]|conviene|recomend|met[eé]lo|comprá|comprar)\b/i.test(l2)) p.push(q + 'la línea 2 es un dato, no una recomendación');
+    const lx = (v.texto_x || '').trim();
+    if (!lx) p.push(q + 'falta la versión para X (texto_x)');
+    else if (lx.startsWith('🏆')) p.push(q + 'la versión para X no lleva el encabezado: lo agrega el sistema');
+    else if (44 + lx.length > MAX_X) p.push(q + `la versión para X es larga: con el encabezado suma ${44 + lx.length} caracteres y X permite 280; apuntá a 200`);
     (datos.nombres_de_usuario_de_los_ganadores_NO_NOMBRAR || []).forEach(n => {
       const limpio = String(n).replace(/^@/, '').replace(/_+$/, '');
-      if (limpio.length >= 4 && (l1 + ' ' + l2).toLowerCase().includes(limpio.toLowerCase())) p.push(q + 'no nombrar a los ganadores (' + n + ')');
+      if (limpio.length >= 4 && (l1 + ' ' + l2 + ' ' + lx).toLowerCase().includes(limpio.toLowerCase())) p.push(q + 'no nombrar a los ganadores (' + n + ')');
     });
   });
   if (vs.length === 2 && vs[0].tipo === vs[1].tipo && vs[0].tipo !== 'sin-record') p.push('las dos versiones tienen que usar récords de tipo distinto');
@@ -625,11 +641,13 @@ function guardar(md, datos, res, resGanadores) {
   if (!todo._) todo._ = "Captions escritos (no los del template) por fecha. Clave: <torneo>-<temporada>-<fecha>. Cada entrada de 'ideal' es una versión del caption del 11 Ideal para Instagram: 'titulo' es el ángulo (solo para la caja), 'texto' es lo que se copia. Subir 'v' cada vez que se cambia el texto: descarta lo que se haya editado a mano en el navegador. Si una fecha no está acá, la página arma el caption con el template de siempre. Los escribe tools/captions.js al cierre de cada fecha.";
   const antes = todo[clave] || {};
   const entrada = { ...antes, v: (antes.v || 0) + 1, escrito: new Date().toISOString(), modelo: MODEL };
-  if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim(), texto_corto: (c.texto_corto || '').trim() || undefined }));
+  if (res) entrada.ideal = res.captions.map(c => ({ titulo: c.titulo, texto: c.texto.trim(), texto_corto: (c.texto_corto || '').trim() || undefined,
+    texto_x: c.texto_x ? `🔥 11 IDEAL — FECHA ${md} | ${TORNEO}\n\n` + c.texto_x.trim() : undefined }));
   // El encabezado lo pone el código, no el editor: anuncia de qué es el posteo, como el título del 11 Ideal.
   if (resGanadores) entrada.ganadores = resGanadores.versiones.map(v => ({
     tipo: v.tipo, titulo: v.titulo || 'Ganadores de la fecha',
     texto: `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}\n\n` + v.linea1.trim() + '\n\n' + v.linea2.trim(),
+    texto_x: v.texto_x ? `🏆 GANADORES DE LA FECHA ${md} | ${TORNEO}\n\n` + v.texto_x.trim() : undefined,
   }));
   todo[clave] = entrada;
   fs.writeFileSync(ARCHIVO, JSON.stringify(todo, null, 2) + '\n');

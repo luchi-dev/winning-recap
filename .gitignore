@@ -9,6 +9,7 @@
 !/especiales.json
 !/captions.json
 !/captions/
+/captions/x-*
 !/publicar.bat
 !/Abrir Recap.bat
 !/tools/

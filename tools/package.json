@@ -10,6 +10,7 @@
     "@anthropic-ai/sdk": "^0.128.0",
     "@imgly/background-removal-node": "^1.4.5",
     "puppeteer-core": "^24.0.0",
-    "sharp": "^0.32.6"
+    "sharp": "^0.32.6",
+    "twitter-api-v2": "^1.29.1"
   }
 }

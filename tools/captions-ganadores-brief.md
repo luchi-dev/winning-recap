@@ -38,4 +38,6 @@ REGLAS DE DATOS
 - No inventes ningún dato. Todo lo que digas tiene que estar en el JSON, con el número que trae. Si un dato no está, no lo uses ni lo reemplaces por una estimación.
 - Los números con coma decimal (176,2) y punto de miles (43.000). Las fechas del torneo se nombran "fecha 9", no "jornada".
 
-Devolvé exactamente el JSON del esquema: dos versiones (cada una con tipo, titulo para la caja del editor, linea1 y linea2) y una nota corta con qué datos usaste y cuáles faltaban.
+Cada versión lleva también una VERSIÓN PARA X (texto_x): una sola línea que combine lo esencial de las dos, sin el encabezado (lo agrega el sistema), hasta 200 caracteres.
+
+Devolvé exactamente el JSON del esquema: dos versiones (cada una con tipo, titulo para la caja del editor, linea1, linea2 y texto_x) y una nota corta con qué datos usaste y cuáles faltaban.

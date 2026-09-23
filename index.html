@@ -3521,6 +3521,7 @@ function corregirSuperSuplentes(matchday, data) {
 function createCardWrapper(cardEl, filename) {
   const wrapper = document.createElement('div');
   wrapper.className = 'card-wrapper';
+  wrapper.dataset.filename = filename;   // para encontrar la placa desde afuera (tools/publicar-x.js)
 
   const scaleContainer = document.createElement('div');
   scaleContainer.className = 'card-scale-container';
@@ -6397,7 +6398,26 @@ async function renderFixturesCard(matchday, data) {
 }
 
 // ── Export ──
+/* La placa como PNG (data URL), exactamente igual que "Descargar PNG" pero sin
+   bajar el archivo. La usa tools/publicar-x.js desde Chrome sin cabeza para
+   publicar en X la misma imagen que se ve acá. */
+async function recapExportar(filename) {
+  const w = document.querySelector('.card-wrapper[data-filename="' + filename + '"]');
+  if (!w) throw new Error('no está la placa ' + filename);
+  return exportarCard(w.querySelector('.card, .pcard'));
+}
+window.recapExportar = recapExportar;
+
 async function downloadCard(cardEl, filename) {
+  const dataUrl = await exportarCard(cardEl);
+  if (!dataUrl) return;
+  const link = document.createElement('a');
+  link.download = filename + '.png';
+  link.href = dataUrl;
+  link.click();
+}
+
+async function exportarCard(cardEl) {
   const isPlayerCard = cardEl.classList.contains('pcard');
   const isPoster     = !isPlayerCard;
 
@@ -6438,18 +6458,15 @@ async function downloadCard(cardEl, filename) {
     if (overlay) overlay.style.display = 'none';
   }
 
+  let dataUrl = null;
   try {
-    const dataUrl = await htmlToImage.toPng(cardEl, {
+    dataUrl = await htmlToImage.toPng(cardEl, {
       width: exportW,
       height: exportH,
       pixelRatio: exportPR,
       backgroundColor: (isPoster && hasBg) ? undefined : 'transparent',
       style: { transform: 'none' },
     });
-    const link = document.createElement('a');
-    link.download = filename + '.png';
-    link.href = dataUrl;
-    link.click();
   } catch (err) {
     console.error('Export failed:', err);
     alert('Error al exportar: ' + err.message);
@@ -6465,6 +6482,7 @@ async function downloadCard(cardEl, filename) {
   cardEl.parentElement.style.width       = origParentW;
   cardEl.parentElement.style.height      = origParentH;
   cardEl.parentElement.style.overflow    = origParentOv;
+  return dataUrl;
 }
 
 async function downloadAll() {

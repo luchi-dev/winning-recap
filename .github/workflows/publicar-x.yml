@@ -1,0 +1,76 @@
+# Publica en X (Twitter) una placa del Recap con su texto, con un clic:
+# Actions → "Publicar en X" → Run workflow → fecha, placa y opción.
+# La imagen sale de la página publicada (winning.com.ar/iloveneuquen), igual
+# que el botón "Descargar PNG"; el texto, de captions.json (texto_x).
+name: Publicar en X
+
+on:
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: 'Número de fecha del Clausura 2026'
+        required: true
+        type: number
+      placa:
+        description: 'Qué placa'
+        required: true
+        type: choice
+        options: [ideal, ganadores]
+        default: ideal
+      opcion:
+        description: 'Qué texto: 1 a 4 para el 11 Ideal, A o B para Ganadores'
+        required: false
+        default: '1'
+      texto:
+        description: 'Texto propio (opcional): reemplaza al de captions.json'
+        required: false
+      probar:
+        description: 'Solo probar: arma la imagen y muestra el texto, no publica'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  X_API_KEY: ${{ secrets.X_API_KEY }}
+  X_API_SECRET: ${{ secrets.X_API_SECRET }}
+  X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+  X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+  CHROME_PATH: /usr/bin/google-chrome
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Traer los textos publicados (captions.json del sitio)
+        run: aws s3 cp s3://winning-com-ar/iloveneuquen/captions.json captions.json --only-show-errors || echo "(uso el captions.json del repo)"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: sa-east-1
+
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+
+      - name: Publicar
+        run: >
+          node tools/publicar-x.js ${{ inputs.fecha }} ${{ inputs.placa }} ${{ inputs.opcion }}
+          ${{ inputs.texto != '' && format('--texto "{0}"', inputs.texto) || '' }}
+          ${{ inputs.probar && '--probar' || '' }}
+
+      - name: Guardar la imagen que se publicó
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: placa-${{ inputs.placa }}-fecha${{ inputs.fecha }}
+          path: captions/x-*.jpg
+          if-no-files-found: ignore
