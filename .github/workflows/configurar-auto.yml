@@ -1,0 +1,63 @@
+# Prende y apaga la publicación automática (qué sale solo y en qué red) y lo
+# guarda en publicar.json en el sitio, que es lo que lee el vigilante en cada
+# corrida. Se dispara desde el panel "Publicación automática" de la página del
+# Recap (o a mano con Run workflow).
+name: Configurar publicación automática
+
+on:
+  workflow_dispatch:
+    inputs:
+      cierre_ig:
+        description: 'Cierre de fecha (carrusel 11 Ideal + Ganadores + MVPs) en Instagram/Facebook'
+        type: boolean
+        default: false
+      cierre_x:
+        description: 'Cierre de fecha en X'
+        type: boolean
+        default: false
+      dia_ig:
+        description: 'MVPs del día en Instagram/Facebook'
+        type: boolean
+        default: false
+      dia_x:
+        description: 'MVPs del día en X'
+        type: boolean
+        default: false
+      pitazo_ig:
+        description: 'Resultado de cada partido al pitazo en Instagram/Facebook'
+        type: boolean
+        default: false
+      pitazo_x:
+        description: 'Resultado de cada partido al pitazo en X'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+
+jobs:
+  configurar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Guardar publicar.json en el sitio
+        run: |
+          cat > publicar.json <<EOF
+          {
+            "_": "Qué se publica solo y en qué red. Lo escribe la acción 'Configurar publicación automática' desde el panel de la página; lo lee tools/vigilante.js.",
+            "actualizado": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "auto": {
+              "cierre": { "ig": ${{ inputs.cierre_ig }}, "x": ${{ inputs.cierre_x }} },
+              "dia":    { "ig": ${{ inputs.dia_ig }},    "x": ${{ inputs.dia_x }} },
+              "pitazo": { "ig": ${{ inputs.pitazo_ig }}, "x": ${{ inputs.pitazo_x }} }
+            }
+          }
+          EOF
+          cat publicar.json
+          aws s3 cp publicar.json $BUCKET/publicar.json --content-type application/json --cache-control "no-cache" --only-show-errors

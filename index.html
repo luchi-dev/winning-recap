@@ -1400,6 +1400,15 @@ body {
 .cap-btn.cap-x:hover { background: #222; }
 .cap-btn.cap-x:disabled { opacity: .7; cursor: wait; }
 .cap-btn.cap-x.is-error { background: #7a1f1f; border-color: #7a1f1f; }
+/* Panel de publicación automática */
+.auto-panel { background: #16161f; border: 1px solid #2b2b3a; border-radius: 8px; padding: 12px 16px; max-width: 720px; }
+.auto-ayuda { color: #999; font-size: 12px; margin: 4px 0 10px; }
+.auto-fila { display: flex; align-items: center; gap: 18px; padding: 8px 0; border-top: 1px solid #22222e; flex-wrap: wrap; }
+.auto-nombre { flex: 1 1 260px; color: #eee; font-size: 14px; font-weight: 700; }
+.auto-nombre small { display: block; color: #888; font-weight: 400; font-size: 12px; }
+.auto-fila label { color: #ccc; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.auto-acciones { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.auto-estado { color: #92B1DC; font-size: 12px; }
 /* Publicar en Instagram: violeta como la red */
 .cap-btn.cap-ig { background: #6b2fa3; border-color: #8a4fc4; color: #fff; font-weight: 700; }
 .cap-btn.cap-ig:hover { background: #7d3bbd; }
@@ -1897,6 +1906,7 @@ body {
   <div id="fotosContainer"></div>
   <div id="ganadoresConfig"></div>
   <div id="ganadoresContainer"></div>
+  <div id="autoPanel"></div>
   <div id="postersContainer"></div>
   <div id="mvpContainer"></div>
   <div id="goleadoresContainer"></div>
@@ -3460,6 +3470,7 @@ async function loadFecha(matchday) {
   // Winners and MVPs ride on their own queries; let them stream in beside the
   // match recap instead of serialising behind it.
   loadGanadores(matchday);
+  autoPanelRender();
   loadMvpCards(matchday);
   loadGoleadores(matchday);
   loadDestacado(matchday);
@@ -4611,6 +4622,57 @@ async function ghApi(ruta, opciones = {}) {
   if (!r.ok && r.status !== 204) throw new Error('GitHub respondió ' + r.status);
   return r.status === 204 ? null : r.json();
 }
+// ── Publicación automática ──
+// Qué sale solo y en qué red, en cada momento del posteo (lo ejecuta el
+// vigilante en GitHub: tools/publicar-auto.js). El panel muestra lo que dice
+// publicar.json en el sitio y, al guardar, le pide a GitHub que lo reescriba
+// (acción "Configurar publicación automática"). Cambia recién en la corrida
+// siguiente del vigilante.
+const AUTO_MOMENTOS = [
+  { id: 'cierre', nombre: 'Cierre de la fecha', detalle: 'carrusel 11 Ideal + Ganadores + MVPs, con el caption 1' },
+  { id: 'dia',    nombre: 'MVPs del día',       detalle: 'al terminar el último partido de cada día' },
+  { id: 'pitazo', nombre: 'Resultado al pitazo', detalle: 'la placa de resultado de cada partido, 15 por fecha' },
+];
+async function autoPanelRender() {
+  const cont = document.getElementById('autoPanel');
+  if (!cont) return;
+  let cfg = {};
+  try { const r = await fetch('publicar.json?v=' + Date.now()); const t = await r.text(); cfg = (t.trim().startsWith('{') ? JSON.parse(t) : {}); } catch (e) { cfg = {}; }
+  const auto = cfg.auto || {};
+  const fila = m => `<div class="auto-fila"><div class="auto-nombre">${m.nombre}<small>${m.detalle}</small></div>` +
+    `<label><input type="checkbox" data-auto="${m.id}:ig"${auto[m.id] && auto[m.id].ig ? ' checked' : ''}> Instagram</label>` +
+    `<label><input type="checkbox" data-auto="${m.id}:x"${auto[m.id] && auto[m.id].x ? ' checked' : ''}> X</label></div>`;
+  cont.innerHTML =
+    `<div class="match-section auto-panel"><h3>PUBLICACIÓN AUTOMÁTICA</h3>` +
+      `<div class="auto-ayuda">Lo que esté prendido sale solo en el momento del posteo, sin revisión previa. ` +
+      (cfg.actualizado ? `Última configuración guardada: ${gnEscape(cfg.actualizado.slice(0, 16).replace('T', ' '))} UTC.` : 'Todavía no hay nada prendido.') + `</div>` +
+      AUTO_MOMENTOS.map(fila).join('') +
+      `<div class="auto-acciones"><button class="cap-btn auto-guardar">Guardar</button><span class="auto-estado"></span></div>` +
+    `</div>`;
+  const btn = cont.querySelector('.auto-guardar'), est = cont.querySelector('.auto-estado');
+  btn.addEventListener('click', async () => {
+    if (!ghToken(true)) return;
+    const inputs = {};
+    cont.querySelectorAll('input[data-auto]').forEach(i => { inputs[i.dataset.auto.replace(':', '_')] = i.checked ? 'true' : 'false'; });
+    try {
+      btn.disabled = true; est.textContent = 'Guardando...';
+      const desde = new Date(Date.now() - 60e3).toISOString();
+      await ghApi('/actions/workflows/configurar-auto.yml/dispatches', { method: 'POST', body: JSON.stringify({ ref: 'main', inputs }) });
+      for (let i = 0; i < 20; i++) {
+        await new Promise(r => setTimeout(r, 6000));
+        const d = await ghApi('/actions/workflows/configurar-auto.yml/runs?per_page=1&created=>' + desde);
+        const run = d && d.workflow_runs && d.workflow_runs[0];
+        if (!run || run.status !== 'completed') continue;
+        est.textContent = run.conclusion === 'success' ? 'Guardado ✓' : 'Falló: ver en GitHub';
+        btn.disabled = false;
+        if (run.conclusion === 'success') setTimeout(autoPanelRender, 1500);
+        return;
+      }
+      est.textContent = 'Tarda más de lo normal: ver en GitHub'; btn.disabled = false;
+    } catch (e) { est.textContent = ''; btn.disabled = false; alert('No se pudo guardar: ' + e.message); }
+  });
+}
+
 /* Manda a publicar en una red y va mostrando el estado de la corrida en el botón. */
 async function capPublicarRed(btn, red, matchday, placa, opcion, texto) {
   const R = CAP_REDES[red];
@@ -6522,6 +6584,20 @@ async function recapExportar(filename) {
   return exportarCard(w.querySelector('.card, .pcard'));
 }
 window.recapExportar = recapExportar;
+
+/* Abre un partido de la fecha cargada (arma sus placas) con el diseño pedido.
+   La usa tools/publicar-auto.js para la placa de resultado al pitazo. */
+async function recapAbrirPartido(gameId, diseno) {
+  if (diseno && (diseno === 'nuevas' || diseno === 'antiguas')) disenoPartidos = diseno;
+  const { matchday, matches } = partidosDeLaFecha || {};
+  const i = (matches || []).findIndex(m => Number(m.game_id) === Number(gameId));
+  if (i < 0) throw new Error('el partido ' + gameId + ' no está en la fecha cargada');
+  const section = document.querySelectorAll('#matchesContainer .match-acordeon')[i];
+  if (!section) throw new Error('no está la sección del partido ' + gameId);
+  await abrirPartido(section, matches[i], matchday);
+  return true;
+}
+window.recapAbrirPartido = recapAbrirPartido;
 
 async function downloadCard(cardEl, filename) {
   const dataUrl = await exportarCard(cardEl);

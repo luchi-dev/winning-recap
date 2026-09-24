@@ -35,6 +35,16 @@ env:
   # Para los captions del 11 Ideal (tools/captions.js). Si el secreto no está,
   # el vigilante simplemente no escribe captions y lo demás sigue igual.
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  # Para publicar solo en el momento del posteo (tools/publicar-auto.js), según
+  # lo que esté prendido en publicar.json. Sin claves, esa red se saltea.
+  X_API_KEY: ${{ secrets.X_API_KEY }}
+  X_API_SECRET: ${{ secrets.X_API_SECRET }}
+  X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+  X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+  IG_USER_ID: ${{ secrets.IG_USER_ID }}
+  IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+  FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+  FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
 
 jobs:
   fotos:
@@ -53,7 +63,8 @@ jobs:
           aws s3 cp $BUCKET/fotos-partido/elegidas.json fotos-partido/elegidas.json --only-show-errors
           aws s3 sync $BUCKET/fotos/ fotos/ --only-show-errors
           aws s3 cp $BUCKET/captions.json captions.json --only-show-errors || echo "(todavía no hay captions.json)"
-          aws s3 sync $BUCKET/captions/ captions/ --only-show-errors
+          aws s3 sync $BUCKET/captions/ captions/ --only-show-errors --exclude "auto-*" --exclude "ig-*" --exclude "x-*"
+          aws s3 cp $BUCKET/publicar.json publicar.json --only-show-errors || echo "(sin publicar.json: nada se publica solo)"
 
       - name: Mirar si falta algo
         id: mirar
@@ -81,4 +92,4 @@ jobs:
           aws s3 sync fotos-partido/ $BUCKET/fotos-partido/ --cache-control "no-cache" --only-show-errors --exclude "*" --include "*.jpg" --include "elegidas.json" --exclude "_*"
           aws s3 cp vigilante.json $BUCKET/vigilante.json --cache-control "no-cache" --only-show-errors
           test -f captions.json && aws s3 cp captions.json $BUCKET/captions.json --cache-control "no-cache" --only-show-errors || true
-          aws s3 sync captions/ $BUCKET/captions/ --cache-control "no-cache" --only-show-errors
+          aws s3 sync captions/ $BUCKET/captions/ --cache-control "no-cache" --only-show-errors --exclude "auto-*" --exclude "ig-*" --exclude "x-*"

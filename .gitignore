@@ -11,6 +11,8 @@
 !/captions/
 /captions/x-*
 /captions/ig-*
+/captions/auto-*
+/publicar.json
 !/publicar.bat
 !/Abrir Recap.bat
 !/tools/

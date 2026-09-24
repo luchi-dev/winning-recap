@@ -80,6 +80,25 @@ function correr(script, argumentos) {
   return r.status === 0;
 }
 
+/* Publicación automática en redes (tools/publicar-auto.js): qué momento y qué
+   red están prendidos lo dice publicar.json (lo escribe la acción "Configurar
+   publicación automática" desde el panel de la página). Cada posteo se anota
+   en estado.publicado y se intenta UNA sola vez: repetir un posteo es peor que
+   perderlo. */
+const AUTO = (leer(path.join(RAIZ, 'publicar.json'), {}).auto) || {};
+const CLAVES_RED = { x: ['X_API_KEY', 'X_API_SECRET', 'X_ACCESS_TOKEN', 'X_ACCESS_SECRET'], ig: ['IG_USER_ID', 'IG_ACCESS_TOKEN'] };
+const redPrendida = (momento, red) => !!(AUTO[momento] && AUTO[momento][red]) && CLAVES_RED[red].every(k => process.env[k]);
+const autoPendiente = (estado, clave, momento) => ['ig', 'x'].filter(red => redPrendida(momento, red) && !(estado.publicado || {})[clave + ':' + red]);
+function autoPublicar(estado, guardar, clave, momento, md, extra) {
+  for (const red of autoPendiente(estado, clave, momento)) {
+    log('publicación automática: ' + momento + ' → ' + red + ' (' + clave + ')');
+    const ok = correr('publicar-auto.js', [momento, md, ...extra, '--redes', red]);
+    estado.publicado[clave + ':' + red] = { t: Date.now(), ok };
+    guardar();
+    log('publicación automática ' + clave + ' en ' + red + ': ' + (ok ? 'salió' : 'falló (no se reintenta, ver el log)'));
+  }
+}
+
 /* Sube lo encontrado. Sólo en GitHub (ahí está BUCKET); en una compu no publica nada. */
 function publicar() {
   if (!process.env.BUCKET) { log('(sin BUCKET: no publico; en GitHub se publica solo)'); return; }
@@ -92,7 +111,7 @@ function publicar() {
     aws('s3', 'cp', 'vigilante.json', B + '/vigilante.json', ...nc),
     // Los captions escritos por captions.js (si no hay, sync no hace nada)
     !fs.existsSync(path.join(RAIZ, 'captions.json')) || aws('s3', 'cp', 'captions.json', B + '/captions.json', ...nc),
-    !fs.existsSync(path.join(RAIZ, 'captions')) || aws('s3', 'sync', 'captions/', B + '/captions/', ...nc),
+    !fs.existsSync(path.join(RAIZ, 'captions')) || aws('s3', 'sync', 'captions/', B + '/captions/', ...nc, '--exclude', 'auto-*', '--exclude', 'ig-*', '--exclude', 'x-*'),
   ].every(Boolean);
   log(ok ? 'publicado en el sitio' : 'OJO: falló la publicación');
 }
@@ -215,14 +234,20 @@ async function pasada(estado) {
 
   // FIN DEL DÍA: MVPs del día
   const porDia = {};
+  const diasTerminados = [];   // para la publicación automática de los MVPs del día
   fx.forEach(j => { (porDia[diaArg(j)] = porDia[diaArg(j)] || []).push(j); });
   for (const [dia, js] of Object.entries(porDia)) {
     if (!js.every(terminado) || ahora - new Date(js[js.length - 1].kickoff_ts) > DIAS_PARTIDO * DIA) continue;
     (await puntosDeLaFecha(js[0].matchday, js.map(j => j.game_id))).slice(0, 5).forEach(p => pedirCara(p, js[0].matchday, 'MVPs del día ' + dia));
+    // Un día de un solo partido no tiene placa "MVPs del día" (la página no la arma); y hay que
+    // esperar un rato tras el último pitazo para que los puntos y las caras estén.
+    const fechaConVariosDias = new Set(fx.filter(j => j.matchday === js[0].matchday).map(diaArg)).size > 1;
+    if (fechaConVariosDias && ahora - new Date(js[js.length - 1].kickoff_ts) > 2 * HORA + 30 * MIN) diasTerminados.push({ dia, md: js[0].matchday });
   }
 
   // CIERRE DE PUNTAJES: pósters, MVPs y Super Suplentes de la fecha
   const captionsPendientes = [];
+  const cierresListos = [];   // fechas con el equipo ideal ya publicado (para la publicación automática)
   for (const md of [...new Set(fx.map(j => j.matchday))]) {
     const js = fx.filter(j => j.matchday === md);
     if (!js.every(terminado) || ahora - new Date(js[js.length - 1].kickoff_ts) > DIAS_FECHA * DIA) continue;
@@ -234,6 +259,7 @@ async function pasada(estado) {
     // Captions del 11 Ideal escritos como editor: una vez por fecha, dos intentos como mucho.
     const c = estado.captions[md] || {};
     if (process.env.ANTHROPIC_API_KEY && !c.ok && (c.n || 0) < 2) captionsPendientes.push(md);
+    cierresListos.push(md);
   }
 
   const listaCaras = [...caras.values()].slice(0, MAX_CARAS);
@@ -256,11 +282,17 @@ async function pasada(estado) {
   motivos.forEach(m => log('momento: caras de ' + m + ' → ' + listaCaras.filter(c => c.motivo === m).map(c => c.nombre).join(', ')));
   captionsPendientes.forEach(md => log('momento: captions del 11 Ideal de la fecha ' + md));
 
-  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0 || captionsPendientes.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
+  // Publicaciones automáticas que faltan (fin del día y cierre; las del pitazo van con la foto)
+  const autoDias = diasTerminados.filter(d => autoPendiente(estado, 'dia:' + d.dia, 'dia').length);
+  const autoCierres = cierresListos.filter(md => autoPendiente(estado, 'cierre:' + md, 'cierre').length);
+  autoDias.forEach(d => log('momento: publicar MVPs del día ' + d.dia));
+  autoCierres.forEach(md => log('momento: publicar el cierre de la fecha ' + md));
+
+  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0 || captionsPendientes.length > 0 || autoDias.length > 0 || autoCierres.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
   if (MIRAR) return { hayTrabajo, esperando, vigilar };
 
   // ── A trabajar ──
-  const guardar = () => fs.writeFileSync(ESTADO, JSON.stringify({ partidos: estado.partidos, caras: estado.caras, captions: estado.captions }, null, 1));
+  const guardar = () => fs.writeFileSync(ESTADO, JSON.stringify({ partidos: estado.partidos, caras: estado.caras, captions: estado.captions, publicado: estado.publicado }, null, 1));
   for (const f of fotos) {
     const p = P(f.j.game_id);
     if (!f.nada) correr('foto-fuentes.js', [f.j.matchday, '--comp', COMPETITION, '--game', f.j.game_id, ...(f.forzar ? ['--forzar'] : [])]);
@@ -269,6 +301,8 @@ async function pasada(estado) {
     if (f.paso === 'reintento') p.cerrado = true;
     guardar();
     if (!f.nada) publicar();     // la foto sale al sitio ya, sin esperar a las caras
+    // PITAZO: la placa de resultado a las redes, si está prendido
+    if (f.paso === 'final') autoPublicar(estado, guardar, 'pitazo:' + f.j.game_id, 'pitazo', f.j.matchday, ['--game', f.j.game_id]);
   }
   for (const md of [...new Set(listaCaras.map(c => c.md))]) {
     const ids = listaCaras.filter(c => c.md === md).map(c => c.id);
@@ -281,6 +315,8 @@ async function pasada(estado) {
     log('caras: ' + ok + '/' + listaCaras.length + ' bajadas');
     publicar();
   }
+  // FIN DEL DÍA: los MVPs del día a las redes (después de las caras, así salen con foto)
+  for (const d of autoDias) autoPublicar(estado, guardar, 'dia:' + d.dia, 'dia', d.md, ['--dia', d.dia]);
   // Captions del 11 Ideal: el editor (Claude) lee los medios y escribe; tarda unos minutos.
   for (const md of captionsPendientes) {
     const ok = correr('captions.js', [md]);
@@ -289,6 +325,8 @@ async function pasada(estado) {
     log('captions de la fecha ' + md + ': ' + (ok ? 'escritos' : 'fallaron (se reintenta en la próxima corrida)'));
     if (ok) publicar();
   }
+  // CIERRE DE PUNTAJES: el carrusel de la fecha a las redes (después de los captions, que son su texto)
+  for (const md of autoCierres) autoPublicar(estado, guardar, 'cierre:' + md, 'cierre', md, []);
 
   // Limpieza: lo de hace más de un mes ya no sirve.
   const viejo = Date.now() - 30 * DIA;
@@ -301,7 +339,7 @@ async function pasada(estado) {
 (async () => {
   const inicio = Date.now();
   const estado = leer(ESTADO, {});
-  estado.partidos = estado.partidos || {}; estado.caras = estado.caras || {}; estado.captions = estado.captions || {};
+  estado.partidos = estado.partidos || {}; estado.caras = estado.caras || {}; estado.captions = estado.captions || {}; estado.publicado = estado.publicado || {};
   // El estado viejo contaba intentos ({n,t}); ya no se usa.
   Object.keys(estado.partidos).forEach(k => { if ('n' in estado.partidos[k]) delete estado.partidos[k]; });
 
