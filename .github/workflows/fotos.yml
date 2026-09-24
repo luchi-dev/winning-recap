@@ -11,7 +11,10 @@ on:
     # que mirar y lanza él mismo la siguiente corrida antes de que GitHub corte
     # ésta (6 h). Como el vigilante empieza a vigilar 2 h antes de cada partido,
     # el cron tiene varias chances de acertar aunque saltee muchas.
-    - cron: '3,23,43 * * *'
+    # OJO: un cron lleva 5 campos (minuto hora día mes día-de-semana). Con 4 el
+    # archivo es inválido, GitHub no programa nada y cada push aparece como
+    # corrida fallida. Así estuvo del 22 al 24 de septiembre de 2026.
+    - cron: '3,23,43 * * * *'
   workflow_dispatch:        # botón "Run workflow" para correrlo a mano
 
 # Una guardia a la vez: las corridas nuevas (cron o relevo) esperan a que
