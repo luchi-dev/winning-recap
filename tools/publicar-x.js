@@ -67,7 +67,7 @@ async function imagenDe(md, placa) {
   // En el server de GitHub Chrome tarda en levantar y a veces no llega a avisar en
   // los 30 s por defecto: más tiempo, sin GPU ni zygote, y su salida en el log.
   const browser = await puppeteer.launch({
-    executablePath: chrome, headless: true, timeout: 120e3, protocolTimeout: 180e3, dumpio: !!process.env.GITHUB_ACTIONS,
+    executablePath: chrome, headless: true, timeout: 120e3, protocolTimeout: 180e3, dumpio: !!process.env.CHROME_DEBUG,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--no-first-run', '--lang=es-AR'],
   });
   try {
