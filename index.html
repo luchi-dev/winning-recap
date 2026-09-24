@@ -1395,6 +1395,11 @@ body {
 .cap-versiones .cap-btn:first-child { border-radius: 4px 0 0 4px; }
 .cap-versiones .cap-btn:last-child { border-radius: 0 4px 4px 0; }
 .cap-btn.is-activa { background: #92B1DC; border-color: #92B1DC; color: #0d0d13; font-weight: 700; }
+/* Publicar en X: negro como la red; verde cuando salió, rojo si falló */
+.cap-btn.cap-x { background: #000; border-color: #555; color: #fff; font-weight: 700; }
+.cap-btn.cap-x:hover { background: #222; }
+.cap-btn.cap-x:disabled { opacity: .7; cursor: wait; }
+.cap-btn.cap-x.is-error { background: #7a1f1f; border-color: #7a1f1f; }
 .cap-txt {
   width: 100%; box-sizing: border-box; resize: vertical; overflow: hidden;
   min-height: 90px; border: 1px solid #333; border-radius: 6px;
@@ -4441,7 +4446,8 @@ function gnRerender() {
   if (escritos.length) {
     const panel = document.createElement('div');
     panel.className = 'cap-panel' + (escritos.length > 1 ? ' is-escritos' : '');   // dos opciones, una al lado de la otra
-    escritos.forEach(c => panel.appendChild(capCaja('ganadores', gnMatchday, c.red, gnEscape(c.titulo), c.texto)));
+    escritos.forEach(c => panel.appendChild(capCaja('ganadores', gnMatchday, c.red, gnEscape(c.titulo), c.texto,
+      capVersiones(c), { placa: 'ganadores', opcion: c.opcion })));
     row.appendChild(panel);
   }
 
@@ -4551,8 +4557,82 @@ function capEscritos(kind, matchday) {
     titulo: c.titulo || ('Caption ' + (i + 1)),
     texto: c.texto,
     texto_corto: c.texto_corto || null,   // misma idea con menos palabras (botón "Corta")
+    texto_x: c.texto_x || null,           // versión de 280 para X (pestaña "X" y "Publicar en X")
     red: 'ig' + (i + 1) + ':v' + v,   // con 'v' nueva se descarta lo editado a mano en el navegador
+    opcion: kind === 'ideal' ? String(i + 1) : ('AB'.charAt(i) || String(i + 1)),
   }));
+}
+
+/* Las variantes de una caja: Completa, Corta (si hay) y X (si hay). */
+function capVersiones(c) {
+  const vs = [{ id: 'completa', label: 'Completa', texto: c.texto }];
+  if (c.texto_corto) vs.push({ id: 'corta', label: 'Corta', texto: c.texto_corto });
+  if (c.texto_x) vs.push({ id: 'x', label: 'X', texto: c.texto_x });
+  return vs.length > 1 ? vs : null;
+}
+
+// ── Publicar en X desde acá ──
+// La página no tiene las claves de X (es pública). Le pide a GitHub que corra
+// la acción "Publicar en X" (.github/workflows/publicar-x.yml), que sí las
+// tiene: arma la placa desde esta misma página y la publica con el texto de la
+// pestaña "X" tal como quedó editado. Para pedírselo a GitHub hace falta un
+// token personal de Luchi con permiso de Actions sobre el repo. Luchi lo pega
+// una vez y queda guardado en su navegador (como los montos de premios y las
+// ediciones de los captions), nunca en el código ni en el sitio.
+const GH_REPO = 'luchi-dev/winning-recap';
+const GH_WORKFLOW = 'publicar-x.yml';
+const GH_TOKEN_STORE = 'winning.recap.github.token';
+function ghToken(pedir) {
+  let t = '';
+  try { t = localStorage.getItem(GH_TOKEN_STORE) || ''; } catch (e) { /* incógnito */ }
+  if (!t && pedir) {
+    t = (prompt('Para publicar desde acá hace falta tu token de GitHub (queda guardado sólo en este navegador).\n\nGitHub → Settings → Developer settings → Personal access tokens → Fine-grained → repo winning-recap, permiso Actions: Read and write.\n\nPegalo acá:') || '').trim();
+    if (t) { try { localStorage.setItem(GH_TOKEN_STORE, t); } catch (e) { /* incógnito */ } }
+  }
+  return t;
+}
+function ghOlvidarToken() { try { localStorage.removeItem(GH_TOKEN_STORE); } catch (e) { /* nada */ } }
+async function ghApi(ruta, opciones = {}) {
+  const r = await fetch('https://api.github.com/repos/' + GH_REPO + ruta, {
+    ...opciones,
+    headers: { Authorization: 'Bearer ' + ghToken(true), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', ...(opciones.headers || {}) },
+  });
+  if (r.status === 401 || r.status === 403) { ghOlvidarToken(); throw new Error('GitHub no aceptó el token (' + r.status + '). Volvé a intentar y pegá uno nuevo.'); }
+  if (!r.ok && r.status !== 204) throw new Error('GitHub respondió ' + r.status);
+  return r.status === 204 ? null : r.json();
+}
+/* Manda a publicar y va mostrando el estado de la corrida en el botón. */
+async function capPublicarX(btn, matchday, placa, opcion, texto) {
+  if (!ghToken(true)) return;
+  if (texto.length > 280) { alert('El texto tiene ' + texto.length + ' caracteres y X permite 280. Acortalo en la pestaña "X".'); return; }
+  if (!confirm('¿Publicar en X la placa de ' + (placa === 'ideal' ? '11 Ideal' : 'Ganadores') + ' de la fecha ' + matchday + ' con este texto?\n\n' + texto)) return;
+  const estado = (t, clase) => { btn.textContent = t; btn.className = 'cap-btn cap-x' + (clase ? ' ' + clase : ''); };
+  try {
+    btn.disabled = true; estado('Enviando...');
+    const desde = new Date(Date.now() - 60e3).toISOString();
+    await ghApi('/actions/workflows/' + GH_WORKFLOW + '/dispatches', {
+      method: 'POST',
+      body: JSON.stringify({ ref: 'main', inputs: { fecha: String(matchday), placa, opcion: String(opcion), texto, probar: 'false' } }),
+    });
+    estado('En cola...');
+    // La corrida aparece unos segundos después; se la sigue hasta que termine.
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 8000));
+      const d = await ghApi('/actions/workflows/' + GH_WORKFLOW + '/runs?per_page=1&created=>' + desde);
+      const run = d && d.workflow_runs && d.workflow_runs[0];
+      if (!run) continue;
+      if (run.status !== 'completed') { estado(run.status === 'queued' ? 'En cola...' : 'Publicando...'); continue; }
+      if (run.conclusion === 'success') { estado('Publicado en X ✓', 'is-ok'); }
+      else { estado('Falló: ver en GitHub', 'is-error'); btn.onclick = () => window.open(run.html_url, '_blank'); }
+      btn.disabled = false;
+      return;
+    }
+    estado('Tarda más de lo normal: ver en GitHub'); btn.disabled = false;
+    btn.onclick = () => window.open('https://github.com/' + GH_REPO + '/actions/workflows/' + GH_WORKFLOW, '_blank');
+  } catch (e) {
+    estado('Publicar en X'); btn.disabled = false;
+    alert('No se pudo publicar: ' + e.message);
+  }
 }
 
 let capConfig = {};
@@ -4715,14 +4795,16 @@ function capGenerar(kind, matchday, team, lineup) {
 /** Caja editable con copiar y restaurar. Con `versiones` ([{id, label, texto}])
     aparecen botones para cambiar entre variantes del mismo caption (Completa /
     Corta); cada variante guarda su edición aparte. */
-function capCaja(kind, matchday, red, titulo, textoBase, versiones) {
+function capCaja(kind, matchday, red, titulo, textoBase, versiones, publicarX) {
   const caja = document.createElement('div');
   caja.className = 'cap-caja';
   const vs = (versiones && versiones.length > 1) ? versiones : null;
   let actual = vs ? vs[0] : null;
-  const claveDe = () => capClave(kind, matchday, red + (actual ? ':' + actual.id : ''));
+  const claveDe = (v) => capClave(kind, matchday, red + ((v || actual) ? ':' + (v || actual).id : ''));
   const baseDe = () => (actual ? actual.texto : textoBase);
   let clave = claveDe();
+  const versionX = vs && vs.find(v => v.id === 'x');
+  const conX = !!(publicarX && versionX);
 
   const esTweet = red === 'tweet';
   caja.innerHTML =
@@ -4731,6 +4813,7 @@ function capCaja(kind, matchday, red, titulo, textoBase, versiones) {
         (vs ? `<span class="cap-versiones">` + vs.map((v, i) => `<button class="cap-btn cap-ver${i === 0 ? ' is-activa' : ''}" data-ver="${v.id}">${v.label}</button>`).join('') + `</span>` : '') +
         `<button class="cap-btn cap-copiar">Copiar</button>` +
         `<button class="cap-btn cap-reset" title="Volver al texto original">Restaurar</button>` +
+        (conX ? `<button class="cap-btn cap-x" title="Publica la placa en X con el texto de la pestaña X">Publicar en X</button>` : '') +
       `</span>` +
     `</div>` +
     `<textarea class="cap-txt${esTweet ? ' is-tweet' : ''}" spellcheck="false"></textarea>` +
@@ -4764,7 +4847,17 @@ function capCaja(kind, matchday, red, titulo, textoBase, versiones) {
     ta.value = baseDe(); delete capConfig[clave]; capGuardar(); contar(); ajustarAlto();
   });
 
-  // Cambio de versión (Completa / Corta): cada una con su texto y su edición guardada.
+  // Publicar en X: usa el texto de la pestaña "X" tal como está (editado o el original),
+  // esté o no esa pestaña a la vista.
+  if (conX) {
+    caja.querySelector('.cap-x').addEventListener('click', ev => {
+      const k = claveDe(versionX);
+      const texto = (capConfig[k] != null ? capConfig[k] : versionX.texto).trim();
+      capPublicarX(ev.currentTarget, matchday, publicarX.placa, publicarX.opcion, texto);
+    });
+  }
+
+  // Cambio de versión (Completa / Corta / X): cada una con su texto y su edición guardada.
   caja.querySelectorAll('.cap-ver').forEach(btn => btn.addEventListener('click', () => {
     actual = vs.find(v => v.id === btn.dataset.ver) || vs[0];
     clave = claveDe();
@@ -4787,7 +4880,7 @@ function capPanel(kind, matchday, team, lineup) {
   if (escritos.length) {
     panel.classList.add('is-escritos');
     escritos.forEach(c => panel.appendChild(capCaja(kind, matchday, c.red, 'Instagram · ' + gnEscape(c.titulo), c.texto,
-      c.texto_corto ? [{ id: 'completa', label: 'Completa', texto: c.texto }, { id: 'corta', label: 'Corta', texto: c.texto_corto }] : null)));
+      capVersiones(c), kind === 'ideal' ? { placa: 'ideal', opcion: c.opcion } : null)));
     const informe = document.createElement('div');
     informe.className = 'cap-cuenta cap-informe';
     informe.style.textAlign = 'left';
