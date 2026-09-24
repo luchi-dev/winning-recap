@@ -61,11 +61,11 @@ jobs:
         run: npm ci --no-audit --no-fund
         working-directory: tools
 
+      # El texto propio va por variable de ambiente: puede tener comillas y saltos de línea.
       - name: Publicar
-        run: >
-          node tools/publicar-x.js ${{ inputs.fecha }} ${{ inputs.placa }} ${{ inputs.opcion }}
-          ${{ inputs.texto != '' && format('--texto "{0}"', inputs.texto) || '' }}
-          ${{ inputs.probar && '--probar' || '' }}
+        run: node tools/publicar-x.js ${{ inputs.fecha }} ${{ inputs.placa }} ${{ inputs.opcion }} ${{ inputs.probar && '--probar' || '' }}
+        env:
+          X_TEXTO: ${{ inputs.texto }}
 
       - name: Guardar la imagen que se publicó
         if: always()

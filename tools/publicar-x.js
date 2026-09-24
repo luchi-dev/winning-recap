@@ -10,7 +10,7 @@
  *            ganadores (por defecto el primero). Se publica el 'texto_x' de esa
  *            opción (la versión de 280 caracteres); si la opción no tiene
  *            texto_x, se usa la versión corta recortada con puntos suspensivos.
- *   --texto  texto propio, en vez del de captions.json.
+ *   --texto  texto propio, en vez del de captions.json (o la variable X_TEXTO).
  *   --probar arma la imagen y muestra el texto, pero no publica (deja
  *            captions/x-<placa>-fecha<N>.jpg para mirarla).
  *
@@ -36,7 +36,7 @@ function argumentos() {
   const placa = a[1];
   const opcion = a[2] && !a[2].startsWith('--') ? a[2] : null;
   const i = a.indexOf('--texto');
-  return { md, placa, opcion, texto: i >= 0 ? a[i + 1] : null, probar: a.includes('--probar') };
+  return { md, placa, opcion, texto: i >= 0 ? a[i + 1] : (process.env.X_TEXTO || null), probar: a.includes('--probar') };
 }
 
 /* El texto de X para esa placa y opción, desde captions.json. */
