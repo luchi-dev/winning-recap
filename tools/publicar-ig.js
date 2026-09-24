@@ -86,14 +86,26 @@ async function publicar(caption, imageUrl) {
   // 1. El contenedor: la imagen (por URL pública) y el caption
   const { id } = await graph(`/${IG_USER_ID}/media`, { image_url: imageUrl, caption }, 'POST');
   // 2. Esperar a que Instagram termine de bajar y procesar la imagen
-  for (let i = 0; i < 20; i++) {
-    const s = await graph(`/${id}`, { fields: 'status_code,status' });
-    if (s.status_code === 'FINISHED') break;
+  let listo = false;
+  for (let i = 0; i < 40 && !listo; i++) {
+    const s = await graph(`/${id}`, { fields: 'status_code,status' }).catch(e => ({ status_code: 'SIN_ESTADO', status: e.message }));
+    log('contenedor ' + id + ': ' + (s.status_code || '?') + (s.status ? ' (' + s.status + ')' : ''));
+    if (s.status_code === 'FINISHED') { listo = true; break; }
     if (s.status_code === 'ERROR' || s.status_code === 'EXPIRED') throw new Error('Instagram no pudo procesar la imagen: ' + (s.status || s.status_code));
-    await new Promise(r => setTimeout(r, 3000));
+    await new Promise(r => setTimeout(r, 4000));
   }
-  // 3. Publicar
-  const p = await graph(`/${IG_USER_ID}/media_publish`, { creation_id: id }, 'POST');
+  // 3. Publicar. Instagram a veces dice "Media ID is not available" (código 9007)
+  // aunque el contenedor figure listo: es transitorio, se espera y se reintenta.
+  let p = null;
+  for (let i = 0; i < 12 && !p; i++) {
+    try {
+      p = await graph(`/${IG_USER_ID}/media_publish`, { creation_id: id }, 'POST');
+    } catch (e) {
+      if (!/9007|2207027|not ready|not available/i.test(e.message) || i === 11) throw e;
+      log('todavía no está listo para publicar, espero 10 s (' + (i + 1) + '/12)...');
+      await new Promise(r => setTimeout(r, 10000));
+    }
+  }
   const info = await graph(`/${p.id}`, { fields: 'permalink' }).catch(() => ({}));
   return info.permalink || ('id ' + p.id);
 }
