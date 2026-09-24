@@ -1,0 +1,81 @@
+# Publica en Instagram una placa del Recap con su caption, con un clic:
+# Actions → "Publicar en Instagram" → Run workflow → fecha, placa y opción.
+# La imagen sale de la página publicada (igual que "Descargar PNG"), se sube al
+# S3 del sitio (Instagram la baja de una dirección pública) y se publica con el
+# caption de captions.json (completo o corto) o con un texto propio.
+name: Publicar en Instagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: 'Número de fecha del Clausura 2026'
+        required: true
+        type: number
+      placa:
+        description: 'Qué placa'
+        required: true
+        type: choice
+        options: [ideal, ganadores]
+        default: ideal
+      opcion:
+        description: 'Qué texto: 1 a 4 para el 11 Ideal, A o B para Ganadores'
+        required: false
+        default: '1'
+      version:
+        description: 'Versión del caption'
+        required: false
+        type: choice
+        options: [completa, corta]
+        default: completa
+      texto:
+        description: 'Caption propio (opcional): reemplaza al de captions.json'
+        required: false
+      probar:
+        description: 'Solo probar: arma y sube la imagen, muestra el caption, no publica'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  IG_USER_ID: ${{ secrets.IG_USER_ID }}
+  IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  CHROME_PATH: /usr/bin/google-chrome
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Traer los textos publicados (captions.json del sitio)
+        run: aws s3 cp $BUCKET/captions.json captions.json --only-show-errors || echo "(uso el captions.json del repo)"
+
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+
+      # El caption propio va por variable de ambiente: puede tener comillas y saltos de línea.
+      - name: Publicar
+        run: node tools/publicar-ig.js ${{ inputs.fecha }} ${{ inputs.placa }} ${{ inputs.opcion }} ${{ inputs.version == 'corta' && '--corta' || '' }} ${{ inputs.probar && '--probar' || '' }}
+        env:
+          IG_TEXTO: ${{ inputs.texto }}
+
+      - name: Guardar la imagen que se publicó
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: placa-ig-${{ inputs.placa }}-fecha${{ inputs.fecha }}
+          path: captions/ig-*.jpg
+          if-no-files-found: ignore

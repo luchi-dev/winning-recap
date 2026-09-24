@@ -101,7 +101,9 @@ async function publicar(texto, png) {
   return r.data && r.data.id;
 }
 
-(async () => {
+module.exports = { imagenDe, textoDe, MAX_X };
+
+if (require.main === module) (async () => {
   const { md, placa, opcion, texto, probar } = argumentos();
   if (!md || !['ideal', 'ganadores'].includes(placa)) {
     console.error('uso: node publicar-x.js <fecha> <ideal|ganadores> [opcion] [--texto "..."] [--probar]');

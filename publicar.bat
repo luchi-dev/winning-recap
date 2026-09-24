@@ -29,7 +29,7 @@ node "tools\lista-fotos.js"
   --include "index.html" --include "historial.json" --include "especiales.json" --include "captions.json" --include "captions/*" --include "background.png" --include "logo-white.png" ^
   --include "badges/*" --include "escudos/*" --include "jerseys/*" --include "fonts/*" --include "icons/*" --include "fotos/*" ^
   --include "fotos-partido/*.jpg" --include "fotos-partido/elegidas.json" ^
-  --exclude "captions/x-*" --exclude "fotos-partido/_*" --exclude "fotos/_*" --exclude "fotos/README.md" --exclude "fotos/revisar.html" --exclude "*/.gitignore"
+  --exclude "captions/x-*" --exclude "captions/ig-*" --exclude "fotos-partido/_*" --exclude "fotos/_*" --exclude "fotos/README.md" --exclude "fotos/revisar.html" --exclude "*/.gitignore"
 if errorlevel 1 goto error
 
 echo.

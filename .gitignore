@@ -10,6 +10,7 @@
 !/captions.json
 !/captions/
 /captions/x-*
+/captions/ig-*
 !/publicar.bat
 !/Abrir Recap.bat
 !/tools/

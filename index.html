@@ -1400,6 +1400,11 @@ body {
 .cap-btn.cap-x:hover { background: #222; }
 .cap-btn.cap-x:disabled { opacity: .7; cursor: wait; }
 .cap-btn.cap-x.is-error { background: #7a1f1f; border-color: #7a1f1f; }
+/* Publicar en Instagram: violeta como la red */
+.cap-btn.cap-ig { background: #6b2fa3; border-color: #8a4fc4; color: #fff; font-weight: 700; }
+.cap-btn.cap-ig:hover { background: #7d3bbd; }
+.cap-btn.cap-ig:disabled { opacity: .7; cursor: wait; }
+.cap-btn.cap-ig.is-error { background: #7a1f1f; border-color: #7a1f1f; }
 .cap-txt {
   width: 100%; box-sizing: border-box; resize: vertical; overflow: hidden;
   min-height: 90px; border: 1px solid #333; border-radius: 6px;
@@ -4580,8 +4585,13 @@ function capVersiones(c) {
 // una vez y queda guardado en su navegador (como los montos de premios y las
 // ediciones de los captions), nunca en el código ni en el sitio.
 const GH_REPO = 'luchi-dev/winning-recap';
-const GH_WORKFLOW = 'publicar-x.yml';
 const GH_TOKEN_STORE = 'winning.recap.github.token';
+// Cada red tiene su acción en GitHub y su texto: X publica la pestaña "X"
+// (280 caracteres); Instagram publica lo que está a la vista (Completa o Corta).
+const CAP_REDES = {
+  x:  { nombre: 'X',         workflow: 'publicar-x.yml',  boton: 'Publicar en X',  maximo: 280 },
+  ig: { nombre: 'Instagram', workflow: 'publicar-ig.yml', boton: 'Publicar en IG', maximo: 2200 },
+};
 function ghToken(pedir) {
   let t = '';
   try { t = localStorage.getItem(GH_TOKEN_STORE) || ''; } catch (e) { /* incógnito */ }
@@ -4601,16 +4611,17 @@ async function ghApi(ruta, opciones = {}) {
   if (!r.ok && r.status !== 204) throw new Error('GitHub respondió ' + r.status);
   return r.status === 204 ? null : r.json();
 }
-/* Manda a publicar y va mostrando el estado de la corrida en el botón. */
-async function capPublicarX(btn, matchday, placa, opcion, texto) {
+/* Manda a publicar en una red y va mostrando el estado de la corrida en el botón. */
+async function capPublicarRed(btn, red, matchday, placa, opcion, texto) {
+  const R = CAP_REDES[red];
   if (!ghToken(true)) return;
-  if (texto.length > 280) { alert('El texto tiene ' + texto.length + ' caracteres y X permite 280. Acortalo en la pestaña "X".'); return; }
-  if (!confirm('¿Publicar en X la placa de ' + (placa === 'ideal' ? '11 Ideal' : 'Ganadores') + ' de la fecha ' + matchday + ' con este texto?\n\n' + texto)) return;
-  const estado = (t, clase) => { btn.textContent = t; btn.className = 'cap-btn cap-x' + (clase ? ' ' + clase : ''); };
+  if (texto.length > R.maximo) { alert('El texto tiene ' + texto.length + ' caracteres y ' + R.nombre + ' permite ' + R.maximo + '.'); return; }
+  if (!confirm('¿Publicar en ' + R.nombre + ' la placa de ' + (placa === 'ideal' ? '11 Ideal' : 'Ganadores') + ' de la fecha ' + matchday + ' con este texto?\n\n' + texto)) return;
+  const estado = (t, clase) => { btn.textContent = t; btn.className = 'cap-btn cap-' + red + (clase ? ' ' + clase : ''); };
   try {
     btn.disabled = true; estado('Enviando...');
     const desde = new Date(Date.now() - 60e3).toISOString();
-    await ghApi('/actions/workflows/' + GH_WORKFLOW + '/dispatches', {
+    await ghApi('/actions/workflows/' + R.workflow + '/dispatches', {
       method: 'POST',
       body: JSON.stringify({ ref: 'main', inputs: { fecha: String(matchday), placa, opcion: String(opcion), texto, probar: 'false' } }),
     });
@@ -4618,19 +4629,19 @@ async function capPublicarX(btn, matchday, placa, opcion, texto) {
     // La corrida aparece unos segundos después; se la sigue hasta que termine.
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 8000));
-      const d = await ghApi('/actions/workflows/' + GH_WORKFLOW + '/runs?per_page=1&created=>' + desde);
+      const d = await ghApi('/actions/workflows/' + R.workflow + '/runs?per_page=1&created=>' + desde);
       const run = d && d.workflow_runs && d.workflow_runs[0];
       if (!run) continue;
       if (run.status !== 'completed') { estado(run.status === 'queued' ? 'En cola...' : 'Publicando...'); continue; }
-      if (run.conclusion === 'success') { estado('Publicado en X ✓', 'is-ok'); }
+      if (run.conclusion === 'success') { estado('Publicado en ' + R.nombre + ' ✓', 'is-ok'); }
       else { estado('Falló: ver en GitHub', 'is-error'); btn.onclick = () => window.open(run.html_url, '_blank'); }
       btn.disabled = false;
       return;
     }
     estado('Tarda más de lo normal: ver en GitHub'); btn.disabled = false;
-    btn.onclick = () => window.open('https://github.com/' + GH_REPO + '/actions/workflows/' + GH_WORKFLOW, '_blank');
+    btn.onclick = () => window.open('https://github.com/' + GH_REPO + '/actions/workflows/' + R.workflow, '_blank');
   } catch (e) {
-    estado('Publicar en X'); btn.disabled = false;
+    estado(R.boton); btn.disabled = false;
     alert('No se pudo publicar: ' + e.message);
   }
 }
@@ -4813,6 +4824,7 @@ function capCaja(kind, matchday, red, titulo, textoBase, versiones, publicarX) {
         (vs ? `<span class="cap-versiones">` + vs.map((v, i) => `<button class="cap-btn cap-ver${i === 0 ? ' is-activa' : ''}" data-ver="${v.id}">${v.label}</button>`).join('') + `</span>` : '') +
         `<button class="cap-btn cap-copiar">Copiar</button>` +
         `<button class="cap-btn cap-reset" title="Volver al texto original">Restaurar</button>` +
+        (publicarX ? `<button class="cap-btn cap-ig" title="Publica la placa en Instagram con el texto que está a la vista (Completa o Corta)">Publicar en IG</button>` : '') +
         (conX ? `<button class="cap-btn cap-x" title="Publica la placa en X con el texto de la pestaña X">Publicar en X</button>` : '') +
       `</span>` +
     `</div>` +
@@ -4853,7 +4865,17 @@ function capCaja(kind, matchday, red, titulo, textoBase, versiones, publicarX) {
     caja.querySelector('.cap-x').addEventListener('click', ev => {
       const k = claveDe(versionX);
       const texto = (capConfig[k] != null ? capConfig[k] : versionX.texto).trim();
-      capPublicarX(ev.currentTarget, matchday, publicarX.placa, publicarX.opcion, texto);
+      capPublicarRed(ev.currentTarget, 'x', matchday, publicarX.placa, publicarX.opcion, texto);
+    });
+  }
+  // Publicar en Instagram: el texto que está a la vista (Completa o Corta, con lo
+  // editado). Si la pestaña activa es la de X, va la Completa.
+  if (publicarX) {
+    caja.querySelector('.cap-ig').addEventListener('click', ev => {
+      const v = (actual && actual.id !== 'x') ? actual : (vs ? vs[0] : null);
+      const k = claveDe(v);
+      const texto = (capConfig[k] != null ? capConfig[k] : (v ? v.texto : textoBase)).trim();
+      capPublicarRed(ev.currentTarget, 'ig', matchday, publicarX.placa, publicarX.opcion, texto);
     });
   }
 
