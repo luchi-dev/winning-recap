@@ -42,6 +42,7 @@ function argumentos() {
     corta: a.includes('--corta'),
     texto: i >= 0 ? a[i + 1] : (process.env.IG_TEXTO || null),
     probar: a.includes('--probar'),
+    sinFacebook: a.includes('--sin-facebook'),
   };
 }
 
@@ -110,10 +111,23 @@ async function publicar(caption, imageUrl) {
   return info.permalink || ('id ' + p.id);
 }
 
+/* Lo mismo en la página de Facebook de Winning (si están FB_PAGE_ID y
+   FB_PAGE_TOKEN): una foto con el caption como texto. El token de página no vence. */
+async function publicarFacebook(caption, imageUrl) {
+  const { FB_PAGE_ID, FB_PAGE_TOKEN } = process.env;
+  if (!FB_PAGE_ID || !FB_PAGE_TOKEN) return null;
+  const url = new URL(`https://graph.facebook.com/v21.0/${FB_PAGE_ID}/photos`);
+  const body = new URLSearchParams({ url: imageUrl, message: caption, access_token: FB_PAGE_TOKEN });
+  const r = await fetch(url, { method: 'POST', body });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || d.error) throw new Error('Facebook respondió ' + r.status + ': ' + JSON.stringify(d.error || d).slice(0, 300));
+  return 'https://www.facebook.com/' + (d.post_id || d.id);
+}
+
 (async () => {
-  const { md, placa, opcion, corta, texto, probar } = argumentos();
+  const { md, placa, opcion, corta, texto, probar, sinFacebook } = argumentos();
   if (!md || !['ideal', 'ganadores'].includes(placa)) {
-    console.error('uso: node publicar-ig.js <fecha> <ideal|ganadores> [opcion] [--corta] [--texto "..."] [--probar]');
+    console.error('uso: node publicar-ig.js <fecha> <ideal|ganadores> [opcion] [--corta] [--texto "..."] [--probar] [--sin-facebook]');
     process.exit(2);
   }
   try {
@@ -127,6 +141,13 @@ async function publicar(caption, imageUrl) {
     if (probar) { log('modo prueba: no se publica'); return; }
     const link = await publicar(caption, url);
     log('publicado en Instagram: ' + link);
+    // Facebook va después: si falla, Instagram ya salió y no se repite.
+    if (sinFacebook) log('Facebook: salteado (--sin-facebook)');
+    else if (!process.env.FB_PAGE_ID || !process.env.FB_PAGE_TOKEN) log('Facebook: sin FB_PAGE_ID / FB_PAGE_TOKEN, no se publica ahí');
+    else {
+      try { log('publicado en Facebook: ' + await publicarFacebook(caption, url)); }
+      catch (e) { console.log('::warning::Facebook falló: ' + e.message); log('Facebook falló: ' + e.message); }
+    }
     fs.unlinkSync(local);
   } catch (e) {
     console.error('[publicar-ig] ' + (e.message || e));

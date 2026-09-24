@@ -4590,7 +4590,7 @@ const GH_TOKEN_STORE = 'winning.recap.github.token';
 // (280 caracteres); Instagram publica lo que está a la vista (Completa o Corta).
 const CAP_REDES = {
   x:  { nombre: 'X',         workflow: 'publicar-x.yml',  boton: 'Publicar en X',  maximo: 280 },
-  ig: { nombre: 'Instagram', workflow: 'publicar-ig.yml', boton: 'Publicar en IG', maximo: 2200 },
+  ig: { nombre: 'Instagram y Facebook', workflow: 'publicar-ig.yml', boton: 'Publicar en IG', maximo: 2200 },   // Facebook sólo si el repo tiene FB_PAGE_ID / FB_PAGE_TOKEN
 };
 function ghToken(pedir) {
   let t = '';
