@@ -1872,51 +1872,445 @@ body {
 .rn-foto-info b { color: #ccc; font-weight: 600; }
 .rn-foto-info a { color: #6f9ee8; text-decoration: none; }
 .rn-foto-info .rn-porque { color: #7fbf7f; }
+
+/* ══ INTERFAZ v2 ══════════════════════════════════════════════════════
+   Sólo el "chrome" de la página: barra de arriba, índice, secciones,
+   botones y paneles. Nada de esto entra en los PNG. No tocar desde acá
+   .card / .pcard ni el font-family del body (las placas lo heredan). */
+:root {
+  --rs-bg: #0d0e18; --rs-sup: #151827; --rs-sup2: #1c2033; --rs-sup3: #242943;
+  --rs-borde: #272c45; --rs-borde2: #363d60;
+  --rs-txt: #eceff7; --rs-txt2: #a2aac4; --rs-txt3: #6c7493;
+  --rs-acento: #92B1DC; --rs-acento-f: #0d0e18;
+  --rs-ok: #4ade80; --rs-aviso: #EAB939; --rs-error: #f87171; --rs-vivo: #ff5c5c;
+  --rs-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --rs-top-h: 60px;
+}
+body { background: var(--rs-bg); }
+html { scroll-behavior: smooth; }
+.selector-view { display: none !important; }
+
+/* Botones de la interfaz */
+.rs-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 34px; padding: 0 14px; border-radius: 9px; cursor: pointer; white-space: nowrap;
+  background: var(--rs-sup2); border: 1px solid var(--rs-borde); color: var(--rs-txt);
+  font: 600 13px var(--rs-ui); transition: background .15s, border-color .15s;
+}
+.rs-btn:hover { background: var(--rs-sup3); border-color: var(--rs-borde2); }
+.rs-btn-pri { background: var(--rs-acento); border-color: var(--rs-acento); color: var(--rs-acento-f); }
+.rs-btn-pri:hover { background: #a9c3e6; border-color: #a9c3e6; }
+
+/* Barra de arriba */
+.rs-top {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap;
+  padding: 12px 28px; font-family: var(--rs-ui);
+  background: rgba(13, 14, 24, .88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rs-borde);
+}
+.rs-brand { display: flex; align-items: center; gap: 10px; margin-right: 6px; }
+.rs-brand img { height: 18px; display: block; }
+.rs-brand span {
+  font-family: 'Canaro', var(--rs-ui); font-weight: 700; font-size: 12px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--rs-acento); padding: 3px 8px;
+  border: 1px solid var(--rs-borde2); border-radius: 6px;
+}
+.rs-seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--rs-sup); border: 1px solid var(--rs-borde); border-radius: 999px; }
+.rs-top .comp-btn {
+  border: 0; border-radius: 999px; padding: 6px 14px; background: transparent;
+  color: var(--rs-txt2); font: 600 13px var(--rs-ui);
+}
+.rs-top .comp-btn:hover { background: var(--rs-sup3); color: var(--rs-txt); }
+.rs-top .comp-btn.active { background: var(--rs-acento); color: var(--rs-acento-f); }
+.rs-fecha { display: inline-flex; align-items: center; gap: 4px; }
+.rs-top .nav-fecha {
+  width: 34px; height: 34px; border-radius: 9px; font-size: 20px;
+  background: var(--rs-sup); border: 1px solid var(--rs-borde); color: var(--rs-txt);
+}
+.rs-top .nav-fecha:hover:not(:disabled) { background: var(--rs-sup3); }
+.rs-select {
+  height: 34px; padding: 0 10px; border-radius: 9px; cursor: pointer;
+  background: var(--rs-sup); border: 1px solid var(--rs-borde); color: var(--rs-txt);
+  font: 600 14px var(--rs-ui);
+}
+.rs-resumen { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex: 1; min-width: 0; }
+.rs-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px;
+  background: var(--rs-sup); border: 1px solid var(--rs-borde); color: var(--rs-txt2);
+  font: 500 12px var(--rs-ui); text-decoration: none; white-space: nowrap;
+}
+.rs-chip b { color: var(--rs-txt); font-weight: 700; }
+.rs-chip.is-aviso { color: var(--rs-aviso); border-color: #5a4a1c; background: #221d0e; }
+.rs-chip.is-ok { color: var(--rs-ok); border-color: #22452f; background: #0f1d15; }
+.rs-chip.is-vivo i { width: 7px; height: 7px; border-radius: 50%; background: var(--rs-vivo); animation: rsPulso 1.2s infinite; }
+.rs-acc { display: flex; gap: 8px; margin-left: auto; }
+
+/* Índice + contenido */
+.cards-view { padding: 0; }
+.rs-layout {
+  display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 32px;
+  max-width: 1760px; margin: 0 auto; padding: 28px 28px 120px;
+}
+.rs-nav {
+  position: sticky; top: calc(var(--rs-top-h) + 24px); align-self: start;
+  display: flex; flex-direction: column; gap: 2px; font-family: var(--rs-ui);
+}
+.rs-nav a {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px;
+  color: var(--rs-txt2); text-decoration: none; font-size: 14px; font-weight: 500;
+  transition: background .15s, color .15s;
+}
+.rs-nav a:hover { background: var(--rs-sup); color: var(--rs-txt); }
+.rs-nav a.is-on { background: var(--rs-sup2); color: var(--rs-txt); box-shadow: inset 3px 0 0 var(--rs-acento); }
+.rs-nav .rs-n { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--rs-txt3); }
+.rs-nav-sep { height: 1px; background: var(--rs-borde); margin: 10px 6px; }
+.rs-dot { width: 8px; height: 8px; border-radius: 50%; background: #343a58; flex: none; }
+.rs-dot.is-ok { background: var(--rs-ok); }
+.rs-dot.is-aviso { background: var(--rs-aviso); }
+.rs-dot.is-error { background: var(--rs-error); }
+.rs-dot.is-cargando { background: var(--rs-acento); animation: rsPulso 1s infinite; }
+@keyframes rsPulso { 50% { opacity: .3; } }
+
+.rs-main { min-width: 0; }
+.rs-head-fecha { margin: 4px 0 24px; font-family: var(--rs-ui); }
+.rs-head-fecha h1 { font-family: 'Canaro', var(--rs-ui); font-weight: 700; font-size: 30px; letter-spacing: .3px; color: #fff; }
+.rs-head-fecha p { color: var(--rs-txt3); font-size: 14px; margin-top: 4px; }
+
+/* Secciones */
+.rs-sec {
+  display: block; scroll-margin-top: calc(var(--rs-top-h) + 16px);
+  background: var(--rs-sup); border: 1px solid var(--rs-borde); border-radius: 18px;
+  padding: 22px 24px 26px; margin-bottom: 22px;
+}
+.rs-sec-head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; font-family: var(--rs-ui); }
+.rs-sec-head > div { min-width: 0; }
+.rs-kicker { font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--rs-acento); }
+.rs-sec-head h2 { font-family: 'Canaro', var(--rs-ui); font-weight: 700; font-size: 22px; color: #fff; margin-top: 4px; }
+.rs-sec-head p { color: var(--rs-txt2); font-size: 14px; margin-top: 4px; line-height: 1.45; max-width: 720px; }
+.rs-sec-head > .rs-btn, .rs-sec-head > .rs-abrir { margin-left: auto; flex: none; }
+.rs-vacio {
+  display: none; padding: 30px; text-align: center; border: 1px dashed var(--rs-borde2); border-radius: 14px;
+  color: var(--rs-txt3); font: 14px var(--rs-ui);
+}
+.rs-sec.is-vacio .rs-vacio { display: block; }
+/* Herramientas: plegada */
+.rs-herr > summary { list-style: none; cursor: pointer; margin-bottom: 0; }
+.rs-herr > summary::-webkit-details-marker { display: none; }
+.rs-herr[open] > summary { margin-bottom: 20px; }
+.rs-abrir { color: var(--rs-txt2); font: 600 13px var(--rs-ui); padding: 8px 12px; border-radius: 9px; border: 1px solid var(--rs-borde); }
+.rs-herr[open] .rs-abrir { font-size: 0; }
+.rs-herr[open] .rs-abrir::before { content: 'Cerrar ▴'; font-size: 13px; }
+.rs-herr-fila {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-family: var(--rs-ui);
+  padding: 14px 16px; border-radius: 12px; background: var(--rs-sup2); border: 1px solid var(--rs-borde); max-width: 760px;
+}
+.rs-herr-fila b { display: block; font-size: 14px; color: var(--rs-txt); }
+.rs-herr-fila small { display: block; font-size: 13px; color: var(--rs-txt2); margin-top: 2px; }
+.rs-herr-fila .rs-btn { margin-left: auto; }
+.rs-herr .rs-cont:not(:empty) { margin-bottom: 16px; }
+
+/* Bloques dentro de cada sección (cada loader arma sus .match-section) */
+.rs-sec .match-section { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--rs-borde); }
+.rs-sec .rs-cont:empty { display: none; }
+.match-section h3 {
+  font: 700 12px var(--rs-ui); letter-spacing: 1.3px; text-transform: uppercase;
+  color: var(--rs-txt2); margin-bottom: 14px;
+}
+.cards-row { gap: 20px; }
+
+/* Tarjeta de cada placa */
+.card-wrapper {
+  background: var(--rs-sup2); border: 1px solid var(--rs-borde); border-radius: 16px; padding: 10px;
+  transition: border-color .15s;
+}
+.card-wrapper:hover { border-color: var(--rs-borde2); }
+.card-scale-container {
+  border: 0; border-radius: 10px;
+  background: repeating-conic-gradient(#191c2e 0 25%, #14172a 0 50%) 0 0 / 18px 18px;
+}
+.card-wrapper .download-btn {
+  width: 100%; margin-top: 10px; height: 36px; padding: 0 12px; border: 0; border-radius: 10px;
+  background: var(--rs-acento); color: var(--rs-acento-f); font: 700 13px var(--rs-ui); cursor: pointer;
+}
+.card-wrapper .download-btn:hover { background: #a9c3e6; color: var(--rs-acento-f); }
+.card-wrapper .download-btn::before { content: '↓  '; }
+/* Controles de foto plegados bajo "Foto y encuadre" */
+.rs-mas { margin-top: 8px; width: 324px; font-family: var(--rs-ui); }
+.rs-mas > summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px; border-radius: 9px; background: var(--rs-sup); border: 1px solid var(--rs-borde);
+  color: var(--rs-txt2); font-size: 12px; font-weight: 600;
+}
+.rs-mas > summary::-webkit-details-marker { display: none; }
+.rs-mas > summary::after { content: '▾'; margin-left: auto; opacity: .6; }
+.rs-mas[open] > summary::after { content: '▴'; }
+.rs-mas > summary:hover { color: var(--rs-txt); border-color: var(--rs-borde2); }
+.rs-mas[open] > summary { margin-bottom: 4px; }
+
+/* Controles chicos: misma letra, tamaño legible, mismo botón */
+.rn-foto-ctl, .rn-opciones, .rn-foto-info, .rn-sinfoto, .gl-ctl, .fd-ctl, .fj-ctl, .pv-ctl, .ce-ctl, .ce-acciones {
+  font-family: var(--rs-ui); font-size: 12px; color: var(--rs-txt2);
+}
+.rn-foto-info { font-size: 12px; }
+.rn-sinfoto { color: var(--rs-txt3); }
+.rn-opciones button, .rn-foto-ctl button, .fd-ctl .fd-rapidos button, .ce-ctl button, .ce-ctl .ce-subir,
+.ce-acciones button, .rn-barra-opciones .rn-exportar, .cap-btn {
+  font: 600 12px var(--rs-ui) !important; padding: 5px 10px !important; border-radius: 8px !important;
+  background: var(--rs-sup); border: 1px solid var(--rs-borde) !important; color: var(--rs-txt); cursor: pointer;
+}
+.rn-opciones button:hover, .rn-foto-ctl button:hover, .fd-ctl .fd-rapidos button:hover, .ce-ctl button:hover,
+.ce-acciones button:hover, .cap-btn:hover { background: var(--rs-sup3); }
+.cap-btn.is-activa { background: var(--rs-acento); color: var(--rs-acento-f); border-color: var(--rs-acento) !important; }
+.cap-btn.is-ok { background: #1f5a36; color: #fff; }
+.cap-btn.cap-x { background: #000; color: #fff; }
+.cap-btn.cap-ig { background: linear-gradient(135deg, #7b2fbf, #c1357f); color: #fff; border-color: transparent !important; }
+.cap-btn.cap-x.is-error, .cap-btn.cap-ig.is-error { background: #7a1f1f; }
+.cap-versiones .cap-btn { border-radius: 0 !important; }
+.cap-versiones .cap-btn:first-child { border-radius: 8px 0 0 8px !important; }
+.cap-versiones .cap-btn:last-child { border-radius: 0 8px 8px 0 !important; }
+.rs-main .card-wrapper .rn-opciones button.rn-gusto { color: #9fe0a8; }
+.rs-main .card-wrapper .rn-opciones button.rn-nosirve { color: #f0a8a8; }
+.rs-main .card-wrapper .rn-opciones button.rn-marcado { background: var(--rs-acento); color: var(--rs-acento-f); }
+.gl-ctl input, .fd-ctl input, .fd-ctl select, .fj-ctl select, .pv-ctl input,
+.ce-ctl input[type=text], .ce-ctl textarea, .gn-config input, .gn-config select {
+  font: 13px var(--rs-ui) !important; background: var(--rs-bg) !important; color: var(--rs-txt) !important;
+  border: 1px solid var(--rs-borde) !important; border-radius: 8px !important; padding: 5px 8px !important;
+}
+.rn-barra-opciones {
+  font: 13px var(--rs-ui); color: var(--rs-txt2); padding: 10px 14px; margin: 0 0 12px;
+  background: var(--rs-sup2); border: 1px solid var(--rs-borde); border-radius: 12px;
+}
+
+/* Barra "Fichas de partido" y cada partido */
+.match-toggle {
+  background: var(--rs-sup2); border: 1px solid var(--rs-borde); border-radius: 12px;
+  padding: 12px 16px; margin: 0 0 12px; color: var(--rs-txt2); font: 13px var(--rs-ui);
+}
+.match-toggle:hover { background: var(--rs-sup3); }
+.match-toggle b { color: var(--rs-acento); }
+.match-diseno { padding: 4px 12px; border-color: var(--rs-borde2); }
+.match-diseno.is-on { background: var(--rs-acento); border-color: var(--rs-acento); color: var(--rs-acento-f); font-weight: 700; }
+.rs-sec .match-acordeon { margin: 0 0 8px; padding: 0; border: 1px solid transparent; border-radius: 14px; }
+.rs-sec .match-acordeon.is-abierto {
+  margin: 12px 0 16px; padding: 0 0 20px; background: var(--rs-bg); border: 1px solid var(--rs-borde);
+}
+.match-head {
+  background: var(--rs-sup2); border: 1px solid var(--rs-borde); border-radius: 12px;
+  padding: 14px 16px; color: var(--rs-txt2); font: 13px var(--rs-ui);
+}
+.match-head:hover { background: var(--rs-sup3); }
+.match-acordeon.is-abierto .match-head { background: var(--rs-sup2); border-radius: 13px 13px 0 0; border-width: 0 0 1px; margin-bottom: 18px; }
+.match-head h3 { font: 600 15px var(--rs-ui); letter-spacing: 0; text-transform: none; color: var(--rs-txt); margin: 0; }
+.match-acordeon > .cards-row { padding: 0 18px; }
+.match-estado { font: 600 11px var(--rs-ui); letter-spacing: .5px; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--rs-sup3); color: var(--rs-txt2); }
+.match-estado[data-e="fin"] { background: #0f1d15; color: var(--rs-ok); }
+.match-estado[data-e="vivo"] { background: #2a1214; color: var(--rs-vivo); }
+.match-pendiente { background: var(--rs-sup); border-color: var(--rs-borde2); color: var(--rs-txt2); font-family: var(--rs-ui); border-radius: 12px; }
+
+/* Paneles: premios, captions, posiciones, publicación, fotos */
+.gn-head, .pe-head, .auto-panel, .cap-caja {
+  background: var(--rs-sup2); border-color: var(--rs-borde); border-radius: 12px; font-family: var(--rs-ui);
+}
+.gn-head { font-size: 13px; padding: 12px 14px; margin-bottom: 16px; }
+.gn-config.is-abierto .gn-head { margin-bottom: 0; }
+.gn-config.is-abierto .gn-cuerpo { background: var(--rs-bg); border-color: var(--rs-borde); border-radius: 12px; margin-bottom: 16px; }
+.gn-config { background: transparent; border: 0; padding: 0; margin: 0; }
+.pe-head { padding: 10px 14px; }
+.pe-report, .pe-detalle { font-family: var(--rs-ui); }
+.pe-detalle.is-abierto { background: var(--rs-bg); border-color: var(--rs-borde); }
+.cap-caja { padding: 12px 14px; }
+/* Título arriba y los botones en su propio renglón (antes se apretaban). */
+.cap-head { display: block; font: 700 12px/1.4 var(--rs-ui); color: var(--rs-acento); margin-bottom: 10px; }
+.cap-acciones { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; text-transform: none; letter-spacing: 0; }
+.cap-btn { white-space: nowrap; }
+/* Cualquier otro control que venga debajo de una placa (historial, top 5, etc.) */
+.card-wrapper > :not(.card-scale-container):not(.download-btn):not(.rs-mas) { max-width: 324px; }
+.card-wrapper > :not(.card-scale-container) input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),
+.card-wrapper > :not(.card-scale-container) select,
+.card-wrapper > :not(.card-scale-container) textarea {
+  font: 13px var(--rs-ui); background: var(--rs-bg); color: var(--rs-txt);
+  border: 1px solid var(--rs-borde); border-radius: 8px; padding: 5px 8px;
+}
+.card-wrapper > :not(.card-scale-container) button:not(.download-btn) {
+  font: 600 12px var(--rs-ui); padding: 5px 10px; border-radius: 8px; cursor: pointer;
+  background: var(--rs-sup); border: 1px solid var(--rs-borde); color: var(--rs-txt);
+}
+.cap-txt { background: var(--rs-bg); border-color: var(--rs-borde); border-radius: 10px; font: 14px/1.55 var(--rs-ui); }
+.cap-txt:focus { border-color: var(--rs-acento); }
+.rs-sec .auto-panel { padding: 16px 18px; margin-bottom: 0; border-bottom: 1px solid var(--rs-borde); border: 1px solid var(--rs-borde); }
+.auto-panel h3 { margin-bottom: 4px; }
+.auto-ayuda { font-size: 13px; color: var(--rs-txt2); }
+.auto-fila { border-top-color: var(--rs-borde); }
+.auto-nombre { font-size: 14px; }
+.foto-report { font: 13px/1.55 var(--rs-ui); border-radius: 12px; padding: 14px 16px; }
+
+/* Cargando / error / vacío */
+.spinner {
+  display: block; padding: 18px 20px; margin: 4px 0; border-radius: 12px; text-align: left;
+  font: 500 14px var(--rs-ui); color: var(--rs-txt2);
+  background: linear-gradient(90deg, var(--rs-sup2) 0%, var(--rs-sup3) 50%, var(--rs-sup2) 100%) 0 0 / 200% 100%;
+  animation: rsBrillo 1.4s linear infinite;
+}
+@keyframes rsBrillo { to { background-position: -200% 0; } }
+.spinner.rs-err { animation: none; background: #24121a; border: 1px solid #5a2533; color: #ffb4bd; }
+.spinner.rs-info { animation: none; background: transparent; border: 1px dashed var(--rs-borde2); color: var(--rs-txt3); text-align: center; }
+
+/* Avisos (reemplazan a los alert) */
+.rs-toasts { position: fixed; right: 20px; bottom: 20px; z-index: 100; display: flex; flex-direction: column; gap: 8px; }
+.rs-toast {
+  max-width: 400px; padding: 12px 16px; border-radius: 12px; font: 14px/1.4 var(--rs-ui); color: var(--rs-txt);
+  background: var(--rs-sup3); border: 1px solid var(--rs-borde2); border-left: 4px solid var(--rs-acento);
+  box-shadow: 0 12px 32px rgba(0,0,0,.45); animation: rsEntra .2s ease-out;
+}
+.rs-toast.is-error { border-left-color: var(--rs-error); }
+@keyframes rsEntra { from { opacity: 0; transform: translateY(8px); } }
+
+/* Pantallas angostas: el índice pasa arriba, en fila */
+@media (max-width: 900px) {
+  /* En el celular la barra de arriba no queda fija (ocupa media pantalla); el índice sí. */
+  .rs-top { position: relative; padding: 10px 14px; }
+  .rs-resumen { order: 5; flex-basis: 100%; }
+  .rs-acc { margin-left: 0; }
+  .card-wrapper { padding: 6px; }
+  .rs-layout { grid-template-columns: 1fr; gap: 0; padding: 0 14px 80px; }
+  .rs-nav {
+    top: 0; z-index: 40; flex-direction: row; overflow-x: auto; gap: 4px;
+    margin: 0 -14px 12px; padding: 10px 14px; background: var(--rs-bg); border-bottom: 1px solid var(--rs-borde);
+  }
+  .rs-nav a { white-space: nowrap; padding: 8px 12px; }
+  .rs-nav a.is-on { box-shadow: inset 0 -2px 0 var(--rs-acento); }
+  .rs-nav-sep { display: none; }
+  .rs-sec { padding: 12px; border-radius: 14px; scroll-margin-top: 64px; }
+  .rs-sec-head { flex-wrap: wrap; }
+  .rs-sec-head > .rs-btn { margin-left: 0; }
+  .cards-row { justify-content: center; }
+  .cap-panel { min-width: 0 !important; }
+  .cap-panel.is-escritos { grid-template-columns: 1fr; }
+  .match-acordeon > .cards-row { padding: 0 8px; }
+}
 </style>
 </head>
 <body>
 
-<!-- ── SELECTOR VIEW ── -->
-<div id="selectorView" class="selector-view">
-  <div class="page-header" style="margin:-40px -40px 32px; padding:24px 40px;">
-    <h1>WINNING RECAP CARDS</h1>
-  </div>
-
-  <div class="competition-row">
+<!-- ── BARRA DE ARRIBA (siempre a la vista) ──
+     Los botones .comp-btn y la grilla .md-btn los usan tools/cerrar-fecha.js y
+     tools/probar-ficha.js: los .comp-btn tienen que quedar visibles. -->
+<header class="rs-top" id="rsTop">
+  <div class="rs-brand"><img src="logo-white.png" alt="Winning"><span>Recap</span></div>
+  <div class="rs-seg">
     <button class="comp-btn active" data-comp="384">Apertura</button>
     <button class="comp-btn" data-comp="724">Clausura</button>
   </div>
+  <div class="rs-fecha">
+    <button class="nav-fecha" id="fechaPrev" onclick="navFecha(-1)" title="Fecha anterior (←)">‹</button>
+    <select id="rsFecha" class="rs-select" title="Elegir fecha"><option value="">Fecha…</option></select>
+    <button class="nav-fecha" id="fechaNext" onclick="navFecha(1)" title="Fecha siguiente (→)">›</button>
+  </div>
+  <div class="rs-resumen" id="rsResumen"></div>
+  <div class="rs-acc">
+    <button class="rs-btn rs-btn-pri" onclick="downloadAll()" title="Baja todas las placas que se ven (los partidos cerrados no cuentan)">Descargar todo lo abierto</button>
+  </div>
+</header>
 
+<!-- Vista vieja de elegir fecha: ya no se muestra (la fecha se elige arriba),
+     pero la grilla sigue porque la usan los scripts de tools/. -->
+<div id="selectorView" class="selector-view">
   <h2 id="seasonLabel">Apertura 2026</h2>
   <div class="matchday-grid" id="matchdayGrid"></div>
 </div>
 
-<!-- ── CARDS VIEW ── -->
+<!-- ── PLACAS ── Cada contenedor conserva su id: el JS los busca por id. -->
 <div id="cardsView" class="cards-view">
-  <div class="cards-toolbar">
-    <button class="back-btn" onclick="showSelector()">Volver</button>
-    <button class="nav-fecha" id="fechaPrev" onclick="navFecha(-1)" title="Fecha anterior">‹</button>
-    <h2 id="fechaTitle"></h2>
-    <button class="nav-fecha" id="fechaNext" onclick="navFecha(1)" title="Fecha siguiente">›</button>
-    <div style="flex:1;"></div>
-    <label class="toolbar-btn bg-btn" for="bgUpload">Subir Fondo</label>
-    <input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(event)">
-    <button class="toolbar-btn" onclick="downloadAll()">Descargar Todas</button>
-  </div>
-  <div id="fotosContainer"></div>
-  <div id="ganadoresConfig"></div>
-  <div id="ganadoresContainer"></div>
-  <div id="autoPanel"></div>
-  <div id="postersContainer"></div>
-  <div id="mvpContainer"></div>
-  <div id="goleadoresContainer"></div>
-  <div id="destacadoContainer"></div>
-  <div id="fixturesContainer"></div>
-  <div id="especialesContainer"></div>
-  <div id="matchesToggle"></div>
-  <div id="matchesContainer"></div>
-  <div id="loadingSpinner" class="spinner" style="display:none;">Cargando datos...</div>
+ <div class="rs-layout">
+  <nav class="rs-nav" id="rsNav">
+    <a href="#sec-previa"    data-sec="sec-previa"><i class="rs-dot"></i><span>Previa</span><b class="rs-n"></b></a>
+    <a href="#sec-partidos"  data-sec="sec-partidos"><i class="rs-dot"></i><span>Partidos</span><b class="rs-n"></b></a>
+    <a href="#sec-dia"       data-sec="sec-dia"><i class="rs-dot"></i><span>Fin del día</span><b class="rs-n"></b></a>
+    <a href="#sec-cierre"    data-sec="sec-cierre"><i class="rs-dot"></i><span>Cierre de fecha</span><b class="rs-n"></b></a>
+    <a href="#sec-editorial" data-sec="sec-editorial"><i class="rs-dot"></i><span>Editorial</span><b class="rs-n"></b></a>
+    <div class="rs-nav-sep"></div>
+    <a href="#sec-herr"      data-sec="sec-herr"><i class="rs-dot"></i><span>Herramientas</span><b class="rs-n"></b></a>
+  </nav>
+
+  <main class="rs-main">
+    <div class="rs-head-fecha"><h1 id="fechaTitle"></h1><p>Todo lo de la fecha, ordenado por momento de publicación.</p></div>
+
+    <section class="rs-sec" id="sec-previa">
+      <div class="rs-sec-head">
+        <div><div class="rs-kicker">1 · Antes de que ruede la pelota</div><h2>Previa</h2>
+          <p>El fixture del día. La previa y el historial de cada cruce están dentro de cada partido (diseño Nuevas).</p></div>
+        <button class="rs-btn" onclick="downloadAll(document.getElementById('sec-previa'))">Descargar sección</button>
+      </div>
+      <div id="fixturesContainer" class="rs-cont"></div>
+      <div class="rs-vacio">Todavía no hay placas de previa para esta fecha.</div>
+    </section>
+
+    <section class="rs-sec" id="sec-partidos">
+      <div class="rs-sec-head">
+        <div><div class="rs-kicker">2 · Al pitazo</div><h2>Partidos</h2>
+          <p>Resultado, MVP y Top 5 de cada partido. Abrí un partido para armar sus placas.</p></div>
+        <button class="rs-btn" onclick="downloadAll(document.getElementById('sec-partidos'))">Descargar abiertos</button>
+      </div>
+      <div id="matchesToggle" class="rs-cont"></div>
+      <div id="matchesContainer" class="rs-cont"></div>
+      <div id="loadingSpinner" class="spinner" style="display:none;">Cargando datos...</div>
+      <div class="rs-vacio">Todavía no hay partidos cargados para esta fecha.</div>
+    </section>
+
+    <section class="rs-sec" id="sec-dia">
+      <div class="rs-sec-head">
+        <div><div class="rs-kicker">3 · Cuando termina cada día</div><h2>Fin del día</h2>
+          <p>Los mejores de todos los partidos de cada día.</p></div>
+        <button class="rs-btn" onclick="downloadAll(document.getElementById('sec-dia'))">Descargar sección</button>
+      </div>
+      <div id="diaContainer" class="rs-cont"></div>
+      <div class="rs-vacio">Todavía no terminó ningún día de esta fecha.</div>
+    </section>
+
+    <section class="rs-sec" id="sec-cierre">
+      <div class="rs-sec-head">
+        <div><div class="rs-kicker">4 · Cierre de puntajes</div><h2>Cierre de fecha</h2>
+          <p>Ganadores, 11 Ideal, Equipo Ganador, MVPs, Super Suplentes y goleadores, con sus captions.</p></div>
+        <button class="rs-btn" onclick="downloadAll(document.getElementById('sec-cierre'))">Descargar sección</button>
+      </div>
+      <div id="ganadoresConfig" class="rs-cont"></div>
+      <div id="ganadoresContainer" class="rs-cont"></div>
+      <div id="postersContainer" class="rs-cont"></div>
+      <div id="mvpContainer" class="rs-cont"></div>
+      <div id="goleadoresContainer" class="rs-cont"></div>
+      <div class="rs-vacio">Los puntajes de esta fecha todavía no cerraron.</div>
+    </section>
+
+    <section class="rs-sec" id="sec-editorial">
+      <div class="rs-sec-head">
+        <div><div class="rs-kicker">5 · Cuando hay una historia</div><h2>Editorial</h2>
+          <p>Ficha de jugador destacado y contenido especial. La placa sale sola; la idea y el texto son nuestros.</p></div>
+        <button class="rs-btn" onclick="downloadAll(document.getElementById('sec-editorial'))">Descargar sección</button>
+      </div>
+      <div id="destacadoContainer" class="rs-cont"></div>
+      <div id="especialesContainer" class="rs-cont"></div>
+      <div class="rs-vacio">No hay contenido editorial para esta fecha.</div>
+    </section>
+
+    <details class="rs-sec rs-herr" id="sec-herr">
+      <summary class="rs-sec-head">
+        <div><div class="rs-kicker">Se toca de vez en cuando</div><h2>Herramientas</h2>
+          <p>Publicación automática en redes, fotos que faltan y fondo de las placas viejas.</p></div>
+        <span class="rs-abrir">Abrir ▾</span>
+      </summary>
+      <div id="autoPanel" class="rs-cont"></div>
+      <div id="fotosContainer" class="rs-cont"></div>
+      <div class="rs-herr-fila">
+        <div><b>Fondo de las placas viejas</b><small>Imagen de fondo para Resultado, Predicciones y Fantasy (diseño Antiguas).</small></div>
+        <label class="rs-btn" for="bgUpload">Subir fondo</label>
+        <input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(event)">
+      </div>
+    </details>
+  </main>
+ </div>
 </div>
+<div class="rs-toasts" id="rsToasts"></div>
 
 <script>
 // ── Supabase ──
@@ -1997,6 +2391,8 @@ function pintarNavFecha() {
   const next = document.getElementById('fechaNext');
   if (prev) prev.disabled = !(fechaActual > 1);
   if (next) next.disabled = !(fechaActual < 16);
+  const sel = document.getElementById('rsFecha');
+  if (sel && fechaActual != null) sel.value = String(fechaActual);
 }
 
 /* Las flechas del teclado hacen lo mismo, salvo que estés escribiendo en un
@@ -2004,7 +2400,7 @@ function pintarNavFecha() {
 document.addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   const t = e.target;
-  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
   if (document.getElementById('cardsView').style.display === 'none') return;
   if (e.key === 'ArrowLeft')  { e.preventDefault(); navFecha(-1); }
   if (e.key === 'ArrowRight') { e.preventDefault(); navFecha(1); }
@@ -3462,6 +3858,7 @@ async function loadFecha(matchday) {
   document.getElementById('ganadoresContainer').innerHTML = '';
   document.getElementById('postersContainer').innerHTML = '';
   document.getElementById('mvpContainer').innerHTML = '';
+  document.getElementById('diaContainer').innerHTML = '';
   document.getElementById('goleadoresContainer').innerHTML = '';
   document.getElementById('destacadoContainer').innerHTML = '';
   document.getElementById('fixturesContainer').innerHTML = '';
@@ -4669,7 +5066,7 @@ async function autoPanelRender() {
         return;
       }
       est.textContent = 'Tarda más de lo normal: ver en GitHub'; btn.disabled = false;
-    } catch (e) { est.textContent = ''; btn.disabled = false; alert('No se pudo guardar: ' + e.message); }
+    } catch (e) { est.textContent = ''; btn.disabled = false; rsToast('No se pudo guardar: ' + e.message, 'error'); }
   });
 }
 
@@ -4677,7 +5074,7 @@ async function autoPanelRender() {
 async function capPublicarRed(btn, red, matchday, placa, opcion, texto) {
   const R = CAP_REDES[red];
   if (!ghToken(true)) return;
-  if (texto.length > R.maximo) { alert('El texto tiene ' + texto.length + ' caracteres y ' + R.nombre + ' permite ' + R.maximo + '.'); return; }
+  if (texto.length > R.maximo) { rsToast('El texto tiene' + texto.length + ' caracteres y ' + R.nombre + ' permite ' + R.maximo + '.'); return; }
   if (!confirm('¿Publicar en ' + R.nombre + ' la placa de ' + (placa === 'ideal' ? '11 Ideal' : 'Ganadores') + ' de la fecha ' + matchday + ' con este texto?\n\n' + texto)) return;
   const estado = (t, clase) => { btn.textContent = t; btn.className = 'cap-btn cap-' + red + (clase ? ' ' + clase : ''); };
   try {
@@ -4704,7 +5101,7 @@ async function capPublicarRed(btn, red, matchday, placa, opcion, texto) {
     btn.onclick = () => window.open('https://github.com/' + GH_REPO + '/actions/workflows/' + R.workflow, '_blank');
   } catch (e) {
     estado(R.boton); btn.disabled = false;
-    alert('No se pudo publicar: ' + e.message);
+    rsToast('No se pudo publicar: ' + e.message, 'error');
   }
 }
 
@@ -6359,7 +6756,10 @@ async function mvCargarDias(matchday) {
 
 async function loadMvpCards(matchday) {
   const container = document.getElementById('mvpContainer');
+  // Los MVPs del día van en su propia sección ("Fin del día").
+  const diaCont = document.getElementById('diaContainer') || container;
   container.innerHTML = '<div class="spinner">Cargando MVPs...</div>';
+  if (diaCont !== container) diaCont.innerHTML = '<div class="spinner">Cargando MVPs del día...</div>';
 
   let mvps, subs, dias = [];
   try {
@@ -6372,6 +6772,7 @@ async function loadMvpCards(matchday) {
     console.error('MVP load failed:', err);
     container.innerHTML =
       '<div class="spinner">Error al cargar MVPs: ' + gnEscape(err.message || err) + '</div>';
+    if (diaCont !== container) diaCont.innerHTML = '';
     return;
   }
 
@@ -6390,6 +6791,7 @@ async function loadMvpCards(matchday) {
   }
 
   container.innerHTML = '';
+  if (diaCont !== container) diaCont.innerHTML = '';
   const specs = [
     { kind: 'mvp',      title: 'MVPs DE LA FECHA',  rows: mvps },
     { kind: 'suplente', title: 'SUPER SUPLENTES',   rows: subs },
@@ -6429,7 +6831,7 @@ async function loadMvpCards(matchday) {
       row.appendChild(w);
     });
     section.appendChild(row);
-    container.appendChild(section);
+    diaCont.appendChild(section);
     row.querySelectorAll('.card-mvp').forEach(card => { mvFitTitle(card); document.fonts.ready.then(() => mvFitTitle(card)); });
   }
 
@@ -6660,7 +7062,9 @@ async function exportarCard(cardEl) {
     });
   } catch (err) {
     console.error('Export failed:', err);
-    alert('Error al exportar: ' + err.message);
+    // tools/cerrar-fecha.js se entera del error por el alert: con Chrome sin cabeza se deja.
+    if (navigator.webdriver) alert('Error al exportar: ' + err.message);
+    else rsToast('Error al exportar: ' + err.message, 'error');
   }
 
   // Restore
@@ -6676,10 +7080,13 @@ async function exportarCard(cardEl) {
   return dataUrl;
 }
 
-async function downloadAll() {
+/* Sin argumento baja todo lo que se ve; con una sección, sólo lo de esa sección. */
+async function downloadAll(raiz) {
   // offsetParent null = está escondido. Exportar eso falla, asi que se saltea.
-  const cards = [...document.querySelectorAll('.card, .pcard')]
+  const cards = [...(raiz || document).querySelectorAll('.card, .pcard')]
     .filter(c => c.offsetParent !== null);
+  if (!cards.length) { rsToast('No hay placas a la vista para descargar.'); return; }
+  rsToast('Descargando ' + cards.length + (cards.length === 1 ? ' placa…' : ' placas…'));
   for (let i = 0; i < cards.length; i++) {
     const card = cards[i];
     let safeName;
@@ -6701,6 +7108,149 @@ async function downloadAll() {
     if (i < cards.length - 1) await new Promise(r => setTimeout(r, 400));
   }
 }
+
+/* ══ Interfaz v2: barra de arriba, índice lateral y estado de cada sección ══
+   Nada de esto arma placas: mira lo que dibujan los loaders y lo ordena. */
+function rsToast(msg, tipo) {
+  const cont = document.getElementById('rsToasts');
+  if (!cont) return;
+  const t = document.createElement('div');
+  t.className = 'rs-toast' + (tipo === 'error' ? ' is-error' : '');
+  t.textContent = msg;
+  cont.appendChild(t);
+  setTimeout(() => t.remove(), tipo === 'error' ? 7000 : 3500);
+}
+
+const rsTerminado = m => !!(m.post_match || m.period === 'FullTime');
+const rsEnJuego = m => !rsTerminado(m) && !!m.period && m.period !== 'PreMatch';
+
+/* Los controles de foto de cada placa van plegados, así la grilla queda pareja. */
+function rsPlegarControles() {
+  document.querySelectorAll('#cardsView .card-wrapper').forEach(w => {
+    const sueltos = [...w.children].filter(c => c.matches('.rn-foto-ctl, .rn-opciones, .rn-foto-info'));
+    if (!sueltos.length) return;
+    let d = w.querySelector(':scope > details.rs-mas');
+    if (!d) {
+      d = document.createElement('details');
+      d.className = 'rs-mas';
+      d.innerHTML = '<summary>Foto y encuadre</summary>';
+      w.appendChild(d);
+    }
+    sueltos.forEach(c => d.appendChild(c));
+  });
+  document.querySelectorAll('#cardsView .match-estado').forEach(e => {
+    const t = e.textContent.trim();
+    e.dataset.e = t === 'Finalizado' ? 'fin' : t === 'En juego' ? 'vivo' : t === 'Próximo' ? 'prox' : '';
+  });
+  document.querySelectorAll('#cardsView .spinner').forEach(s => {
+    const t = s.textContent.trim();
+    s.classList.toggle('rs-err', /^(Error|No se pudo|No pude)/i.test(t));
+    s.classList.toggle('rs-info', /^Sin /i.test(t));
+  });
+}
+
+const rsVisible = el => el.offsetParent !== null;
+
+function rsEstado() {
+  const { matches } = partidosDeLaFecha || { matches: [] };
+  document.querySelectorAll('#rsNav a[data-sec]').forEach(a => {
+    const sec = document.getElementById(a.dataset.sec);
+    if (!sec) return;
+    const placas = sec.querySelectorAll('.card, .pcard').length;
+    const cargando = [...sec.querySelectorAll('.spinner, .match-pendiente')]
+      .some(s => !s.classList.contains('rs-err') && !s.classList.contains('rs-info') && (rsVisible(s) || !sec.open && sec.tagName === 'DETAILS'));
+    const error = !!sec.querySelector('.spinner.rs-err');
+    let clase = cargando ? 'is-cargando' : error ? 'is-error' : placas ? 'is-ok' : '';
+    let n = placas || '';
+    if (a.dataset.sec === 'sec-partidos' && matches.length) {
+      n = matches.filter(rsTerminado).length + '/' + matches.length;
+      if (!cargando && !error) clase = matches.every(rsTerminado) ? 'is-ok' : matches.some(rsEnJuego) ? 'is-cargando' : '';
+    }
+    if (a.dataset.sec === 'sec-herr') {
+      const faltan = document.querySelector('#fotosContainer .foto-report:not(.is-ok)');
+      clase = faltan ? 'is-aviso' : '';
+      n = '';
+    }
+    a.querySelector('.rs-dot').className = 'rs-dot' + (clase ? ' ' + clase : '');
+    a.querySelector('.rs-n').textContent = n;
+    // Vacía: ningún contenedor dibujó nada y no está cargando.
+    const conts = [...sec.querySelectorAll('.rs-cont')];
+    const vacia = !cargando && conts.every(c => !c.children.length) && !rsVisible(document.getElementById('loadingSpinner'));
+    sec.classList.toggle('is-vacio', vacia && sec.tagName !== 'DETAILS');
+  });
+
+  // Resumen de la fecha en la barra de arriba.
+  const res = document.getElementById('rsResumen');
+  if (!res || fechaActual == null) return;
+  const chips = [];
+  if (matches.length) {
+    chips.push(`<a class="rs-chip" href="#sec-partidos"><b>${matches.filter(rsTerminado).length}/${matches.length}</b> terminados</a>`);
+    const vivos = matches.filter(rsEnJuego).length;
+    if (vivos) chips.push(`<a class="rs-chip is-vivo" href="#sec-partidos"><i></i><b>${vivos}</b> en juego</a>`);
+  }
+  const placas = document.querySelectorAll('#cardsView .card, #cardsView .pcard').length;
+  if (placas) chips.push(`<span class="rs-chip"><b>${placas}</b> placas armadas</span>`);
+  const fr = document.querySelector('#fotosContainer .foto-report');
+  if (fr) {
+    const faltan = fr.classList.contains('is-ok') ? 0 : fr.querySelectorAll('.foto-table tr').length;
+    chips.push(faltan
+      ? `<a class="rs-chip is-aviso" href="#sec-herr" data-abrir="sec-herr">Faltan <b>${faltan}</b> fotos</a>`
+      : `<span class="rs-chip is-ok">Fotos completas ✓</span>`);
+  }
+  const html = chips.join('');
+  if (res.innerHTML !== html) res.innerHTML = html;
+}
+
+function rsInit() {
+  // Selector de fecha de la barra de arriba.
+  const sel = document.getElementById('rsFecha');
+  for (let i = 1; i <= 16; i++) sel.insertAdjacentHTML('beforeend', `<option value="${i}">Fecha ${i}</option>`);
+  sel.addEventListener('change', () => { if (sel.value) { loadFecha(+sel.value); window.scrollTo({ top: 0 }); } });
+
+  // Cambiar de torneo recarga la fecha que estás mirando. Los scripts de
+  // tools/ (Chrome sin cabeza) eligen la fecha ellos: ahí no se recarga.
+  document.querySelectorAll('.rs-top .comp-btn').forEach(b => b.addEventListener('click', e => {
+    if (navigator.webdriver || !e.isTrusted) return;
+    loadFecha(fechaActual || 1);
+  }));
+
+  // Herramientas está plegada: los links que llevan ahí la abren.
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href="#sec-herr"]');
+    if (a) document.getElementById('sec-herr').open = true;
+  });
+
+  // Alto de la barra de arriba, para que el índice y las anclas no queden tapados.
+  const top = document.getElementById('rsTop');
+  const medir = () => document.documentElement.style.setProperty('--rs-top-h', top.offsetHeight + 'px');
+  medir();
+  if (window.ResizeObserver) new ResizeObserver(medir).observe(top);
+
+  // Qué sección estás mirando.
+  if (window.IntersectionObserver) {
+    const links = [...document.querySelectorAll('#rsNav a[data-sec]')];
+    const io = new IntersectionObserver(entradas => {
+      entradas.forEach(en => {
+        if (!en.isIntersecting) return;
+        links.forEach(l => l.classList.toggle('is-on', l.dataset.sec === en.target.id));
+      });
+    }, { rootMargin: '-35% 0px -60% 0px' });
+    document.querySelectorAll('.rs-sec').forEach(s => io.observe(s));
+  }
+
+  // Cada vez que un loader dibuja algo: plegar controles y actualizar estados.
+  let pendiente = false;
+  const actualizar = () => {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(() => { pendiente = false; rsPlegarControles(); rsEstado(); });
+  };
+  new MutationObserver(actualizar).observe(document.querySelector('.rs-main'), { childList: true, subtree: true });
+  document.getElementById('sec-herr').addEventListener('toggle', actualizar);
+  actualizar();
+}
+// Después del DOMContentLoaded de arriba, que engancha los .comp-btn primero.
+document.addEventListener('DOMContentLoaded', rsInit);
 </script>
 </body>
 </html>
