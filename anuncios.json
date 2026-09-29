@@ -4,7 +4,7 @@
     {
       "titulo": "Sarmiento vs River postergado al miércoles 14/10",
       "nota": "La fecha 11 cierra parcial el lunes 05/10 con Banfield–Rosario Central (21:15). Sarmiento–River (game 2614522) se juega el mié 14/10 19:00, después de la fecha 12. Misma regla que la fecha 2.",
-      "v": 1,
+      "v": 2,
       "items": [
         {
           "tipo": "imagen",
@@ -23,7 +23,7 @@
         {
           "tipo": "video",
           "titulo": "Video para story",
-          "sub": "1080×1920 · 36 s · con voz",
+          "sub": "1080×1920 · 40 s · voz ElevenLabs",
           "src": "anuncios/724-2026-11/postergado-sarmiento-river-story.mp4"
         },
         {
