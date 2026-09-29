@@ -2205,6 +2205,80 @@ html { scroll-behavior: smooth; }
   .cap-panel.is-escritos { grid-template-columns: 1fr; }
   .match-acordeon > .cards-row { padding: 0 8px; }
 }
+
+/* ══ FRASES ═══════════════════════════════════════════════════════════
+   Frames "frase" (globo, 1139:18390), "frase 1" (banda, 1139:18477) y
+   "frase 3" (mayus, 1139:18747) de "templates para automatizar". Datos en
+   frases.json (tools/frases.js). No se replican el grano ni la sombra
+   interna del logo; el globo y la curva son los SVG exportados del Figma. */
+.card-fr { background: #1e1e1e; font-family: 'CanaroBlack', sans-serif; }
+.card-fr .rn-foto { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; background-color: #1e1e1e; }
+.card-fr.moviendo { cursor: move; }
+.card-fr .fr-logo { position: absolute; left: 377px; top: 70px; width: 327px; z-index: 5; }
+.card-fr .fr-logo img { width: 100%; display: block; }
+.card-fr .fr-texto { position: absolute; display: flex; align-items: center; justify-content: center; text-align: center; }
+.card-fr .fr-texto span { display: block; width: 100%; overflow-wrap: break-word; }
+/* Tarjeta del autor (globo y banda): foto 226x181 a la izquierda, nombre con contorno. */
+.card-fr .fr-tarjeta { position: absolute; width: 512px; height: 181px; background: #fff; overflow: hidden;
+  box-shadow: 0 15.62px 41.66px -5.21px rgba(0,0,0,.22), 0 3.9px 10.41px rgba(0,0,0,.1); }
+.card-fr .fr-tarjeta::after { content: ''; position: absolute; inset: 0; border: 6px solid #000; border-radius: inherit; pointer-events: none; }
+.card-fr .fr-autor-foto { position: absolute; left: 0; top: 0; width: 226px; height: 181px; background-color: #c9c9c9; background-size: cover; background-position: center; background-repeat: no-repeat; }
+.card-fr .fr-nombre { position: absolute; left: 285px; top: 0; width: 215px; height: 181px; display: flex; align-items: center; }
+.card-fr .fr-nombre span, .card-fr .fr-pastilla span, .card-fr .fr-comilla span {
+  color: #fff; paint-order: stroke fill; -webkit-text-stroke: 4.75px #000; text-shadow: 0 2.71px 0 #000; }
+.card-fr .fr-nombre span { font-size: 37.67px; line-height: 41.56px; }
+
+.card-fr-globo .fr-globo { position: absolute; left: 79px; top: 700px; width: 675px; height: 393px; }
+.card-fr-globo .fr-texto { left: 141px; top: 726px; width: 518px; height: 340px; color: #000; font-size: 46.44px; line-height: 61.43px; }
+.card-fr-globo .fr-tarjeta { left: 528px; top: 1129px; border-radius: 28.64px; }
+
+.card-fr-banda .fr-curva { position: absolute; display: block; }
+.card-fr-banda .fr-curva-b { left: -1px; top: 922px; width: 1218px; height: 476px; }
+.card-fr-banda .fr-curva-c { left: -137px; top: 930px; width: 1354px; height: 530px; }
+.card-fr-banda .fr-texto { left: 89px; top: 1055px; width: 902px; height: 260px; color: #fff; font-size: 73.44px; line-height: 61.43px; }
+.card-fr-banda .fr-tarjeta { left: 540px; top: 839px; border-radius: 138.64px; }
+.card-fr-banda .fr-tarjeta::after { border-color: #92b1dc; }
+
+.card-fr-mayus .fr-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 50.5%, #000 86.1%); }
+.card-fr-mayus .fr-pila { position: absolute; left: 50px; bottom: 43px; width: 981px; display: flex; flex-direction: column; align-items: flex-start; }
+.card-fr-mayus .fr-comilla, .card-fr-mayus .fr-pastilla { position: relative; background: #92b1dc; border-radius: 22.14px;
+  box-shadow: 0 12.08px 32.21px -4.03px rgba(0,0,0,.22), 0 3.02px 8.05px rgba(0,0,0,.1); }
+.card-fr-mayus .fr-comilla { width: 87px; height: 79px; }
+.card-fr-mayus .fr-comilla span { position: absolute; left: 0; right: 0; top: 18px; text-align: center; font-size: 66.34px; line-height: 73.18px; -webkit-text-stroke: 8.37px #000; text-shadow: 0 4.78px 0 #000; }
+.card-fr-mayus .fr-texto { position: relative; margin: 45px 0 46px; width: 981px; justify-content: flex-start; text-align: left; color: #fff; font-size: 51.27px; line-height: 53.3px; text-transform: uppercase; }
+.card-fr-mayus .fr-pastilla { min-width: 351px; height: 79px; padding: 0 34px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.card-fr-mayus .fr-pastilla span { font-size: 29.12px; line-height: 32.13px; white-space: nowrap; -webkit-text-stroke: 3.68px #000; text-shadow: 0 2.1px 0 #000; }
+
+/* Preguntas rápidas (diseño provisorio, sin frame en Figma): mismo lenguaje que "frase 3". */
+.card-fr-preguntas .fr-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.92) 62%, #000 100%); }
+.card-fr-preguntas .fr-pila { position: absolute; left: 50px; bottom: 43px; width: 981px; display: flex; flex-direction: column; align-items: flex-start; }
+.card-fr-preguntas .fr-titulo { background: #92b1dc; border-radius: 22.14px; padding: 14px 30px 10px; margin-bottom: 30px;
+  box-shadow: 0 12.08px 32.21px -4.03px rgba(0,0,0,.22), 0 3.02px 8.05px rgba(0,0,0,.1); }
+.card-fr-preguntas .fr-titulo span { font-size: 44px; line-height: 50px; color: #fff; text-transform: uppercase; paint-order: stroke fill; -webkit-text-stroke: 5px #000; text-shadow: 0 3px 0 #000; }
+.card-fr-preguntas .fr-lista { width: 981px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 40px; }
+.card-fr-preguntas .fr-q { display: flex; flex-direction: column; gap: 2px; }
+.card-fr-preguntas .fr-q b { font-weight: normal; color: #fff; font-size: 34px; line-height: 38px; }
+.card-fr-preguntas .fr-q i { font-style: normal; color: #92b1dc; font-size: 40px; line-height: 44px; text-transform: uppercase; }
+.card-fr-preguntas .fr-pastilla { position: relative; background: #92b1dc; border-radius: 22.14px; min-width: 351px; height: 79px; padding: 0 34px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 12.08px 32.21px -4.03px rgba(0,0,0,.22), 0 3.02px 8.05px rgba(0,0,0,.1); }
+.card-fr-preguntas .fr-pastilla span { font-size: 29.12px; line-height: 32.13px; white-space: nowrap; -webkit-text-stroke: 3.68px #000; text-shadow: 0 2.1px 0 #000; }
+.fr-estado { padding: 6px 8px; border-radius: 4px; background: #1b1b1f; border: 1px solid #333; line-height: 1.5; }
+.fr-estado .fr-tag { display: inline-block; padding: 0 6px; border-radius: 3px; font-weight: 700; margin-right: 6px; }
+.fr-tag.para_aprobar { background: #e8b54a; color: #111; }
+.fr-tag.publicada { background: #5cb85c; color: #111; }
+.fr-tag.descartada { background: #555; color: #ddd; }
+.fr-panel .fr-publicar { background: #1d9bf0; color: #fff; border-color: #1d9bf0; font-weight: 700; }
+.fr-panel .fr-publicar.is-ok { background: #5cb85c; border-color: #5cb85c; }
+.fr-panel .fr-publicar.is-error { background: #c0392b; border-color: #c0392b; }
+/* Controles (fuera de la placa) */
+.fr-panel { display: grid; gap: 6px; font: 11px system-ui; color: #9a9aa8; width: 100%; max-width: 1010px; margin: 4px 0 10px; }
+.fr-panel textarea, .fr-panel input[type=text] { width: 100%; box-sizing: border-box; font: 12px system-ui; background: #1b1b1f; color: #ddd; border: 1px solid #444; border-radius: 4px; padding: 5px 7px; }
+.fr-panel textarea { resize: vertical; min-height: 38px; }
+.fr-panel .fr-fila { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fr-panel button, .fr-panel label.fr-subir { font: 11px system-ui; padding: 2px 8px; background: #222; color: #bbb; border: 1px solid #555; border-radius: 3px; cursor: pointer; }
+.fr-panel button.is-on { background: #92b1dc; color: #111; border-color: #92b1dc; }
+.fr-panel label.fr-subir input { display: none; }
+.fr-panel a { color: #92b1dc; }
 </style>
 </head>
 <body>
@@ -2316,6 +2390,7 @@ html { scroll-behavior: smooth; }
       </div>
       <div id="destacadoContainer" class="rs-cont"></div>
       <div id="especialesContainer" class="rs-cont"></div>
+      <div id="frasesContainer" class="rs-cont"></div>
       <div class="rs-vacio">No hay contenido editorial para esta fecha.</div>
     </section>
 
@@ -3795,6 +3870,277 @@ async function pintarEspeciales(matchday) {
 }
 
 // ══════════════════════════════════════════════════════════════════════
+// FRASES — frases de entrevistas (X, YouTube…) en tres diseños del Figma
+// ("frase" = globo, "frase 1" = banda, "frase 3" = mayus). No dependen de la
+// fecha: frases.json trae la lista, la más nueva primero (tools/frases.js).
+// Lo editado a mano (textos, autor, foto elegida) vale mientras frases.json no
+// traiga una versión nueva (v) de esa frase. Las fotos subidas a mano no se
+// guardan (no entran en localStorage): se vuelven a subir si se recarga.
+// ══════════════════════════════════════════════════════════════════════
+const FR_DISENOS = [
+  { k: 'globo', rotulo: 'globo' },
+  { k: 'banda', rotulo: 'banda celeste' },
+  { k: 'mayus', rotulo: 'mayúsculas' },
+];
+const FR_KEY = 'winning.recap.fr.';
+let frCache = null;
+async function frCargar() {
+  if (frCache) return frCache;
+  frCache = [];
+  try {
+    // En winning.com.ar un archivo que no existe devuelve la home con 200: por eso el try.
+    const r = await fetch('frases.json?v=' + Date.now());
+    frCache = (JSON.parse(await r.text()) || {}).frases || [];
+  } catch (e) { console.warn('frases.json no disponible', e); }
+  return frCache;
+}
+function frEstado(f) {
+  let e = null; try { e = JSON.parse(localStorage.getItem(FR_KEY + f.id)); } catch (x) {}
+  const base = { texto: f.texto || '', texto_corto: f.texto_corto || '', usar_corto: !!(f.usar_corto && f.texto_corto), autor: f.autor || '', foto: f.foto || 0, preguntas: f.preguntas || [], diseno: f.diseno || 'mayus' };
+  return e && e.v === (f.v || 1) ? Object.assign(base, e.cambios) : base;
+}
+function frGuardar(f, st) {
+  const cambios = { texto: st.texto, texto_corto: st.texto_corto, usar_corto: st.usar_corto, autor: st.autor, foto: st.foto, diseno: st.diseno };
+  try { localStorage.setItem(FR_KEY + f.id, JSON.stringify({ v: f.v || 1, cambios })); } catch (e) {}
+}
+/* La frase a mostrar; el globo y la banda la llevan entre comillas (si no las trae ya). */
+function frTexto(st, comillas) {
+  let t = String((st.usar_corto && st.texto_corto) ? st.texto_corto : st.texto).trim().replace(/^["“«]+|["”»]+$/g, '');
+  return comillas ? '“' + t + '”' : t;
+}
+function buildFrase(k, st) {
+  const card = document.createElement('div');
+  card.className = 'card card-fr card-fr-' + k;
+  const autor = gnEscape(st.autor);
+  const tarjeta = `<div class="fr-tarjeta"><div class="fr-autor-foto"></div><div class="fr-nombre"><span>${autor}</span></div></div>`;
+  let html = '<div class="rn-foto"></div>';
+  if (k === 'globo') html += `<img class="fr-globo" src="icons/frase-globo.svg" alt=""><div class="fr-texto"><span>${gnEscape(frTexto(st, true))}</span></div>` + tarjeta;
+  if (k === 'banda') html += '<img class="fr-curva fr-curva-b" src="icons/frase-curva-blanca.svg" alt=""><img class="fr-curva fr-curva-c" src="icons/frase-curva-celeste.svg" alt="">' +
+    `<div class="fr-texto"><span>${gnEscape(frTexto(st, true))}</span></div>` + tarjeta;
+  if (k === 'mayus') html += '<div class="fr-scrim"></div>' +
+    `<div class="fr-pila"><div class="fr-comilla"><span>“</span></div><div class="fr-texto"><span>${gnEscape(frTexto(st, false))}</span></div><div class="fr-pastilla"><span>${autor}</span></div></div>`;
+  if (k === 'preguntas') html += '<div class="fr-scrim"></div><div class="fr-pila"><div class="fr-titulo"><span>Preguntas rápidas</span></div><div class="fr-lista">' +
+    (st.preguntas || []).slice(0, 6).map(q => `<div class="fr-q"><b>${gnEscape(q.pregunta)}</b><i>${gnEscape(q.respuesta)}</i></div>`).join('') +
+    `</div><div class="fr-pastilla"><span>${autor}</span></div></div>`;
+  card.innerHTML = html + `<div class="fr-logo">${WINNING_LOGO_HTML}</div>`;
+  return card;
+}
+/* Achica la letra hasta que la frase entre en su caja (el globo no crece) y el nombre en su lugar. */
+const FR_MAX = { globo: 318, banda: 250, mayus: 272 };
+/* Preguntas: achica la lista hasta que quepa debajo del logo. */
+function frAjustarPreguntas(card) {
+  const lista = card.querySelector('.fr-lista'); if (!lista) return;
+  lista.style.zoom = '';
+  let z = 1;
+  while (card.querySelector('.fr-pila').offsetHeight > 1080 && z > 0.5) { z -= 0.04; lista.style.zoom = z; }
+}
+function frAjustar(card, k) {
+  const span = card.querySelector('.fr-texto span');
+  if (span) {
+    span.style.fontSize = ''; span.style.lineHeight = '';
+    const cs = getComputedStyle(span), fs0 = parseFloat(cs.fontSize), lh0 = parseFloat(cs.lineHeight);
+    let f = 1;
+    while (span.offsetHeight > FR_MAX[k] && f > 0.45) { f -= 0.03; span.style.fontSize = (fs0 * f) + 'px'; span.style.lineHeight = (lh0 * f) + 'px'; }
+  }
+  if (k === 'preguntas') frAjustarPreguntas(card);
+  const nom = card.querySelector('.fr-nombre span');
+  if (nom) {
+    nom.style.fontSize = ''; nom.style.lineHeight = '';
+    let f = 1;
+    // Dos renglones como mucho y ninguna palabra más ancha que el lugar.
+    while ((nom.offsetHeight > 84 || nom.scrollWidth > 215) && f > 0.5) { f -= 0.04; nom.style.fontSize = (37.67 * f) + 'px'; nom.style.lineHeight = (41.56 * f) + 'px'; }
+  }
+}
+/* Foto del autor: recorte [x, y, ancho, alto] en píxeles de la imagen (o centrada si no hay). */
+function frFotoAutor(card, src, recorte) {
+  const el = card.querySelector('.fr-autor-foto'); if (!el) return;
+  if (!src) { el.style.backgroundImage = ''; return; }
+  el.style.backgroundImage = `url('${src}')`;
+  if (!recorte) { el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; return; }
+  const img = new Image();
+  img.onload = () => {
+    const [x, y, w] = recorte, s = 226 / w;
+    el.style.backgroundSize = Math.round(img.naturalWidth * s) + 'px ' + Math.round(img.naturalHeight * s) + 'px';
+    el.style.backgroundPosition = Math.round(-x * s) + 'px ' + Math.round(-y * s) + 'px';
+  };
+  img.src = src;
+}
+/* Foto de fondo en las tres placas; el encuadre de cada diseño se guarda aparte (rnFotoControles). */
+function frPonerFondo(cards, f, src, pos) {
+  cards.forEach(({ card, fid }) => {
+    card.querySelector('.rn-foto').style.backgroundImage = src ? `url('${src}')` : '';
+    delete rnFotoNat[fid];
+    let guardado = null; try { guardado = localStorage.getItem(rnFotoKey(fid)); } catch (e) {}
+    if (!guardado || card.dataset.src !== undefined) rnFotoGuardar(fid, pos || { x: 50, y: 50, zoom: 1 });
+    card.dataset.src = src || '';
+    if (!src) return;
+    const img = new Image(); img.onload = () => { rnFotoNat[fid] = { w: img.naturalWidth, h: img.naturalHeight }; rnFotoAplicar(card, fid); }; img.src = src;
+  });
+}
+function frArmar(row, panel, f) {
+  const st = frEstado(f);
+  const fotos = f.fotos || [];
+  const disenos = FR_DISENOS.concat(f.tipo === 'preguntas' && (f.preguntas || []).length ? [{ k: 'preguntas', rotulo: 'preguntas' }] : []);
+  const cards = disenos.map(d => {
+    const card = buildFrase(d.k, st);
+    const fid = 'fr-' + f.id + '-' + d.k;
+    const wrapper = createCardWrapper(card, 'frase_' + f.id + '_' + d.k);
+    row.appendChild(wrapper);
+    rnFotoControles(wrapper, card, fid);
+    return { k: d.k, card, fid, wrapper };
+  });
+  const ajustar = () => cards.forEach(c => frAjustar(c.card, c.k));
+  const fotoIdx = () => Math.max(0, Math.min(fotos.length - 1, st.foto || 0));
+  const fondo = () => { const o = fotos[fotoIdx()]; frPonerFondo(cards, f, o && o.archivo, o && o.pos); };
+  const autorFoto = (src, recorte) => cards.forEach(c => frFotoAutor(c.card, src, recorte));
+  // Primera vez: respeta encuadres guardados; después, cambiar de foto vuelve al sugerido.
+  cards.forEach(c => { delete c.card.dataset.src; });
+  fondo();
+  if (f.foto_autor) autorFoto(f.foto_autor.archivo, f.foto_autor.recorte);
+
+  const fuente = f.fuente || {};
+  panel.innerHTML =
+    `<div class="fr-fila"><b>frase completa</b>${fuente.url ? ` · <a href="${gnEscape(fuente.url)}" target="_blank" rel="noopener">${gnEscape(fuente.cuenta || 'fuente')}</a>` : ''}</div>` +
+    `<textarea class="fr-in-texto" rows="2">${gnEscape(st.texto)}</textarea>` +
+    '<div class="fr-fila"><b>versión corta</b> (un pedazo textual; vacía = usa la completa)</div>' +
+    `<textarea class="fr-in-corto" rows="1">${gnEscape(st.texto_corto)}</textarea>` +
+    `<div class="fr-fila">en las placas: <button type="button" class="fr-usar" data-c="0">completa</button><button type="button" class="fr-usar" data-c="1">corta</button>` +
+    ` · autor <input type="text" class="fr-in-autor" style="width:220px" value="${gnEscape(st.autor)}"></div>` +
+    '<div class="fr-fila">fondo: ' + (fotos.length > 1 ? '<button type="button" class="fr-prev">‹</button><span class="fr-foto-lbl"></span><button type="button" class="fr-next">otra foto ›</button>' : '<span class="fr-foto-lbl"></span>') +
+    '<label class="fr-subir">subir archivo<input type="file" accept="image/*" class="fr-in-fondo"></label><button type="button" class="fr-link-fondo">pegar link</button></div>' +
+    '<div class="fr-fila">foto del autor: <label class="fr-subir">subir archivo<input type="file" accept="image/*" class="fr-in-autorfoto"></label><button type="button" class="fr-link-autor">pegar link</button>' +
+    '<button type="button" class="fr-autor-fondo">usar la del fondo</button></div>';
+  const $ = s => panel.querySelector(s);
+  const pintarUsar = () => panel.querySelectorAll('.fr-usar').forEach(b => b.classList.toggle('is-on', (b.dataset.c === '1') === !!(st.usar_corto && st.texto_corto)));
+  const pintarLbl = () => {
+    const o = fotos[fotoIdx()], lbl = $('.fr-foto-lbl'); if (!lbl) return;
+    lbl.textContent = o ? `opción ${fotoIdx() + 1} de ${fotos.length}` + (o.fuente ? ' · ' + o.fuente : o.seg != null ? ' · video ' + o.seg + ' s' : '') : 'sin foto';
+  };
+  const textos = () => {
+    cards.forEach(c => {
+      const t = c.card.querySelector('.fr-texto span'); if (t) t.textContent = frTexto(st, c.k !== 'mayus');
+      c.card.querySelectorAll('.fr-nombre span, .fr-pastilla span').forEach(n => { n.textContent = st.autor; });
+    });
+    ajustar(); frGuardar(f, st); pintarUsar();
+  };
+  $('.fr-in-texto').addEventListener('input', e => { st.texto = e.target.value; textos(); });
+  $('.fr-in-corto').addEventListener('input', e => { st.texto_corto = e.target.value; if (st.texto_corto && !st.usar_corto && !e.target.dataset.tocado) st.usar_corto = true; e.target.dataset.tocado = '1'; textos(); });
+  $('.fr-in-autor').addEventListener('input', e => { st.autor = e.target.value; textos(); });
+  panel.querySelectorAll('.fr-usar').forEach(b => b.addEventListener('click', () => { st.usar_corto = b.dataset.c === '1'; textos(); }));
+  const cambiarFoto = d => { st.foto = (fotoIdx() + d + fotos.length) % fotos.length; frGuardar(f, st); cards.forEach(c => { c.card.dataset.src = ''; }); fondo(); pintarLbl(); };
+  if ($('.fr-prev')) { $('.fr-prev').addEventListener('click', () => cambiarFoto(-1)); $('.fr-next').addEventListener('click', () => cambiarFoto(1)); }
+  const leerArchivo = (input, fn) => input.addEventListener('change', e => { const a = e.target.files && e.target.files[0]; if (!a) return; const r = new FileReader(); r.onload = () => fn(r.result, a.name); r.readAsDataURL(a); });
+  const fondoAMano = (src, origen) => { cards.forEach(c => { c.card.dataset.src = ''; }); frPonerFondo(cards, f, src, null); $('.fr-foto-lbl').textContent = 'a mano: ' + origen; };
+  leerArchivo($('.fr-in-fondo'), fondoAMano);
+  $('.fr-link-fondo').addEventListener('click', () => { const u = prompt('Pegá el link de la foto (.jpg, .png o .webp):'); if (u) fondoAMano(u.trim(), u.trim().replace(/^https?:\/\/(www\.)?/, '').slice(0, 50)); });
+  leerArchivo($('.fr-in-autorfoto'), src => autorFoto(src, null));
+  $('.fr-link-autor').addEventListener('click', () => { const u = prompt('Pegá el link de la foto del autor:'); if (u) autorFoto(u.trim(), null); });
+  $('.fr-autor-fondo').addEventListener('click', () => { const src = cards[0].card.dataset.src; if (src) autorFoto(src, null); });
+  pintarUsar(); pintarLbl();
+  frPanelPublicar(panel, f, st, disenos, () => frGuardar(f, st));
+  document.fonts.ready.then(ajustar);
+  row.dataset.listo = '1';
+}
+/* Texto del tuit: la frase entre comillas, quién la dijo y de dónde salió. */
+function frTextoX(f, st) {
+  const t = frTexto(st, false), a = st.autor ? '\n\n🗣️ ' + st.autor : '', via = f.fuente && f.fuente.cuenta ? '\n📹 ' + f.fuente.cuenta : '';
+  return ('“' + t + '”' + a + via).slice(0, 280);
+}
+function frPanelPublicar(panel, f, st, disenos, guardar) {
+  const div = document.createElement('div');
+  const estado = f.estado || 'manual';
+  const rot = { para_aprobar: 'PARA APROBAR', publicada: 'PUBLICADA', descartada: 'DESCARTADA', manual: 'CARGADA A MANO' }[estado] || estado;
+  div.innerHTML =
+    `<div class="fr-estado"><span class="fr-tag ${gnEscape(estado)}">${gnEscape(rot)}</span>` +
+    (f.partido ? `${gnEscape(f.partido)} · ` : '') +
+    (f.elegida_por ? `elegida por ${f.elegida_por === 'claude' ? 'Claude' : 'reglas (sin clave de Anthropic)'}${f.polemica != null ? ' · polémica ' + f.polemica : ''}` : '') +
+    (f.por_que ? `<br><i>${gnEscape(f.por_que)}</i>` : '') +
+    (f.tuit ? `<br>tuit: ${gnEscape(f.tuit.slice(0, 300))}` : '') +
+    (f.fuente && f.fuente.video ? ` · <a href="${gnEscape(f.fuente.video)}" target="_blank" rel="noopener">ver video</a>` : '') + '</div>' +
+    '<div class="fr-fila"><b>publicar en X</b> · diseño: ' + disenos.map(d => `<button type="button" class="fr-dis" data-k="${d.k}">${d.rotulo}</button>`).join('') + '</div>' +
+    `<textarea class="fr-in-x" rows="3"></textarea>` +
+    '<div class="fr-fila"><button type="button" class="fr-publicar">Publicar en X</button><span class="fr-x-largo"></span></div>';
+  panel.appendChild(div);
+  const ta = div.querySelector('.fr-in-x'), largo = div.querySelector('.fr-x-largo');
+  ta.value = frTextoX(f, st);
+  const contar = () => { largo.textContent = ta.value.length + ' / 280'; largo.style.color = ta.value.length > 280 ? '#e55' : ''; };
+  ta.addEventListener('input', contar); contar();
+  // Si cambian la frase o el autor arriba, el texto del tuit se rehace (salvo que lo hayan tocado a mano).
+  panel.addEventListener('input', e => { if (e.target !== ta && !ta.dataset.aMano) { ta.value = frTextoX(f, st); contar(); } });
+  ta.addEventListener('input', () => { ta.dataset.aMano = '1'; });
+  const pintarDis = () => div.querySelectorAll('.fr-dis').forEach(b => b.classList.toggle('is-on', b.dataset.k === st.diseno));
+  div.querySelectorAll('.fr-dis').forEach(b => b.addEventListener('click', () => { st.diseno = b.dataset.k; guardar(); pintarDis(); }));
+  if (!disenos.some(d => d.k === st.diseno)) st.diseno = disenos[0].k;
+  pintarDis();
+  div.querySelector('.fr-publicar').addEventListener('click', e => frPublicarX(e.currentTarget, f, st, ta.value));
+}
+/* Igual que capPublicarRed: dispara publicar-frase.yml y sigue la corrida. La placa sale de la
+   página publicada, así que lo editado a mano en la placa (textos) viaja como parámetro. */
+async function frPublicarX(btn, f, st, texto) {
+  if (!ghToken(true)) return;
+  if (texto.length > 280) { rsToast('El texto tiene ' + texto.length + ' caracteres y X permite 280.'); return; }
+  if (!confirm('¿Publicar en X la frase de ' + (st.autor || 'sin autor') + ' con el diseño "' + st.diseno + '"?\n\n' + texto)) return;
+  const poner = (t, clase) => { btn.textContent = t; btn.className = 'fr-publicar' + (clase ? ' ' + clase : ''); };
+  try {
+    btn.disabled = true; poner('Enviando...');
+    const desde = new Date(Date.now() - 60e3).toISOString();
+    await ghApi('/actions/workflows/publicar-frase.yml/dispatches', { method: 'POST', body: JSON.stringify({ ref: 'main', inputs: {
+      frase: f.id, diseno: st.diseno, texto, frase_texto: frTexto(st, false), autor: st.autor || '', probar: 'false' } }) });
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 8000));
+      const d = await ghApi('/actions/workflows/publicar-frase.yml/runs?per_page=1&created=>' + desde);
+      const run = d && d.workflow_runs && d.workflow_runs[0];
+      if (!run) continue;
+      if (run.status !== 'completed') { poner(run.status === 'queued' ? 'En cola...' : 'Publicando...'); continue; }
+      if (run.conclusion === 'success') poner('Publicada en X ✓', 'is-ok');
+      else { poner('Falló: ver en GitHub', 'is-error'); btn.onclick = () => window.open(run.html_url, '_blank'); }
+      btn.disabled = false; return;
+    }
+    poner('Tarda más de lo normal: ver en GitHub'); btn.disabled = false;
+  } catch (e) { poner('Publicar en X'); btn.disabled = false; rsToast('No se pudo publicar: ' + e.message, 'error'); }
+}
+/* Para tools/redes.js: abre la frase (arma sus placas), aplica textos que vengan de afuera y espera. */
+async function recapAbrirFrase(id, cambios) {
+  if (cambios) { try { const f = (await frCargar()).find(x => x.id === id); if (f) localStorage.setItem(FR_KEY + id, JSON.stringify({ v: f.v || 1, cambios: Object.assign(frEstado(f), cambios) })); } catch (e) {} }
+  await pintarFrases();
+  const sec = document.querySelector('#frasesContainer .match-section[data-frase="' + id + '"]');
+  if (!sec) throw new Error('no está la frase ' + id + ' en frases.json');
+  if (!sec.classList.contains('is-abierto')) sec.querySelector('.match-head').click();
+  for (let i = 0; i < 100 && !sec.querySelector('.cards-row').dataset.listo; i++) await new Promise(r => setTimeout(r, 100));
+  await document.fonts.ready;
+}
+window.recapAbrirFrase = recapAbrirFrase;
+let frPintando = null;
+function pintarFrases() { return frPintando || (frPintando = frPintar().finally(() => { setTimeout(() => { frPintando = null; }, 0); })); }
+async function frPintar() {
+  const cont = document.getElementById('frasesContainer');
+  if (!cont) return;
+  if (cont.querySelector('.match-section')) return;   // ya están (se arman una vez: no dependen de la fecha)
+  const lista = await frCargar();
+  if (!lista.length) return;
+  cont.innerHTML = '<div class="match-toggle" style="cursor:default"><b>FRASES</b><span>' + lista.length + (lista.length === 1 ? ' frase' : ' frases') + ' de entrevistas</span></div>';
+  lista.forEach((f, i) => {
+    const section = document.createElement('div');
+    section.className = 'match-section match-acordeon';
+    section.dataset.frase = f.id;
+    const cuando = f.fuente && f.fuente.fecha ? new Date(f.fuente.fecha).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }) : '';
+    section.innerHTML = '<button type="button" class="match-head"><span class="match-flecha">▸</span>' +
+      `<h3>${gnEscape(f.autor || 'Sin autor')} · ${gnEscape(frTexto({ texto: f.texto }, false).slice(0, 60))}…</h3><span class="match-estado">${f.estado === 'para_aprobar' ? '⏳ para aprobar · ' : f.estado === 'publicada' ? '✓ publicada · ' : ''}${gnEscape(cuando)}</span></button>` +
+      '<div class="fr-panel" style="display:none"></div><div class="cards-row" style="display:none"></div>';
+    const row = section.querySelector('.cards-row'), panel = section.querySelector('.fr-panel');
+    const abrir = si => {
+      section.classList.toggle('is-abierto', si);
+      section.querySelector('.match-flecha').textContent = si ? '▾' : '▸';
+      row.style.display = panel.style.display = si ? '' : 'none';
+      if (si && !row.dataset.armado) { row.dataset.armado = '1'; frArmar(row, panel, f); }
+    };
+    section.querySelector('.match-head').addEventListener('click', () => abrir(!section.classList.contains('is-abierto')));
+    cont.appendChild(section);
+    if (i === 0 && !navigator.webdriver) abrir(true);   // la más nueva, abierta (en Chrome sin cabeza abre recapAbrirFrase)
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════
 // ANUNCIOS — avisos especiales de la fecha (partido postergado, novedades…)
 // anuncios.json: clave "<torneo>-<temporada>-<fecha>", lista de anuncios; cada uno
 // con titulo, nota opcional, v (subirlo al reemplazar archivos: rompe el caché)
@@ -3991,6 +4337,7 @@ async function loadFecha(matchday) {
   // Los partidos se guardan para poder redibujarlos si se cambia de diseño.
   partidosDeLaFecha = { matchday, matches: data.matches || [] };
   pintarEspeciales(matchday);
+  pintarFrases();
   pintarPartidos();
 }
 
@@ -5119,6 +5466,7 @@ const AUTO_MOMENTOS = [
   { id: 'cierre', nombre: 'Cierre de la fecha', detalle: 'carrusel 11 Ideal + Ganadores + MVPs, con el caption 1' },
   { id: 'dia',    nombre: 'MVPs del día',       detalle: 'al terminar el último partido de cada día' },
   { id: 'pitazo', nombre: 'Resultado al pitazo', detalle: 'la placa de resultado de cada partido, 15 por fecha' },
+  { id: 'frase',  nombre: 'Frase post-partido', detalle: 'la frase más polémica de las entrevistas (TNT + Juego Simple), hasta 2 h después del pitazo; apagado = queda para aprobar' },
 ];
 async function autoPanelRender() {
   const cont = document.getElementById('autoPanel');

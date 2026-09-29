@@ -1,0 +1,69 @@
+# Busca a mano la frase más polémica de las entrevistas de un partido o de una fecha
+# (tools/entrevistas.js). Normalmente no hace falta: el vigilante lo hace solo a los
+# 45 y 120 min de cada pitazo. Sirve para probar con partidos ya jugados.
+# Lee tuits con la API de X: consume crédito.
+name: Buscar frases
+
+on:
+  workflow_dispatch:
+    inputs:
+      partido:
+        description: 'game_id de un partido (o vacío y completar fecha)'
+        required: false
+      fecha:
+        description: 'Número de fecha del Clausura 2026 (todos sus partidos)'
+        required: false
+      probar:
+        description: 'Solo mostrar lo que elegiría, sin guardar'
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: frases
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  X_API_KEY: ${{ secrets.X_API_KEY }}
+  X_API_SECRET: ${{ secrets.X_API_SECRET }}
+  X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+  X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Traer las frases publicadas
+        run: |
+          aws s3 cp $BUCKET/frases.json frases.json --only-show-errors || echo "(todavía no hay frases.json en el sitio)"
+          aws s3 sync $BUCKET/frases/ frases/ --only-show-errors
+
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+
+      - name: Buscar
+        run: |
+          if [ -n "${{ inputs.partido }}" ]; then QUE="--partido ${{ inputs.partido }}"; else QUE="--fecha ${{ inputs.fecha }}"; fi
+          node tools/entrevistas.js $QUE ${{ inputs.probar && '--dry' || '' }}
+
+      - name: Publicar en el sitio
+        if: ${{ !inputs.probar }}
+        run: |
+          aws s3 cp frases.json $BUCKET/frases.json --cache-control "no-cache" --only-show-errors
+          test -d frases && aws s3 sync frases/ $BUCKET/frases/ --cache-control "no-cache" --only-show-errors || true
+          echo "Listo: https://winning.com.ar/iloveneuquen/index.html (Editorial → Frases)"

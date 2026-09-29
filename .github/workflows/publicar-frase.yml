@@ -1,0 +1,95 @@
+# Publica en X una frase de frases.json (botón "Publicar en X" de Editorial → Frases).
+# La placa sale de la página publicada, igual que "Descargar PNG", con el texto y el
+# autor como estaban en la página al apretar el botón.
+name: Publicar frase
+
+on:
+  workflow_dispatch:
+    inputs:
+      frase:
+        description: 'id de la frase (ej. x-2104969808991207632)'
+        required: true
+      diseno:
+        description: 'Diseño de la placa'
+        required: true
+        type: choice
+        options: [mayus, globo, banda, preguntas]
+        default: mayus
+      texto:
+        description: 'Texto del tuit (vacío = “frase” 🗣️ autor)'
+        required: false
+      frase_texto:
+        description: 'La frase como quedó en la página (vacío = la de frases.json)'
+        required: false
+      autor:
+        description: 'El autor como quedó en la página (vacío = el de frases.json)'
+        required: false
+      probar:
+        description: 'Solo probar: arma la imagen y muestra el texto, no publica'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: frases
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  X_API_KEY: ${{ secrets.X_API_KEY }}
+  X_API_SECRET: ${{ secrets.X_API_SECRET }}
+  X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+  X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+  CHROME_PATH: /usr/bin/google-chrome
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Traer las frases publicadas
+        run: aws s3 cp $BUCKET/frases.json frases.json --only-show-errors
+
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+
+      - name: Armar la placa y publicar
+        env:
+          F_TEXTO: ${{ inputs.texto }}
+          F_FRASE: ${{ inputs.frase_texto }}
+          F_AUTOR: ${{ inputs.autor }}
+        run: |
+          mkdir -p captions
+          MD=$(node -e "const f=(require('./frases.json').frases||[]).find(x=>x.id==='${{ inputs.frase }}');console.log((f&&f.matchday)||1)")
+          ARGS=(frase "$MD" --frase "${{ inputs.frase }}" --diseno "${{ inputs.diseno }}" --redes x)
+          [ -n "$F_TEXTO" ] && ARGS+=(--texto "$F_TEXTO")
+          [ -n "$F_FRASE" ] && ARGS+=(--frase-texto "$F_FRASE")
+          [ -n "$F_AUTOR" ] && ARGS+=(--autor "$F_AUTOR")
+          ${{ inputs.probar && 'ARGS+=(--probar)' || 'true' }}
+          node tools/publicar-auto.js "${ARGS[@]}"
+
+      - name: Guardar que se publicó
+        if: ${{ !inputs.probar }}
+        # Se vuelve a traer el del sitio y se marca sólo esta frase: el vigilante pudo haber sumado otras mientras.
+        run: |
+          aws s3 cp $BUCKET/frases.json sitio.json --only-show-errors
+          node -e "
+            const fs=require('fs'), id='${{ inputs.frase }}';
+            const mia=(JSON.parse(fs.readFileSync('frases.json','utf8')).frases||[]).find(f=>f.id===id);
+            const s=JSON.parse(fs.readFileSync('sitio.json','utf8')), f=(s.frases||[]).find(x=>x.id===id);
+            if(!mia||mia.estado!=='publicada'||!f){console.log('nada que marcar');process.exit(0)}
+            Object.assign(f,{estado:'publicada',publicada:mia.publicada});
+            fs.writeFileSync('sitio.json',JSON.stringify(s,null,2)+'\n');console.log('marcada publicada: '+id)"
+          aws s3 cp sitio.json $BUCKET/frases.json --cache-control "no-cache" --only-show-errors

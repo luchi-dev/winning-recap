@@ -60,6 +60,9 @@ const CORRIDA_MAX = 5 * HORA + 40 * MIN;   // el job de GitHub corta a las 6 h: 
 const GUARDIA_ANTES = 2 * HORA;    // desde cuánto antes del kickoff se queda despierto
 const GUARDIA_DESPUES = 45 * MIN;  // hasta cuánto después del pitazo (cubre el reintento de los 30 min)
 const ESPERA_PUNTAJE = 16 * HORA;  // cuánto se espera el cierre del puntaje tras el último partido
+const PASOS_ENTREVISTAS = [45, 120]; // minutos después del pitazo: flash + conferencia del DT, y zona mixta
+const FRASES = path.join(RAIZ, 'frases.json');
+const idsFrases = () => (leer(FRASES, {}).frases || []).map(f => f.id);
 
 const MIRAR = process.argv.includes('--mirar');
 const dormir = ms => new Promise(r => setTimeout(r, ms));
@@ -112,6 +115,9 @@ function publicar() {
     // Los captions escritos por captions.js (si no hay, sync no hace nada)
     !fs.existsSync(path.join(RAIZ, 'captions.json')) || aws('s3', 'cp', 'captions.json', B + '/captions.json', ...nc),
     !fs.existsSync(path.join(RAIZ, 'captions')) || aws('s3', 'sync', 'captions/', B + '/captions/', ...nc, '--exclude', 'auto-*', '--exclude', 'ig-*', '--exclude', 'x-*'),
+    // Las frases de entrevistas (tools/entrevistas.js) y sus fotos
+    !fs.existsSync(FRASES) || aws('s3', 'cp', 'frases.json', B + '/frases.json', ...nc),
+    !fs.existsSync(path.join(RAIZ, 'frases')) || aws('s3', 'sync', 'frases/', B + '/frases/', ...nc),
   ].every(Boolean);
   log(ok ? 'publicado en el sitio' : 'OJO: falló la publicación');
 }
@@ -232,6 +238,14 @@ async function pasada(estado) {
     }
   }
 
+  // ENTREVISTAS: a los 45 y 120 min del pitazo se buscan en X (TNT + Juego Simple) y se arma la
+  // frase más polémica (queda para aprobar, o sale sola si 'frase' está prendido). Una por partido.
+  const entrevistas = [];
+  if (CLAVES_RED.x.every(k => process.env[k])) for (const j of fx.filter(reciente)) {
+    const p = P(j.game_id), n = (p.ent || []).length;
+    if (terminado(j) && p.final && !p.frase && n < PASOS_ENTREVISTAS.length && ahora - p.final >= PASOS_ENTREVISTAS[n] * MIN) entrevistas.push(j);
+  }
+
   // FIN DEL DÍA: MVPs del día
   const porDia = {};
   const diasTerminados = [];   // para la publicación automática de los MVPs del día
@@ -271,6 +285,8 @@ async function pasada(estado) {
     const k = new Date(j.kickoff_ts).getTime();
     if (!terminado(j) && k - ahora < GUARDIA_ANTES && ahora - k < 4 * HORA) vigilar.push('partido: ' + nombre(j));
     else if (terminado(j) && !P(j.game_id).cerrado && ahora - k < 3 * HORA + GUARDIA_DESPUES) vigilar.push('reintento: ' + nombre(j));
+    else if (terminado(j) && CLAVES_RED.x.every(c => process.env[c]) && P(j.game_id).final && !P(j.game_id).frase &&
+      (P(j.game_id).ent || []).length < PASOS_ENTREVISTAS.length && ahora - P(j.game_id).final < (PASOS_ENTREVISTAS[PASOS_ENTREVISTAS.length - 1] + 5) * MIN) vigilar.push('entrevistas: ' + nombre(j));
   });
   for (const md of [...new Set(fx.map(j => j.matchday))]) {
     const js = fx.filter(j => j.matchday === md);
@@ -281,6 +297,7 @@ async function pasada(estado) {
   const motivos = [...new Set(listaCaras.map(c => c.motivo))];
   motivos.forEach(m => log('momento: caras de ' + m + ' → ' + listaCaras.filter(c => c.motivo === m).map(c => c.nombre).join(', ')));
   captionsPendientes.forEach(md => log('momento: captions del 11 Ideal de la fecha ' + md));
+  entrevistas.forEach(j => log('momento: entrevistas de ' + nombre(j) + ' (' + ((P(j.game_id).ent || []).length + 1) + 'ª búsqueda)'));
 
   // Publicaciones automáticas que faltan (fin del día y cierre; las del pitazo van con la foto)
   const autoDias = diasTerminados.filter(d => autoPendiente(estado, 'dia:' + d.dia, 'dia').length);
@@ -288,7 +305,7 @@ async function pasada(estado) {
   autoDias.forEach(d => log('momento: publicar MVPs del día ' + d.dia));
   autoCierres.forEach(md => log('momento: publicar el cierre de la fecha ' + md));
 
-  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0 || captionsPendientes.length > 0 || autoDias.length > 0 || autoCierres.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
+  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0 || captionsPendientes.length > 0 || autoDias.length > 0 || autoCierres.length > 0 || entrevistas.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
   if (MIRAR) return { hayTrabajo, esperando, vigilar };
 
   // ── A trabajar ──
@@ -314,6 +331,19 @@ async function pasada(estado) {
     const ok = listaCaras.filter(c => fs.existsSync(path.join(DIR_FOTOS, c.id + '.png'))).length;
     log('caras: ' + ok + '/' + listaCaras.length + ' bajadas');
     publicar();
+  }
+  // ENTREVISTAS: la frase del partido (y a las redes si 'frase' está prendido; si no, queda para aprobar)
+  for (const j of entrevistas) {
+    const p = P(j.game_id), antes = new Set(idsFrases());
+    correr('entrevistas.js', ['--partido', j.game_id]);
+    p.ent = (p.ent || []).concat(Date.now());
+    const nueva = idsFrases().find(id => !antes.has(id));
+    if (nueva) { p.frase = nueva; log('frase nueva de ' + nombre(j) + ': ' + nueva); }
+    guardar();
+    if (!nueva) continue;
+    publicar();
+    autoPublicar(estado, guardar, 'frase:' + nueva, 'frase', j.matchday, ['--frase', nueva]);
+    if (redPrendida('frase', 'x') || redPrendida('frase', 'ig')) publicar();   // queda marcada 'publicada'
   }
   // FIN DEL DÍA: los MVPs del día a las redes (después de las caras, así salen con foto)
   for (const d of autoDias) autoPublicar(estado, guardar, 'dia:' + d.dia, 'dia', d.md, ['--dia', d.dia]);

@@ -76,9 +76,33 @@ function mezclarCaptions() {
   try { traerFaltantes('captions', rel => /\.(md|json)$/i.test(rel)); } catch (e) { console.log('   captions/: no hay en el server'); }
 }
 
+/* frases.json: las escribe tools/entrevistas.js en GitHub después de cada partido y
+   publicar-auto.js las marca 'publicada'. Se mezcla frase por frase: gana la del server
+   si acá no está, si tiene 'v' más alta o si allá ya se publicó. */
+function mezclarFrases() {
+  const tmp = path.join(os.tmpdir(), 'frases-server.json');
+  if (aws('s3', 'cp', BUCKET + '/frases.json', tmp, '--only-show-errors').status !== 0) { console.log('   frases.json: no hay en el server'); return; }
+  const local = path.join(RAIZ, 'frases.json');
+  let mio = { frases: [] }, suyo = { frases: [] };
+  try { mio = JSON.parse(fs.readFileSync(local, 'utf8')); } catch (e) {}
+  try { suyo = JSON.parse(fs.readFileSync(tmp, 'utf8')); } catch (e) { return; }
+  const tomadas = [];
+  for (const f of suyo.frases || []) {
+    const i = mio.frases.findIndex(x => x.id === f.id);
+    if (i < 0) { mio.frases.push(f); tomadas.push(f.id); }
+    else if ((f.v || 1) > (mio.frases[i].v || 1) || (f.estado === 'publicada' && mio.frases[i].estado !== 'publicada')) { mio.frases[i] = f; tomadas.push(f.id); }
+  }
+  mio.frases.sort((a, b) => String((b.fuente || {}).fecha || '').localeCompare(String((a.fuente || {}).fecha || '')));
+  if (tomadas.length) fs.writeFileSync(local, JSON.stringify(mio, null, 2) + '\n');
+  console.log('   frases.json: ' + (tomadas.length ? tomadas.length + ' frase(s) desde el server' : 'nada nuevo'));
+  fs.mkdirSync(path.join(RAIZ, 'frases'), { recursive: true });
+  try { traerFaltantes('frases', rel => /\.(jpg|png)$/i.test(rel)); } catch (e) { console.log('   frases/: no hay en el server'); }
+}
+
 try {
   traerFaltantes('fotos', rel => /\.png$/i.test(rel));
   traerFaltantes('fotos-partido', rel => /\.jpg$/i.test(rel) && !rel.startsWith('_'));
   mezclarElegidas();
   mezclarCaptions();
+  mezclarFrases();
 } catch (e) { console.error('   ' + e.message); process.exit(1); }

@@ -40,7 +40,9 @@ function chromePath() {
 /* archivos: nombres de placa tal como los usa "Descargar PNG" (data-filename):
    equipo_ideal_fecha10, ganadores_fecha10, mvps_fecha10, mvps_f10_sabado,
    resultado_f10_VEL_vs_TIG... opciones.game abre antes el partido (las placas
-   de partido se arman al abrirlo), opciones.diseno elige 'nuevas' o 'antiguas'. */
+   de partido se arman al abrirlo), opciones.diseno elige 'nuevas' o 'antiguas'.
+   opciones.frase abre esa frase de frases.json (frase_<id>_<diseno>) con opciones.cambios
+   (texto, autor) aplicados, por si se editaron en la página antes de aprobar. */
 async function imagenes(md, archivos, opciones = {}) {
   const puppeteer = require('puppeteer-core');
   const sharp = require('sharp');
@@ -58,6 +60,7 @@ async function imagenes(md, archivos, opciones = {}) {
       await page.waitForFunction(() => typeof partidosDeLaFecha !== 'undefined' && partidosDeLaFecha && partidosDeLaFecha.matches && partidosDeLaFecha.matches.length, { timeout: 90e3 });
       await page.evaluate((g, d) => recapAbrirPartido(g, d), Number(opciones.game), opciones.diseno || 'nuevas');
     }
+    if (opciones.frase) await page.evaluate((id, c) => recapAbrirFrase(id, c), opciones.frase, opciones.cambios || null);
     const salida = [];
     for (const archivo of archivos) {
       await page.waitForSelector(`.card-wrapper[data-filename="${archivo}"]`, { timeout: 90e3 });

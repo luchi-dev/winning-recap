@@ -31,6 +31,14 @@ on:
         description: 'Resultado de cada partido al pitazo en X'
         type: boolean
         default: false
+      frase_ig:
+        description: 'Frase post-partido (entrevistas) en Instagram/Facebook'
+        type: boolean
+        default: false
+      frase_x:
+        description: 'Frase post-partido (entrevistas) en X'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -55,7 +63,8 @@ jobs:
             "auto": {
               "cierre": { "ig": ${{ inputs.cierre_ig }}, "x": ${{ inputs.cierre_x }} },
               "dia":    { "ig": ${{ inputs.dia_ig }},    "x": ${{ inputs.dia_x }} },
-              "pitazo": { "ig": ${{ inputs.pitazo_ig }}, "x": ${{ inputs.pitazo_x }} }
+              "pitazo": { "ig": ${{ inputs.pitazo_ig }}, "x": ${{ inputs.pitazo_x }} },
+              "frase":  { "ig": ${{ inputs.frase_ig }},  "x": ${{ inputs.frase_x }} }
             }
           }
           EOF

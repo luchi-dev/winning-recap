@@ -1,0 +1,82 @@
+{
+  "frases": [
+    {
+      "id": "x-2104969808991207632",
+      "texto": "Mauricio no hace nada por el otro. Mauricio hace solo lo que le conviene a él.",
+      "autor": "Gastón Gaudio",
+      "fuente": {
+        "red": "x",
+        "url": "https://x.com/elfutbolirico/status/2104969808991207632",
+        "cuenta": "@elfutbolirico",
+        "fecha": "2026-09-29T16:21:25.000Z"
+      },
+      "fotos": [
+        {
+          "archivo": "frases/x-2104969808991207632/sujeto-macri.jpg",
+          "fuente": "Macri · Wikimedia Commons",
+          "pos": {
+            "x": 50,
+            "y": 30,
+            "zoom": 1
+          }
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/prensa-1.jpg",
+          "fuente": "eldestapeweb.com",
+          "pos": {
+            "x": 36,
+            "y": 50,
+            "zoom": 1
+          }
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-1.jpg",
+          "seg": 5.9
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-2.jpg",
+          "seg": 17.7
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-3.jpg",
+          "seg": 29.5
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-4.jpg",
+          "seg": 41.3
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-5.jpg",
+          "seg": 53.1
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-6.jpg",
+          "seg": 64.8
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-7.jpg",
+          "seg": 76.6
+        },
+        {
+          "archivo": "frases/x-2104969808991207632/cuadro-8.jpg",
+          "seg": 88.4
+        }
+      ],
+      "foto": 0,
+      "diseno": "globo",
+      "v": 2,
+      "texto_corto": "",
+      "usar_corto": false,
+      "foto_autor": {
+        "archivo": "frases/x-2104969808991207632/prensa-1.jpg",
+        "recorte": [
+          380,
+          110,
+          600,
+          480
+        ]
+      },
+      "sujeto": "Mauricio Macri"
+    }
+  ]
+}

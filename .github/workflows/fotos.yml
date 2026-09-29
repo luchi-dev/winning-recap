@@ -65,6 +65,8 @@ jobs:
           aws s3 cp $BUCKET/captions.json captions.json --only-show-errors || echo "(todavía no hay captions.json)"
           aws s3 sync $BUCKET/captions/ captions/ --only-show-errors --exclude "auto-*" --exclude "ig-*" --exclude "x-*"
           aws s3 cp $BUCKET/publicar.json publicar.json --only-show-errors || echo "(sin publicar.json: nada se publica solo)"
+          aws s3 cp $BUCKET/frases.json frases.json --only-show-errors || echo "(todavía no hay frases.json en el sitio)"
+          aws s3 sync $BUCKET/frases/ frases/ --only-show-errors
 
       - name: Mirar si falta algo
         id: mirar
@@ -93,3 +95,5 @@ jobs:
           aws s3 cp vigilante.json $BUCKET/vigilante.json --cache-control "no-cache" --only-show-errors
           test -f captions.json && aws s3 cp captions.json $BUCKET/captions.json --cache-control "no-cache" --only-show-errors || true
           aws s3 sync captions/ $BUCKET/captions/ --cache-control "no-cache" --only-show-errors --exclude "auto-*" --exclude "ig-*" --exclude "x-*"
+          test -f frases.json && aws s3 cp frases.json $BUCKET/frases.json --cache-control "no-cache" --only-show-errors || true
+          test -d frases && aws s3 sync frases/ $BUCKET/frases/ --cache-control "no-cache" --only-show-errors || true

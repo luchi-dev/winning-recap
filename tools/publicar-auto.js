@@ -7,6 +7,7 @@
  *   node publicar-auto.js cierre <fecha>                    [--redes ig,x] [--probar]
  *   node publicar-auto.js dia    <fecha> --dia 2026-09-19   [--redes ig,x] [--probar]
  *   node publicar-auto.js pitazo <fecha> --game 2614498     [--redes ig,x] [--probar]
+ *   node publicar-auto.js frase  <fecha> --frase x-210…      [--diseno mayus] [--texto "…"] [--redes x] [--probar]
  *
  *   cierre  al cierre de puntajes: carrusel 11 Ideal + Ganadores + MVPs de la
  *           fecha, con el caption 1 del 11 Ideal (completo en Instagram, la
@@ -15,6 +16,10 @@
  *   dia     al terminar el último partido del día: la placa de MVPs del día.
  *   pitazo  al terminar un partido: la placa de resultado (diseño "nuevas",
  *           con la foto del partido si el vigilante ya la encontró).
+ *   frase   una frase de frases.json (tools/entrevistas.js): la placa en el diseño
+ *           elegido (globo, banda, mayus o preguntas) y el texto “frase” 🗣️ Autor.
+ *           --frase-texto / --autor reemplazan lo de frases.json (editado en la página).
+ *           Al publicar la marca 'publicada' en frases.json.
  *
  * Cada red se publica por separado (--redes ig o --redes x) para que el
  * vigilante anote cada una y nunca repita un posteo. Facebook va pegado a
@@ -37,13 +42,21 @@ const sinAcentos = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f
 function argumentos() {
   const a = process.argv.slice(2);
   const val = k => { const i = a.indexOf(k); return i >= 0 ? a[i + 1] : null; };
-  return { momento: a[0], md: Number(a[1]), dia: val('--dia'), game: val('--game'), redes: (val('--redes') || 'ig,x').split(',').map(s => s.trim()).filter(Boolean), probar: a.includes('--probar') };
+  return { momento: a[0], md: Number(a[1]), dia: val('--dia'), game: val('--game'), frase: val('--frase'), diseno: val('--diseno'), texto: val('--texto'), fraseTexto: val('--frase-texto'), autor: val('--autor'),
+    redes: (val('--redes') || 'ig,x').split(',').map(s => s.trim()).filter(Boolean), probar: a.includes('--probar') };
 }
 
 async function recap(md) {
   const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_matchday_recap', { method: 'POST', headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_competition_id: COMPETITION, p_season_id: SEASON, p_matchday: md }) });
   if (!r.ok) throw new Error('get_matchday_recap -> HTTP ' + r.status);
   return r.json();
+}
+
+const leerFrases = () => { try { return JSON.parse(fs.readFileSync(path.join(RAIZ, 'frases.json'), 'utf8')); } catch (e) { return { frases: [] }; } };
+function marcarFrase(id, cambios) {
+  const todo = leerFrases(), f = todo.frases.find(x => x.id === id); if (!f) return;
+  Object.assign(f, cambios);
+  fs.writeFileSync(path.join(RAIZ, 'frases.json'), JSON.stringify(todo, null, 2) + '\n');
 }
 
 /* Qué placas y qué textos van en cada momento. */
@@ -73,22 +86,38 @@ async function armar(momento, md, opciones) {
     const texto = `⚽ FINAL — FECHA ${md} | ${TORNEO}\n\n${m.home_team.name} ${m.home_score}-${m.away_score} ${m.away_team.name}`;
     return { archivos: [`resultado_f${md}_${m.home_team.short_name}_vs_${m.away_team.short_name}`], ig: texto, x: texto, nombre: 'pitazo-' + opciones.game, game: opciones.game };
   }
-  throw new Error('momento desconocido: ' + momento + ' (cierre, dia o pitazo)');
+  if (momento === 'frase') {
+    const f = leerFrases().frases.find(x => x.id === opciones.frase);
+    if (!f) throw new Error('la frase ' + opciones.frase + ' no está en frases.json');
+    const diseno = opciones.diseno || f.diseno || 'mayus';
+    const cambios = {};
+    if (opciones.fraseTexto) Object.assign(cambios, { texto: opciones.fraseTexto, usar_corto: false });
+    if (opciones.autor) cambios.autor = opciones.autor;
+    const frase = String(opciones.fraseTexto || (f.usar_corto && f.texto_corto) || f.texto).replace(/^["“«]+|["”»]+$/g, '').trim();
+    const autor = opciones.autor || f.autor;
+    const texto = (opciones.texto || ('“' + frase + '”' + (autor ? '\n\n🗣️ ' + autor : '') + (f.fuente && f.fuente.cuenta ? '\n📹 ' + f.fuente.cuenta : ''))).slice(0, 280);
+    return { archivos: ['frase_' + f.id + '_' + diseno], ig: texto, x: texto, nombre: 'frase-' + f.id, frase: f.id, cambios: Object.keys(cambios).length ? cambios : null };
+  }
+  throw new Error('momento desconocido: ' + momento + ' (cierre, dia, pitazo o frase)');
 }
 
 (async () => {
-  const { momento, md, dia, game, redes: cuales, probar } = argumentos();
+  const { momento, md, dia, game, frase, diseno, texto, fraseTexto, autor, redes: cuales, probar } = argumentos();
   if (!momento || !md) { console.error('uso: node publicar-auto.js <cierre|dia|pitazo> <fecha> [--dia YYYY-MM-DD] [--game id] [--redes ig,x] [--probar]'); process.exit(2); }
   let fallo = false;
   try {
-    const plan = await armar(momento, md, { dia, game });
+    const plan = await armar(momento, md, { dia, game, frase, diseno, texto, fraseTexto, autor });
     log(`${momento}, fecha ${md}: ${plan.archivos.join(' + ')} → ${cuales.join(' y ')}`);
-    const jpgs = await redes.imagenes(md, plan.archivos, plan.game ? { game: plan.game, diseno: 'nuevas' } : {});
+    const jpgs = await redes.imagenes(md, plan.archivos, plan.game ? { game: plan.game, diseno: 'nuevas' } : plan.frase ? { frase: plan.frase, cambios: plan.cambios } : {});
     jpgs.forEach((j, i) => fs.writeFileSync(path.join(RAIZ, 'captions', `auto-${plan.nombre}-${i + 1}.jpg`), j));
     if (probar) { log('modo prueba: no se publica.\n--- Instagram:\n' + plan.ig + '\n--- X:\n' + plan.x); return; }
 
     if (cuales.includes('x')) {
-      try { log('publicado en X: ' + await redes.publicarX(plan.x, jpgs)); }
+      try {
+        const url = await redes.publicarX(plan.x, jpgs);
+        log('publicado en X: ' + url);
+        if (plan.frase) marcarFrase(plan.frase, { estado: 'publicada', publicada: { x: url, t: new Date().toISOString() } });
+      }
       catch (e) { fallo = true; console.error('[publicar-auto] X falló: ' + (e.data ? JSON.stringify(e.data) : e.message)); }
     }
     if (cuales.includes('ig')) {
