@@ -1,0 +1,55 @@
+{
+  "_": "Anuncios por fecha. Clave: <torneo>-<temporada>-<fecha>. Los archivos van en anuncios/<clave>/ y los sube publicar.bat. Subir 'v' cuando se reemplaza un archivo con el mismo nombre (rompe el caché del navegador).",
+  "724-2026-11": [
+    {
+      "titulo": "Sarmiento vs River postergado al miércoles 14/10",
+      "nota": "La fecha 11 cierra parcial el lunes 05/10 con Banfield–Rosario Central (21:15). Sarmiento–River (game 2614522) se juega el mié 14/10 19:00, después de la fecha 12. Misma regla que la fecha 2.",
+      "v": 1,
+      "items": [
+        {
+          "tipo": "imagen",
+          "titulo": "Flyer Novedades · La regla",
+          "sub": "1200×1800 · webp para la app",
+          "src": "anuncios/724-2026-11/postergado-river-sarmiento-1200x1800.webp",
+          "png": "anuncios/724-2026-11/postergado-river-sarmiento-1200x1800.png"
+        },
+        {
+          "tipo": "imagen",
+          "titulo": "Flyer Novedades · Cómo se computa",
+          "sub": "1200×1800 · webp para la app",
+          "src": "anuncios/724-2026-11/computo-fecha11-1200x1800.webp",
+          "png": "anuncios/724-2026-11/computo-fecha11-1200x1800.png"
+        },
+        {
+          "tipo": "video",
+          "titulo": "Video para story",
+          "sub": "1080×1920 · 36 s · con voz",
+          "src": "anuncios/724-2026-11/postergado-sarmiento-river-story.mp4"
+        },
+        {
+          "tipo": "texto",
+          "titulo": "Aviso en la ficha · River Plate",
+          "sub": "Etiqueta POSTERGADO (club_advisories, team_id 608)",
+          "texto": "River Plate juega su partido de la fecha 11 el miércoles 14/10, después de la fecha 12. La fecha 11 queda parcialmente finalizada el lunes 05/10 con el último partido no postergado: desde ese momento tus jugadores de River Plate quedan fijos en tu equipo y suman los puntos de la fecha 11 recién cuando juegue el club. Para la fecha 12 los podés transferir normalmente: sus puntos de la fecha 11 quedan guardados y se te acreditan igual."
+        },
+        {
+          "tipo": "texto",
+          "titulo": "Aviso en la ficha · Sarmiento",
+          "sub": "Etiqueta POSTERGADO (club_advisories, team_id 8629)",
+          "texto": "Sarmiento juega su partido de la fecha 11 el miércoles 14/10, después de la fecha 12. La fecha 11 queda parcialmente finalizada el lunes 05/10 con el último partido no postergado: desde ese momento tus jugadores de Sarmiento quedan fijos en tu equipo y suman los puntos de la fecha 11 recién cuando juegue el club. Para la fecha 12 los podés transferir normalmente: sus puntos de la fecha 11 quedan guardados y se te acreditan igual."
+        },
+        {
+          "tipo": "texto",
+          "titulo": "Mensaje general (novedad o push)",
+          "sub": "Título: Sarmiento vs River se juega el 14/10",
+          "texto": "El partido de la fecha 11 entre Sarmiento y River se postergó al miércoles 14/10, después de la fecha 12. La fecha 11 cierra parcialmente el lunes 05/10 con el último partido: tus jugadores de River y Sarmiento quedan fijos en tu equipo para ese partido y suman sus puntos cuando se juegue. En la fecha 12 los podés transferir normalmente: los puntos de la fecha 11 quedan guardados igual."
+        },
+        {
+          "tipo": "texto",
+          "titulo": "Push corto",
+          "texto": "Sarmiento vs River se juega el 14/10. Tus jugadores de esos clubes suman los puntos de la fecha 11 cuando se juegue, y en la fecha 12 los podés transferir normal."
+        }
+      ]
+    }
+  ]
+}

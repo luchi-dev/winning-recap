@@ -1998,6 +1998,22 @@ html { scroll-behavior: smooth; }
 .rs-herr > summary { list-style: none; cursor: pointer; margin-bottom: 0; }
 .rs-herr > summary::-webkit-details-marker { display: none; }
 .rs-herr[open] > summary { margin-bottom: 20px; }
+/* Anuncios: flyers de Novedades, videos de story y textos para la app (anuncios.json) */
+.an-bloque { border: 1px solid var(--rs-borde); border-radius: 14px; padding: 18px 20px 20px; margin-bottom: 16px; font-family: var(--rs-ui); }
+.an-bloque h3 { font-family: 'Canaro', var(--rs-ui); font-weight: 700; font-size: 18px; color: #fff; }
+.an-nota { color: var(--rs-txt2); font-size: 13px; margin-top: 4px; line-height: 1.45; max-width: 760px; }
+.an-grid { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; align-items: flex-start; }
+.an-item { background: var(--rs-sup2); border: 1px solid var(--rs-borde); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.an-item.an-media { width: 290px; }
+.an-item.an-texto { width: 440px; }
+.an-item img, .an-item video { width: 100%; border-radius: 8px; display: block; background: #000; }
+.an-tit { font-size: 13px; font-weight: 700; color: var(--rs-txt); }
+.an-sub { font-size: 12px; color: var(--rs-txt3); }
+.an-txt { white-space: pre-wrap; font-size: 13px; line-height: 1.5; color: var(--rs-txt2); background: #0e1120; border-radius: 8px; padding: 10px 12px; max-height: 260px; overflow: auto; }
+.an-bts { display: flex; gap: 8px; flex-wrap: wrap; }
+.an-bts a, .an-bts button { font: 600 12px var(--rs-ui); color: var(--rs-txt); background: var(--rs-sup); border: 1px solid var(--rs-borde2); border-radius: 8px; padding: 6px 10px; cursor: pointer; text-decoration: none; }
+.an-bts a:hover, .an-bts button:hover { border-color: var(--rs-acento); }
+@media (max-width: 700px) { .an-item.an-media, .an-item.an-texto { width: 100%; } }
 .rs-abrir { color: var(--rs-txt2); font: 600 13px var(--rs-ui); padding: 8px 12px; border-radius: 9px; border: 1px solid var(--rs-borde); }
 .rs-herr[open] .rs-abrir { font-size: 0; }
 .rs-herr[open] .rs-abrir::before { content: 'Cerrar ▴'; font-size: 13px; }
@@ -2224,6 +2240,7 @@ html { scroll-behavior: smooth; }
 <div id="cardsView" class="cards-view">
  <div class="rs-layout">
   <nav class="rs-nav" id="rsNav">
+    <a href="#sec-anuncios"  data-sec="sec-anuncios"><i class="rs-dot"></i><span>Anuncios</span><b class="rs-n"></b></a>
     <a href="#sec-previa"    data-sec="sec-previa"><i class="rs-dot"></i><span>Previa</span><b class="rs-n"></b></a>
     <a href="#sec-partidos"  data-sec="sec-partidos"><i class="rs-dot"></i><span>Partidos</span><b class="rs-n"></b></a>
     <a href="#sec-dia"       data-sec="sec-dia"><i class="rs-dot"></i><span>Fin del día</span><b class="rs-n"></b></a>
@@ -2235,6 +2252,15 @@ html { scroll-behavior: smooth; }
 
   <main class="rs-main">
     <div class="rs-head-fecha"><h1 id="fechaTitle"></h1><p>Todo lo de la fecha, ordenado por momento de publicación.</p></div>
+
+    <section class="rs-sec" id="sec-anuncios">
+      <div class="rs-sec-head">
+        <div><div class="rs-kicker">0 · Cuando hay algo que avisar</div><h2>Anuncios</h2>
+          <p>Flyers para Novedades de la app, videos para stories y textos para avisos. Se cargan por fecha en anuncios.json.</p></div>
+      </div>
+      <div id="anunciosContainer" class="rs-cont"></div>
+      <div class="rs-vacio">No hay anuncios para esta fecha.</div>
+    </section>
 
     <section class="rs-sec" id="sec-previa">
       <div class="rs-sec-head">
@@ -3768,6 +3794,69 @@ async function pintarEspeciales(matchday) {
   });
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// ANUNCIOS — avisos especiales de la fecha (partido postergado, novedades…)
+// anuncios.json: clave "<torneo>-<temporada>-<fecha>", lista de anuncios; cada uno
+// con titulo, nota opcional, v (subirlo al reemplazar archivos: rompe el caché)
+// e items: { tipo: 'imagen' | 'video' | 'texto', titulo, sub, src | texto }.
+// Los archivos viven en anuncios/<clave>/ y se suben con publicar.bat.
+// ══════════════════════════════════════════════════════════════════════
+let anCache = null;
+async function anCargar() {
+  if (anCache) return anCache;
+  anCache = {};
+  try {
+    // En winning.com.ar un archivo que no existe devuelve la home con 200: por eso el try.
+    const r = await fetch('anuncios.json?v=' + Date.now());
+    anCache = JSON.parse(await r.text()) || {};
+  } catch (e) { console.warn('anuncios.json no disponible', e); }
+  return anCache;
+}
+async function pintarAnuncios(matchday) {
+  const cont = document.getElementById('anunciosContainer');
+  if (!cont) return;
+  cont.innerHTML = '';
+  const todos = await anCargar();
+  if (fechaActual !== matchday) return;   // cambiaron de fecha mientras cargaba
+  const lista = todos[currentComp + '-' + currentSeason + '-' + matchday] || [];
+  lista.forEach(a => {
+    const v = '?v=' + (a.v || 1);
+    const bloque = document.createElement('div');
+    bloque.className = 'an-bloque';
+    bloque.innerHTML = `<h3>${gnEscape(a.titulo || 'Anuncio')}</h3>` + (a.nota ? `<div class="an-nota">${gnEscape(a.nota)}</div>` : '');
+    const grid = document.createElement('div');
+    grid.className = 'an-grid';
+    (a.items || []).forEach(it => {
+      const d = document.createElement('div');
+      const cab = `<div class="an-tit">${gnEscape(it.titulo || '')}</div>` + (it.sub ? `<div class="an-sub">${gnEscape(it.sub)}</div>` : '');
+      const archivo = it.src ? it.src.split('/').pop() : '';
+      const bajar = it.src ? `<a href="${gnEscape(it.src + v)}" download="${gnEscape(archivo)}">descargar</a>` +
+        (it.png ? `<a href="${gnEscape(it.png + v)}" download="${gnEscape(it.png.split('/').pop())}">descargar PNG</a>` : '') +
+        `<a href="${gnEscape(it.src + v)}" target="_blank" rel="noopener">abrir</a>` : '';
+      if (it.tipo === 'imagen') {
+        d.className = 'an-item an-media';
+        d.innerHTML = `<img src="${gnEscape(it.src + v)}" alt="" loading="lazy">` + cab + `<div class="an-bts">${bajar}</div>`;
+      } else if (it.tipo === 'video') {
+        d.className = 'an-item an-media';
+        // #t=: arranca mostrando un cuadro con contenido en vez del fondo vacío del segundo 0.
+        d.innerHTML = `<video src="${gnEscape(it.src + v + '#t=' + (it.portada_s || 3))}" controls playsinline preload="metadata"></video>` + cab + `<div class="an-bts">${bajar}</div>`;
+      } else {
+        d.className = 'an-item an-texto';
+        d.innerHTML = cab + `<div class="an-txt">${gnEscape(it.texto || '')}</div><div class="an-bts"><button type="button">copiar</button></div>`;
+        const bt = d.querySelector('button');
+        bt.addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(it.texto || ''); bt.textContent = 'copiado ✓'; }
+          catch (e) { bt.textContent = 'no se pudo copiar'; }
+          setTimeout(() => { bt.textContent = 'copiar'; }, 1800);
+        });
+      }
+      grid.appendChild(d);
+    });
+    bloque.appendChild(grid);
+    cont.appendChild(bloque);
+  });
+}
+
 function pintarBarraPartidos() {
   const cont = document.getElementById('matchesContainer');
   const barra = document.getElementById('matchesToggle');
@@ -3863,6 +3952,7 @@ async function loadFecha(matchday) {
   document.getElementById('destacadoContainer').innerHTML = '';
   document.getElementById('fixturesContainer').innerHTML = '';
   document.getElementById('loadingSpinner').style.display = 'block';
+  pintarAnuncios(matchday);
 
   // Winners and MVPs ride on their own queries; let them stream in beside the
   // match recap instead of serialising behind it.
