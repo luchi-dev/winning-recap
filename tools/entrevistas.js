@@ -24,7 +24,8 @@ const RAIZ = path.resolve(__dirname, '..');
 const JSON_FRASES = path.join(RAIZ, 'frases.json');
 const HORA = 3600e3;
 const CUENTAS = (process.env.FRASES_CUENTAS || 'TNTSportsAR,juegosimple__').split(',');
-const POLEMICA_MIN = 6;     // con Claude: menos que esto no se arma placa
+const POLEMICA_MIN = 6;
+const REGLAS_MIN = 4;       // sin Claude: puntos mínimos de palabras polémicas (ver puntajeReglas)     // con Claude: menos que esto no se arma placa
 const MODELO = process.env.FRASES_MODEL || 'claude-opus-5-5';
 
 const args = process.argv.slice(2);
@@ -76,9 +77,30 @@ async function partidos(filtro) {
   });
 }
 const conPalabra = (txt, w) => new RegExp('(^|[^a-z])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z]|$)').test(txt);
+/* Cuánto nombra un tuit a un partido: equipos (3), jugadores con nombre completo (2) o sólo apellido (1).
+   Hace falta nombrar a un equipo o a un jugador con nombre completo: un apellido suelto no alcanza. */
 function nombraPartido(texto, p) {
   const t = sinAcentos(texto).replace(/[#@]/g, ' ');
-  return p.claves.filter(w => conPalabra(t, w)).length * 2 + p.jugadores.filter(j => j.apellido.length > 3 && conPalabra(t, j.apellido)).length;
+  const eq = p.claves.filter(w => conPalabra(t, w)).length;
+  const completos = p.jugadores.filter(j => j.nombre.includes(' ') && conPalabra(t, sinAcentos(j.nombre))).length;
+  const apellidos = p.jugadores.filter(j => j.apellido.length > 3 && conPalabra(t, j.apellido)).length;
+  return eq || completos ? eq * 3 + completos * 2 + apellidos : 0;
+}
+/* Cada tuit va a UN partido: el que más nombra entre los que se jugaban a esa hora. */
+function repartir(todas, ps, horas) {
+  const de = new Map();
+  for (const e of todas) {
+    const t = new Date(e.fecha).getTime();
+    let mejor = null;
+    for (const p of ps) {
+      const k = new Date(p.kickoff_ts).getTime();
+      if (t < k - 30 * 60e3 || t > k + horas * HORA) continue;
+      const n = nombraPartido(e.texto, p);
+      if (n && (!mejor || n > mejor.n || (n === mejor.n && Math.abs(t - k) < Math.abs(t - mejor.k)))) mejor = { p, n, k };
+    }
+    if (mejor) { if (!de.has(mejor.p.game_id)) de.set(mejor.p.game_id, []); de.get(mejor.p.game_id).push(e); }
+  }
+  return de;
 }
 
 // ── X ─────────────────────────────────────────────────────────────────
@@ -198,7 +220,8 @@ async function elegirConClaude(p, cands) {
 }
 function elegirConReglas(p, cands) {
   const nombres = [p.home_team_display, p.away_team_display, ...p.jugadores.map(j => j.nombre)];
-  const conPuntos = cands.map(e => ({ e, pts: puntajeReglas(e), frases: frasesDe(e.texto) })).filter(x => x.frases.length || preguntasDe(x.e.texto));
+  const conPuntos = cands.map(e => ({ e, pts: puntajeReglas(e), frases: frasesDe(e.texto) }))
+    .filter(x => (x.frases.length || preguntasDe(x.e.texto)) && x.pts >= REGLAS_MIN && hablanteReglas(x.e, p));
   if (!conPuntos.length) return null;
   conPuntos.sort((a, b) => b.pts - a.pts || new Date(a.e.fecha) - new Date(b.e.fecha));
   const { e, pts, frases } = conPuntos[0];
@@ -277,12 +300,12 @@ async function main() {
   try { todo = JSON.parse(fs.readFileSync(JSON_FRASES, 'utf8')); } catch (e) {}
   const usadas = new Set(todo.frases.map(f => f.id));
   const nuevas = [];
+  // Para repartir bien, se comparan con todos los partidos de la fecha (no sólo los pedidos).
+  const todosLosDeLaFecha = partido ? await partidos('matchday=eq.' + ps[0].matchday) : ps;
+  const reparto = repartir(todas, todosLosDeLaFecha, horas);
   for (const p of ps) {
     // Del partido: lo nombra y salió entre el kickoff y `horas` después.
-    const ini = new Date(p.kickoff_ts).getTime() - 30 * 60e3, fin = new Date(p.kickoff_ts).getTime() + horas * HORA;
-    const cands = todas.filter(e => { const t = new Date(e.fecha).getTime(); return t >= ini && t <= fin && nombraPartido(e.texto, p) > 0; })
-      .filter(e => !usadas.has('x-' + e.id));
-    // Si un tuit nombra a los dos partidos que se juegan a la vez, que quede en el que más nombra.
+    const cands = (reparto.get(p.game_id) || []).filter(e => !usadas.has('x-' + e.id));
     log(`${p.nombre}: ${cands.length} entrevistas`);
     cands.forEach(e => log(`   · @${e.cuenta} ${e.fecha.slice(11, 16)} ${e.texto.replace(/\s+/g, ' ').slice(0, 150)}`));
     if (!cands.length) continue;
