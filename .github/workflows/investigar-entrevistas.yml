@@ -1,0 +1,58 @@
+# Informe de cómo suben las entrevistas post-partido las cuentas de X de una fecha
+# (tools/entrevistas-investigar.js). Lee tuits con la API de X: consume crédito.
+# El informe queda en https://winning.com.ar/iloveneuquen/captions/entrevistas-fecha<N>.md
+name: Investigar entrevistas
+
+on:
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: 'Número de fecha del Clausura 2026'
+        required: true
+        type: number
+        default: 10
+      cuentas:
+        description: 'Cuentas de X separadas por coma'
+        required: false
+        default: 'TNTSportsAR,ESPNArgentina,TyCSports,LigaProfArg'
+      max:
+        description: 'Tope de tuits a leer por cuenta'
+        required: false
+        default: '300'
+
+permissions:
+  contents: read
+
+env:
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  X_API_KEY: ${{ secrets.X_API_KEY }}
+  X_API_SECRET: ${{ secrets.X_API_SECRET }}
+  X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+  X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+
+jobs:
+  investigar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+
+      - name: Leer las cuentas y armar el informe
+        run: node tools/entrevistas-investigar.js ${{ inputs.fecha }} --cuentas "${{ inputs.cuentas }}" --max ${{ inputs.max }}
+
+      - name: Publicar el informe
+        run: |
+          aws s3 cp captions/entrevistas-fecha${{ inputs.fecha }}.md $BUCKET/captions/ --content-type "text/markdown; charset=utf-8" --cache-control "no-cache" --only-show-errors
+          aws s3 cp captions/entrevistas-fecha${{ inputs.fecha }}.json $BUCKET/captions/ --cache-control "no-cache" --only-show-errors
+          echo "Informe: https://winning.com.ar/iloveneuquen/captions/entrevistas-fecha${{ inputs.fecha }}.md"
+          cat captions/entrevistas-fecha${{ inputs.fecha }}.md
