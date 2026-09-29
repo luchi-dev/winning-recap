@@ -312,7 +312,7 @@ async function main() {
     const el = process.env.ANTHROPIC_API_KEY ? await elegirConClaude(p, cands) : elegirConReglas(p, cands);
     if (!el || (!el.frase && el.formato === 'frase')) { log(`${p.nombre}: nada para armar`); continue; }
     const id = 'x-' + el.e.id, rel = 'frases/' + id, dir = path.join(RAIZ, rel);
-    log(`${p.nombre}: ELEGIDA (${el.elegida_por}, ${el.por_que})\n     "${el.frase}" — ${el.hablante || '¿?'}${el.sujeto ? ' · habla de ' + el.sujeto + ' (' + el.sujeto_tipo + ')' : ''}`);
+    log(`${p.nombre}: ELEGIDA (${el.elegida_por}, ${el.por_que}) → "${el.frase}" — ${el.hablante || '¿?'}${el.sujeto ? ' · habla de ' + el.sujeto + ' (' + el.sujeto_tipo + ')' : ''}`);
     const f = DRY ? { fotos: [], foto_autor: null } : await armarFotos(p, el, dir, rel);
     nuevas.push({
       id, estado: 'para_aprobar', tipo: el.formato, texto: el.frase, texto_corto: '', usar_corto: false, autor: el.hablante, sujeto: el.sujeto || '', sujeto_tipo: el.sujeto_tipo,
