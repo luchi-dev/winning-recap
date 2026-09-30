@@ -64,7 +64,7 @@
       ],
       "foto": 0,
       "diseno": "globo",
-      "v": 2,
+      "v": 3,
       "texto_corto": "",
       "usar_corto": false,
       "foto_autor": {
@@ -76,7 +76,157 @@
           480
         ]
       },
-      "sujeto": "Mauricio Macri"
+      "sujeto": "Mauricio Macri",
+      "sujeto_tipo": "otra_persona",
+      "tarjeta": true
+    },
+    {
+      "id": "x-2101501215737614545",
+      "estado": "para_aprobar",
+      "tipo": "frase",
+      "texto": "Herrera es un crack",
+      "texto_corto": "",
+      "usar_corto": false,
+      "autor": "Omar De Felippe",
+      "sujeto": "Herrera (árbitro)",
+      "sujeto_tipo": "arbitro",
+      "game_id": 2614505,
+      "matchday": 10,
+      "partido": "Instituto vs Talleres",
+      "fuente": {
+        "red": "x",
+        "url": "https://x.com/TNTSportsAR/status/2101501215737614545",
+        "cuenta": "@TNTSportsAR",
+        "fecha": "2026-09-20T02:38:28.000Z"
+      },
+      "tuit": "\"HERRERA ES UN CRACK\" 👀\n\nLa respuesta de Omar De Felippe cuando le preguntaron por el arbitraje luego de la derrota de Talleres en el clásico vs. Instituto.",
+      "polemica": 5,
+      "por_que": "reglas: 5 puntos de palabras polémicas",
+      "elegida_por": "reglas",
+      "fotos": [
+        {
+          "archivo": "fotos-partido/2614505-original.jpg",
+          "fuente": "foto del partido"
+        },
+        {
+          "archivo": "frases/x-2101501215737614545/video.jpg",
+          "fuente": "video de @TNTSportsAR"
+        }
+      ],
+      "foto": 0,
+      "foto_autor": {
+        "archivo": "frases/x-2101501215737614545/video.jpg",
+        "recorte": [
+          339,
+          41,
+          523,
+          419
+        ]
+      },
+      "diseno": "mayus",
+      "v": 2,
+      "tarjeta": true
+    },
+    {
+      "id": "x-2101403299710631940",
+      "estado": "para_aprobar",
+      "tipo": "frase",
+      "texto": "Es inexplicable, tenemos que aprender",
+      "texto_corto": "",
+      "usar_corto": false,
+      "autor": "Agustín Auzmendi",
+      "sujeto": "",
+      "sujeto_tipo": "mismo",
+      "game_id": 2614507,
+      "matchday": 10,
+      "partido": "Gimnasia LP vs Banfield",
+      "fuente": {
+        "red": "x",
+        "url": "https://x.com/TNTSportsAR/status/2101403299710631940",
+        "cuenta": "@TNTSportsAR",
+        "fecha": "2026-09-19T20:09:23.000Z"
+      },
+      "tuit": "\"ES INEXPLICABLE, TENEMOS QUE APRENDER\" 🐺\n\nAgustín Auzmendi y su bronca luego del triunfo que se le escapó sobre el final a Gimnasia ante Banfield.",
+      "polemica": 4,
+      "por_que": "reglas: 4 puntos de palabras polémicas",
+      "elegida_por": "reglas",
+      "fotos": [
+        {
+          "archivo": "frases/x-2101403299710631940/cuadro-1.jpg",
+          "fuente": "video de @TNTSportsAR, 8.2 s",
+          "pos": {
+            "x": 50,
+            "y": 10,
+            "zoom": 1.35
+          }
+        },
+        {
+          "archivo": "frases/x-2101403299710631940/cuadro-2.jpg",
+          "fuente": "video de @TNTSportsAR, 24.5 s",
+          "pos": {
+            "x": 50,
+            "y": 10,
+            "zoom": 1.35
+          }
+        },
+        {
+          "archivo": "frases/x-2101403299710631940/cuadro-3.jpg",
+          "fuente": "video de @TNTSportsAR, 40.9 s",
+          "pos": {
+            "x": 50,
+            "y": 10,
+            "zoom": 1.35
+          }
+        },
+        {
+          "archivo": "frases/x-2101403299710631940/cuadro-4.jpg",
+          "fuente": "video de @TNTSportsAR, 57.3 s",
+          "pos": {
+            "x": 50,
+            "y": 10,
+            "zoom": 1.35
+          }
+        },
+        {
+          "archivo": "frases/x-2101403299710631940/cuadro-5.jpg",
+          "fuente": "video de @TNTSportsAR, 73.6 s",
+          "pos": {
+            "x": 50,
+            "y": 10,
+            "zoom": 1.35
+          }
+        },
+        {
+          "archivo": "frases/x-2101403299710631940/cuadro-6.jpg",
+          "fuente": "video de @TNTSportsAR, 90 s",
+          "pos": {
+            "x": 50,
+            "y": 10,
+            "zoom": 1.35
+          }
+        },
+        {
+          "archivo": "fotos-partido/2614507-original.jpg",
+          "fuente": "foto del partido"
+        },
+        {
+          "archivo": "frases/x-2101403299710631940/video.jpg",
+          "fuente": "video de @TNTSportsAR"
+        }
+      ],
+      "foto": 5,
+      "foto_autor": {
+        "archivo": "frases/x-2101403299710631940/video.jpg",
+        "recorte": [
+          339,
+          41,
+          523,
+          419
+        ]
+      },
+      "diseno": "mayus",
+      "v": 3,
+      "tarjeta": false
     }
   ]
 }

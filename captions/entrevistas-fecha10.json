@@ -1,0 +1,1520 @@
+{
+  "fecha": 10,
+  "desde": "2026-09-18T19:00:00.000Z",
+  "hasta": "2026-09-23T06:15:00.000Z",
+  "cuentas": [
+    {
+      "usuario": "juegosimple__",
+      "leidos": 200
+    }
+  ],
+  "filas": [
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102587695104921706",
+      "created_at": "2026-09-23T02:35:45.000Z",
+      "text": "🇦🇷😮‍💨 Ezequiel Fernández. Showtime. https://t.co/uTeTworSJJ",
+      "likes": 802,
+      "vistas": 14408,
+      "video": 11,
+      "partido": "Rosario Central 1-0 Argentinos Juniors",
+      "game_id": 2614506,
+      "por": [
+        "fernandez",
+        "fernandez"
+      ],
+      "min_desde_final": 3161,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102569435156599286",
+      "created_at": "2026-09-23T01:23:11.000Z",
+      "text": "https://t.co/tdJB7nldka",
+      "likes": 7,
+      "vistas": 1877,
+      "video": 92,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102471135493607460",
+      "created_at": "2026-09-22T18:52:35.000Z",
+      "text": "🇦🇷🥹 Estamos de vuelta. https://t.co/U8RdviamqV",
+      "likes": 124,
+      "vistas": 3476,
+      "video": 58,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102421894234337376",
+      "created_at": "2026-09-22T15:36:55.000Z",
+      "text": "https://t.co/UnM16KI8LB",
+      "likes": 5,
+      "vistas": 1850,
+      "video": 21,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102415570423427533",
+      "created_at": "2026-09-22T15:11:47.000Z",
+      "text": "https://t.co/mGYL2ArsJB",
+      "likes": 11,
+      "vistas": 5712,
+      "video": 84,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102413730709410239",
+      "created_at": "2026-09-22T15:04:29.000Z",
+      "text": "https://t.co/mGYL2ArsJB",
+      "likes": 21,
+      "vistas": 2612,
+      "video": 84,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102410090645209309",
+      "created_at": "2026-09-22T14:50:01.000Z",
+      "text": "https://t.co/lXNM7PjAyJ",
+      "likes": 8,
+      "vistas": 1115,
+      "video": 19,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102143790567858461",
+      "created_at": "2026-09-21T21:11:50.000Z",
+      "text": "https://t.co/YhiBBcL2HO",
+      "likes": 8,
+      "vistas": 2301,
+      "video": 71,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102134496459989101",
+      "created_at": "2026-09-21T20:34:54.000Z",
+      "text": "🇦🇷👕 LA CAMISETA ESPECIAL QUE USARÁ LIONEL MESSI EN SU PARTIDO DESPEDIDA. https://t.co/LJNNPKQkTA",
+      "likes": 526,
+      "vistas": 17561,
+      "video": 14,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102110729285361888",
+      "created_at": "2026-09-21T19:00:27.000Z",
+      "text": "💥 EL GOL DE TOMÁS FERNÁNDEZ.\n\n🇦🇷 ALDOSIVI LE GANA 1-0 A ATLÉTICO TUCUMÁN.  https://t.co/hf9U1l3nv6",
+      "likes": 20,
+      "vistas": 3517,
+      "video": 69,
+      "partido": "Aldosivi 1-0 Atlético Tucumán",
+      "game_id": 2614509,
+      "por": [
+        "aldosivi",
+        "atletico tucuman",
+        "tucuman",
+        "fernandez"
+      ],
+      "min_desde_final": -25,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102057947706593744",
+      "created_at": "2026-09-21T15:30:43.000Z",
+      "text": "🇦🇷😮‍💨 Leandro Paredes bajo la lluvia en el Gasómetro. https://t.co/w2XJKWFceK",
+      "likes": 589,
+      "vistas": 6454,
+      "video": 26,
+      "partido": "Aldosivi 1-0 Atlético Tucumán",
+      "game_id": 2614509,
+      "por": [
+        "paredes"
+      ],
+      "min_desde_final": -234,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102052732009955740",
+      "created_at": "2026-09-21T15:10:00.000Z",
+      "text": "🇦🇷🪄 La clase de fútbol de Leandro Paredes ante San Lorenzo en el Nuevo Gasómetro. Para saborear. https://t.co/Gnywduft3j",
+      "likes": 929,
+      "vistas": 12390,
+      "video": 284,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "san lorenzo",
+        "lorenzo",
+        "paredes"
+      ],
+      "min_desde_final": 1170,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102044500466000365",
+      "created_at": "2026-09-21T14:37:17.000Z",
+      "text": "https://t.co/IBPPJXRlN2",
+      "likes": 19,
+      "vistas": 1797,
+      "video": 58,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102041015397871973",
+      "created_at": "2026-09-21T14:23:26.000Z",
+      "text": "https://t.co/uxwmc2ju10",
+      "likes": 9,
+      "vistas": 997,
+      "video": 138,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102038155620679972",
+      "created_at": "2026-09-21T14:12:04.000Z",
+      "text": "https://t.co/49EqZq6Hif",
+      "likes": 8,
+      "vistas": 1107,
+      "video": 35,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102034971493818540",
+      "created_at": "2026-09-21T13:59:25.000Z",
+      "text": "https://t.co/6ZPDjaJisA",
+      "likes": 3,
+      "vistas": 996,
+      "video": 15,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102034967819657586",
+      "created_at": "2026-09-21T13:59:24.000Z",
+      "text": "https://t.co/D1Hrv66SiM",
+      "likes": 7,
+      "vistas": 1347,
+      "video": 25,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102032885230211410",
+      "created_at": "2026-09-21T13:51:08.000Z",
+      "text": "https://t.co/3hvDE87rPJ",
+      "likes": 8,
+      "vistas": 1075,
+      "video": 36,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102030056360980808",
+      "created_at": "2026-09-21T13:39:53.000Z",
+      "text": "https://t.co/BFPYrY0via",
+      "likes": 7,
+      "vistas": 1102,
+      "video": 15,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102024528427634962",
+      "created_at": "2026-09-21T13:17:55.000Z",
+      "text": "https://t.co/IzpZnXmCAI",
+      "likes": 8,
+      "vistas": 1230,
+      "video": 35,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2102017205030326541",
+      "created_at": "2026-09-21T12:48:49.000Z",
+      "text": "https://t.co/eTRXzpVncm",
+      "likes": 6,
+      "vistas": 1134,
+      "video": 44,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101859024035582085",
+      "created_at": "2026-09-21T02:20:16.000Z",
+      "text": "🤯 DOBLETE DE RONALDO MARTÍNEZ.\n\n🇦🇷 VÉLEZ SARSFIELD LE GANA 3-2 A TIGRE. https://t.co/Jo9qzktr4N",
+      "likes": 82,
+      "vistas": 40057,
+      "video": 72,
+      "partido": "Vélez Sarsfield 3-2 Tigre",
+      "game_id": 2614498,
+      "por": [
+        "velez sarsfield",
+        "velez",
+        "sarsfield",
+        "tigre"
+      ],
+      "min_desde_final": -5,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101853204677796135",
+      "created_at": "2026-09-21T01:57:09.000Z",
+      "text": "🇦🇷😅 JAJA, esto de Rodolfo Arruabarrena con Miguel Merentiel en pleno San Lorenzo - Boca Juniors.\n\n🗣️ “DALE, SALÍ LA C*NCHA DE TU HERMANA”. https://t.co/YfB9CuJ7Hi",
+      "likes": 913,
+      "vistas": 39112,
+      "video": 10,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "san lorenzo",
+        "lorenzo",
+        "boca juniors",
+        "boca"
+      ],
+      "min_desde_final": 377,
+      "marcas": [
+        "🗣️",
+        "frase entre comillas"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101819242827882927",
+      "created_at": "2026-09-20T23:42:12.000Z",
+      "text": "🇦🇷😮‍💨 EL GOLAZO DE TIRO LIBRE DE LIONEL MESSI. https://t.co/sQrXUKCT80",
+      "likes": 1177,
+      "vistas": 28291,
+      "video": 75,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101819156655915373",
+      "created_at": "2026-09-20T23:41:51.000Z",
+      "text": "https://t.co/sQrXUKCT80",
+      "likes": 18,
+      "vistas": 1551,
+      "video": 75,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101774867490034107",
+      "created_at": "2026-09-20T20:45:52.000Z",
+      "text": "🔝 QUE CABEZAZO DE IGNACIO OVANDO.\n\n🇦🇷 ROSARIO CENTRAL LE GANA 1-0 A ARGENTINOS JUNIORS. https://t.co/etZApHm5hG",
+      "likes": 51,
+      "vistas": 3550,
+      "video": 23,
+      "partido": "Rosario Central 1-0 Argentinos Juniors",
+      "game_id": 2614506,
+      "por": [
+        "rosario central",
+        "rosario",
+        "central",
+        "argentinos juniors"
+      ],
+      "min_desde_final": -69,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101773167417057750",
+      "created_at": "2026-09-20T20:39:06.000Z",
+      "text": "🇦🇷 EL GOL QUE LE ANULARON A ARGENTINOS JUNIORS ANTE ROSARIO CENTRAL.\n\n⁉️ ¿OPINIONES? https://t.co/d4JdJHaXCZ",
+      "likes": 40,
+      "vistas": 7481,
+      "video": 17,
+      "partido": "Rosario Central 1-0 Argentinos Juniors",
+      "game_id": 2614506,
+      "por": [
+        "rosario central",
+        "rosario",
+        "central",
+        "argentinos juniors"
+      ],
+      "min_desde_final": -76,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101770725287670193",
+      "created_at": "2026-09-20T20:29:24.000Z",
+      "text": "💥 QUE GOLAZO DE SANTIAGO SOLARI.\n\n🇦🇷 NEWELL’S LE GANA 1-0 A PLATENSE.  https://t.co/1La8l1djwI",
+      "likes": 131,
+      "vistas": 15157,
+      "video": 64,
+      "partido": "Platense 0-1 Newell's Old Boys",
+      "game_id": 2614499,
+      "por": [
+        "platense"
+      ],
+      "min_desde_final": -86,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101767921819066670",
+      "created_at": "2026-09-20T20:18:16.000Z",
+      "text": "🇦🇷😅 Luego del pitazo en el Nuevo Gasómetro, un hincha de San Lorenzo se metió en la cancha para ABRAZAR a Leandro Paredes. https://t.co/J8u7Ox092l",
+      "likes": 4224,
+      "vistas": 310660,
+      "video": 22,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "san lorenzo",
+        "lorenzo",
+        "paredes"
+      ],
+      "min_desde_final": 38,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101766335009096032",
+      "created_at": "2026-09-20T20:11:57.000Z",
+      "text": "https://t.co/WkfhUSC1Lu",
+      "likes": 32,
+      "vistas": 2267,
+      "video": 61,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101763357904650521",
+      "created_at": "2026-09-20T20:00:08.000Z",
+      "text": "🇦🇷😮‍💨 Leandro Paredes. Showtime. https://t.co/BWolr7hBsn",
+      "likes": 997,
+      "vistas": 25695,
+      "video": 9,
+      "partido": "Rosario Central 1-0 Argentinos Juniors",
+      "game_id": 2614506,
+      "por": [
+        "paredes"
+      ],
+      "min_desde_final": -115,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101754378218533360",
+      "created_at": "2026-09-20T19:24:27.000Z",
+      "text": "🪄 ASISTENCIA DE LAUTARO BLANCO Y GOL DE MIGUEL MERENTIEL.\n\n🇦🇷 BOCA JUNIORS LE GANA 2-0 A SAN LORENZO.  https://t.co/no53Nbxs9G",
+      "likes": 116,
+      "vistas": 11142,
+      "video": 80,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "san lorenzo",
+        "lorenzo",
+        "boca juniors",
+        "boca"
+      ],
+      "min_desde_final": -16,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101753928840790443",
+      "created_at": "2026-09-20T19:22:39.000Z",
+      "text": "🇦🇷🪄 QUE CAÑO DE LAUTARO BLANCO.  https://t.co/dyapPDbdaQ",
+      "likes": 148,
+      "vistas": 4476,
+      "video": 13,
+      "partido": "Gimnasia LP 2-2 Banfield",
+      "game_id": 2614507,
+      "por": [
+        "cano"
+      ],
+      "min_desde_final": 1438,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101749982260871591",
+      "created_at": "2026-09-20T19:06:59.000Z",
+      "text": "🤯 QUE ZURDAZO DE LEANDRO LOZANO.\n\n🇦🇷 BOCA JUNIORS LE GANA 1-0 A SAN LORENZO.  https://t.co/C6XD9RAY5G",
+      "likes": 300,
+      "vistas": 7844,
+      "video": 70,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "san lorenzo",
+        "lorenzo",
+        "boca juniors",
+        "boca"
+      ],
+      "min_desde_final": -33,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101749694057644148",
+      "created_at": "2026-09-20T19:05:50.000Z",
+      "text": "🇦🇷❌ LA CHANCE QUE TUVO MIGUEL MERENTIEL.  https://t.co/CZ33brf8oF",
+      "likes": 21,
+      "vistas": 3247,
+      "video": 35,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101738464232264128",
+      "created_at": "2026-09-20T18:21:12.000Z",
+      "text": "🇦🇷 MANUEL INSAURRALDE SE FUE EXPULSADO POR ESTE PLANCHAZO A SANTIAGO ASCACIBAR.\n\n❌ SAN LORENZO SE QUEDA CON DIEZ JUGADORES.  https://t.co/PCZXazVYsx",
+      "likes": 116,
+      "vistas": 38746,
+      "video": 82,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "san lorenzo",
+        "lorenzo"
+      ],
+      "min_desde_final": -79,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101737646653313052",
+      "created_at": "2026-09-20T18:17:58.000Z",
+      "text": "🇺🇾❌ LA CHANCE QUE ERRÓ MIGUEL MERENTIEL.  https://t.co/SOfmCH47nn",
+      "likes": 42,
+      "vistas": 3789,
+      "video": 13,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101737567573934365",
+      "created_at": "2026-09-20T18:17:39.000Z",
+      "text": "🇦🇷🧤 QUE ATAJADA DE JOSÉ DEVECCHI. https://t.co/Co14Duandm",
+      "likes": 20,
+      "vistas": 3509,
+      "video": 9,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101722903397933312",
+      "created_at": "2026-09-20T17:19:22.000Z",
+      "text": "https://t.co/s8wZIwi0Uy",
+      "likes": 18,
+      "vistas": 1810,
+      "video": 45,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101721190158987357",
+      "created_at": "2026-09-20T17:12:34.000Z",
+      "text": "🇪🇨🧠 Las declaraciones de Hernán Galindez sobre la llegada de Marcelo Gallardo a la Selección de Ecuador:\n\n🗣️ “ES UN TECNICO DE MUCHA JERARQUÍA QUE LE HARÁ MUCHO BIEN A NUESTRA SELECCIÓN”. https://t.co/7mnY3NAmqF",
+      "likes": 27,
+      "vistas": 3727,
+      "video": 44,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "galindez"
+      ],
+      "min_desde_final": 1038,
+      "marcas": [
+        "🗣️",
+        "frase entre comillas",
+        "habló/entrevista"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101719627579453914",
+      "created_at": "2026-09-20T17:06:21.000Z",
+      "text": "https://t.co/xk6NFGC5O0",
+      "likes": 49,
+      "vistas": 11590,
+      "video": 15,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101716591893242283",
+      "created_at": "2026-09-20T16:54:18.000Z",
+      "text": "🇦🇷❌ INSÓLITO GOL EN CONTRA DE LISANDRO MARTÍNEZ EN MANCHESTER UNITED. https://t.co/PNX61Jzpwu",
+      "likes": 284,
+      "vistas": 15174,
+      "video": 22,
+      "partido": "Vélez Sarsfield 3-2 Tigre",
+      "game_id": 2614498,
+      "por": [
+        "martinez"
+      ],
+      "min_desde_final": -571,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101705120891236707",
+      "created_at": "2026-09-20T16:08:43.000Z",
+      "text": "🇦🇷❌ EL PATADÓN DE JUDE BELLINGHAM A JULIÁN ÁLVAREZ.  https://t.co/hNd5ouwKPD",
+      "likes": 415,
+      "vistas": 18656,
+      "video": 33,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "alvarez"
+      ],
+      "min_desde_final": -211,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101701970054529068",
+      "created_at": "2026-09-20T15:56:12.000Z",
+      "text": "🇦🇷🏴󠁧󠁢󠁥󠁮󠁧󠁿 EL CRUCE ENTRE GIULIANO SIMEONE Y JUDE BELLINGHAM EN EL DERBY DE MADRID. https://t.co/ErbCiGAY1g",
+      "likes": 15,
+      "vistas": 2495,
+      "video": 15,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101699491225043424",
+      "created_at": "2026-09-20T15:46:21.000Z",
+      "text": "🇦🇷😳 LOS SILBIDOS PARA JULIÁN ÁLVAREZ EN SU INGRESO EN EL DERBY DE MADRID.  https://t.co/AYHdMYQgIY",
+      "likes": 23,
+      "vistas": 3163,
+      "video": 15,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "alvarez"
+      ],
+      "min_desde_final": -234,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101698678201160112",
+      "created_at": "2026-09-20T15:43:07.000Z",
+      "text": "🇦🇷😮‍💨 ASISTENCIA DE GIULIANO SIMEONE ANTE REAL MADRID EN EL DERBY. https://t.co/sLZTid5hLc",
+      "likes": 42,
+      "vistas": 3742,
+      "video": 39,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101696785857003979",
+      "created_at": "2026-09-20T15:35:36.000Z",
+      "text": "🇦🇷🔝 EL PENAL QUE LE HICIERON A GIULIANO SIMEONE EN EL DERBY DE MADRID.  https://t.co/U8m6OZaeDd",
+      "likes": 51,
+      "vistas": 4601,
+      "video": 38,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101694503778230451",
+      "created_at": "2026-09-20T15:26:31.000Z",
+      "text": "🇦🇷🏴󠁧󠁢󠁥󠁮󠁧󠁿 EL CRUCE ENTRE CRISTIAN ROMERO Y JUDE BELLINGHAM EN PLENO DERBY DE MADRID.  https://t.co/ehxCwM0Act",
+      "likes": 129,
+      "vistas": 4366,
+      "video": 14,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "romero"
+      ],
+      "min_desde_final": -253,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101688382791241827",
+      "created_at": "2026-09-20T15:02:12.000Z",
+      "text": "🇦🇷 CRISTIAN ROMERO FUE AMONESTADO POR ESTA INFRACCIÓN ANTE JUDE BELLINGHAM.\n\n⁉️ ¿OPINIONES? https://t.co/UydAId9akz",
+      "likes": 23,
+      "vistas": 4900,
+      "video": 23,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "romero"
+      ],
+      "min_desde_final": -278,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101683049859580135",
+      "created_at": "2026-09-20T14:41:01.000Z",
+      "text": "🇦🇷😳 HUBO SILBIDOS PARA JULIÁN ÁLVAREZ EN LA PREVIA DEL CLÁSICO DE MADRID.  https://t.co/gUiSy9TIqI",
+      "likes": 8,
+      "vistas": 2448,
+      "video": 7,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "alvarez"
+      ],
+      "min_desde_final": -299,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101679992480399618",
+      "created_at": "2026-09-20T14:28:52.000Z",
+      "text": "🇦🇷🟨 Diego Simeone AMONESTADO en solo CINCO MINUTOS Derby de Madrid en el Metropolitano. https://t.co/zIpCsCLo97",
+      "likes": 28,
+      "vistas": 2407,
+      "video": 18,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101670012373127608",
+      "created_at": "2026-09-20T13:49:12.000Z",
+      "text": "🇦🇷🔝 UF, QUE DEFINICIÓN DE DAVID ROMERO ANTE GENOA EN SERIE A. https://t.co/zy8FsRdpjU",
+      "likes": 183,
+      "vistas": 5667,
+      "video": 18,
+      "partido": "San Lorenzo 0-2 Boca Juniors",
+      "game_id": 2614503,
+      "por": [
+        "romero"
+      ],
+      "min_desde_final": -351,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101669912913547642",
+      "created_at": "2026-09-20T13:48:49.000Z",
+      "text": "https://t.co/zy8FsRdpjU",
+      "likes": 8,
+      "vistas": 1296,
+      "video": 18,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101662412973768720",
+      "created_at": "2026-09-20T13:19:00.000Z",
+      "text": "🇦🇷😮‍💨 POR FAVOR, QUE GOLAZO DE TIRO LIBRE DE ENZO FERNÁNDEZ CON MANCHESTER CITY. https://t.co/tt3jD5YA6d",
+      "likes": 698,
+      "vistas": 11794,
+      "video": 29,
+      "partido": "Rosario Central 1-0 Argentinos Juniors",
+      "game_id": 2614506,
+      "por": [
+        "fernandez",
+        "fernandez"
+      ],
+      "min_desde_final": -516,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101662316810887295",
+      "created_at": "2026-09-20T13:18:37.000Z",
+      "text": "https://t.co/tt3jD5YA6d",
+      "likes": 18,
+      "vistas": 1594,
+      "video": 29,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101487481719861619",
+      "created_at": "2026-09-20T01:43:54.000Z",
+      "text": "🔝 EL CABEZAZO DE FERNANDO ALARCÓN.\n\n🇦🇷 INSTITUTO LE GANA 2-0 A TALLERES.  https://t.co/i7pVQzHENO",
+      "likes": 42,
+      "vistas": 3303,
+      "video": 79,
+      "partido": "Instituto 3-1 Talleres",
+      "game_id": 2614505,
+      "por": [
+        "instituto",
+        "talleres",
+        "alarcon"
+      ],
+      "min_desde_final": -26,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101485954095554940",
+      "created_at": "2026-09-20T01:37:49.000Z",
+      "text": "😮‍💨 QUE VOLEA DE GIULIANO CERATO.\n\n🇦🇷 INSTITUTO LE GANA 1-0 A TALLERES.  https://t.co/q5JycyurMH",
+      "likes": 127,
+      "vistas": 3629,
+      "video": 59,
+      "partido": "Instituto 3-1 Talleres",
+      "game_id": 2614505,
+      "por": [
+        "instituto",
+        "talleres",
+        "cerato"
+      ],
+      "min_desde_final": -32,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101483730380456081",
+      "created_at": "2026-09-20T01:28:59.000Z",
+      "text": "🇦🇷😮‍💨 Uf, este ángulo de la INCREÍBLE ATAJADA de Hernán Galindez al tiro libre de Ángel Correa.  https://t.co/p9dNUjJ2lo",
+      "likes": 52,
+      "vistas": 3421,
+      "video": 6,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "galindez"
+      ],
+      "min_desde_final": 94,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101462516731719733",
+      "created_at": "2026-09-20T00:04:41.000Z",
+      "text": "🇦🇷🔝 La reacción de Diego Martínez al GOL de Lucas Blondel ante River Plate en El Monumental.  https://t.co/rwSyj7fuib",
+      "likes": 1983,
+      "vistas": 53748,
+      "video": 37,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river"
+      ],
+      "min_desde_final": 10,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101458142668177714",
+      "created_at": "2026-09-19T23:47:19.000Z",
+      "text": "🔝 QUE DEFINICIÓN DE LUCAS BLONDEL.\n\n🇦🇷 HURACÁN LE GANA 2-1 A RIVER PLATE.  https://t.co/ujFRACw6Wz",
+      "likes": 324,
+      "vistas": 66891,
+      "video": 19,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river",
+        "huracan"
+      ],
+      "min_desde_final": -8,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101454427085262980",
+      "created_at": "2026-09-19T23:32:33.000Z",
+      "text": "😮‍💨 QUE GOLAZO DE TOMÁS GALVÁN, POR FAVOR.\n\n🇦🇷 RIVER PLATE EMPATA 1-1 ANTE HURACÁN. https://t.co/DSgqfJIGvG",
+      "likes": 50,
+      "vistas": 3583,
+      "video": 16,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river",
+        "huracan",
+        "galvan"
+      ],
+      "min_desde_final": -22,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101451953322541549",
+      "created_at": "2026-09-19T23:22:43.000Z",
+      "text": "😡 La bronca de la hinchada de River Plate luego del GOL ANULADO a Sebastián Driussi. https://t.co/kWeHVCaCuc https://t.co/n9JPcJbndZ",
+      "likes": 59,
+      "vistas": 16304,
+      "video": 12,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river",
+        "driussi"
+      ],
+      "min_desde_final": -32,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101451553915703679",
+      "created_at": "2026-09-19T23:21:08.000Z",
+      "text": "🇦🇷 EL GOL QUE LE ANULARON A RIVER PLATE ANTE HURACÁN.\n\n⁉️ ¿OPINIONES?  https://t.co/o8VQXYHQZP",
+      "likes": 113,
+      "vistas": 29765,
+      "video": 45,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river",
+        "huracan"
+      ],
+      "min_desde_final": -34,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101446060174344297",
+      "created_at": "2026-09-19T22:59:18.000Z",
+      "text": "🇦🇷😡 La bronca de los hinchas de River Plate con el Presidente de la AFA, en el entretiempo ante Huracán.\n\n🗣️ “CHIQUI TAPIA BOTÓN”. https://t.co/kD5rCS66yS",
+      "likes": 350,
+      "vistas": 167089,
+      "video": 23,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river",
+        "huracan"
+      ],
+      "min_desde_final": -56,
+      "marcas": [
+        "🗣️",
+        "frase entre comillas"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101445428336095250",
+      "created_at": "2026-09-19T22:56:47.000Z",
+      "text": "🇪🇨🧤 QUE ATAJADA DE HERNÁN GALINDEZ.  https://t.co/1SSlm5JKKx",
+      "likes": 62,
+      "vistas": 3539,
+      "video": 13,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "galindez"
+      ],
+      "min_desde_final": -58,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101441857934803177",
+      "created_at": "2026-09-19T22:42:36.000Z",
+      "text": "🇦🇷❌ TOBIAS ANDRADA SE RETIRÓ LLORANDO ANTE ANTE HURACÁN EN EL MONUMENTAL.  https://t.co/WcHCZHDyHn",
+      "likes": 257,
+      "vistas": 9901,
+      "video": 14,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "huracan",
+        "andrada"
+      ],
+      "min_desde_final": -72,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101434603856634032",
+      "created_at": "2026-09-19T22:13:46.000Z",
+      "text": "😮‍💨 EL GOL DE TIRO LIBRE DE OSCAR CORTÉS.\n\n🇦🇷 HURACÁN LE GANA 1-0 A RIVER PLATE.  https://t.co/XOqesL067p",
+      "likes": 122,
+      "vistas": 7343,
+      "video": 19,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river",
+        "huracan",
+        "cortes"
+      ],
+      "min_desde_final": -101,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101434072576758037",
+      "created_at": "2026-09-19T22:11:40.000Z",
+      "text": "🇦🇷❌ THIAGO ALMADA SE RETIRA LESIONADO EN 6 MINUTOS DE PARTIDO ANTE HURACÁN. https://t.co/FNEzI7Ljjj",
+      "likes": 51,
+      "vistas": 5912,
+      "video": 24,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "huracan"
+      ],
+      "min_desde_final": -103,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101433290678780149",
+      "created_at": "2026-09-19T22:08:33.000Z",
+      "text": "🇦🇷🏟️ EL RECIBIMIENTO DEL MONUMENTAL PARA EL PARTIDO ENTRE RIVER PLATE Y HURACÁN. https://t.co/VohV7NcAhc",
+      "likes": 82,
+      "vistas": 3456,
+      "video": 40,
+      "partido": "River Plate 1-2 Huracán",
+      "game_id": 2614510,
+      "por": [
+        "river plate",
+        "river",
+        "huracan"
+      ],
+      "min_desde_final": -106,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101418952555434231",
+      "created_at": "2026-09-19T21:11:35.000Z",
+      "text": "🎯 QUE GOLAZO DE MAXIMILIANO MEZA.\n\n🇦🇷 INDEPENDIENTE LE GANA 2-1 A UNIÓN.  https://t.co/5pncCI0Kmh",
+      "likes": 93,
+      "vistas": 4337,
+      "video": 20,
+      "partido": "Unión 1-2 Independiente",
+      "game_id": 2614504,
+      "por": [
+        "union",
+        "independiente"
+      ],
+      "min_desde_final": -28,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101418773404139662",
+      "created_at": "2026-09-19T21:10:52.000Z",
+      "text": "💥 EL CABEZAZO DE SANTIAGO MONTIEL.\n\n🇦🇷 INDEPENDIENTE EMPATA 1-1 ANTE UNIÓN.  https://t.co/iiKLwcajLO",
+      "likes": 17,
+      "vistas": 3275,
+      "video": 26,
+      "partido": "Unión 1-2 Independiente",
+      "game_id": 2614504,
+      "por": [
+        "union",
+        "independiente",
+        "montiel"
+      ],
+      "min_desde_final": -29,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101418469522604496",
+      "created_at": "2026-09-19T21:09:40.000Z",
+      "text": "🔝 EL GOL DE MARCELO ESTIGARRIBIA. \n\n🇦🇷 UNIÓN LE GANA 1-0 A INDEPENDIENTE.  https://t.co/ZjTabPqt4N",
+      "likes": 16,
+      "vistas": 3224,
+      "video": 26,
+      "partido": "Unión 1-2 Independiente",
+      "game_id": 2614504,
+      "por": [
+        "union",
+        "independiente",
+        "estigarribia"
+      ],
+      "min_desde_final": -30,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101413116076552679",
+      "created_at": "2026-09-19T20:48:23.000Z",
+      "text": "🇦🇷 EL GOL QUE LE ANULARON A UNIÓN ANTE INDEPENDIENTE.\n\n⁉️ ¿OPINIONES? https://t.co/PBquq1qM6Z",
+      "likes": 45,
+      "vistas": 5771,
+      "video": 32,
+      "partido": "Unión 1-2 Independiente",
+      "game_id": 2614504,
+      "por": [
+        "union",
+        "independiente"
+      ],
+      "min_desde_final": -52,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101412983251362100",
+      "created_at": "2026-09-19T20:47:52.000Z",
+      "text": "🇦🇷⁉️¿OPINIONES? https://t.co/WuqsyXsntl",
+      "likes": 11,
+      "vistas": 3258,
+      "video": 19,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101387715900027005",
+      "created_at": "2026-09-19T19:07:28.000Z",
+      "text": "🇦🇷❌ EL ERROR DE GERMÁN PEZZELLA EN PEÑAROL.  https://t.co/N9klYRmuh0",
+      "likes": 118,
+      "vistas": 7037,
+      "video": 16,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101371977470558491",
+      "created_at": "2026-09-19T18:04:55.000Z",
+      "text": "🇦🇷 EL FESTEJO QUE SE MANDO LAUTARO MARTÍNEZ.\n\n😮‍💨 AURA ABSOLUTA. https://t.co/gy4uLuA62F",
+      "likes": 1296,
+      "vistas": 31812,
+      "video": 9,
+      "partido": "Gimnasia LP 2-2 Banfield",
+      "game_id": 2614507,
+      "por": [
+        "martinez"
+      ],
+      "min_desde_final": -80,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101367640853745802",
+      "created_at": "2026-09-19T17:47:41.000Z",
+      "text": "🇦🇷🤯 LAUTARO MARTÍNEZ Y SU DOBLETE PARA EMPATAR ANTE ROMA DE VISITANTE. https://t.co/fD2xta4oHi",
+      "likes": 90,
+      "vistas": 3310,
+      "video": 19,
+      "partido": "Gimnasia LP 2-2 Banfield",
+      "game_id": 2614507,
+      "por": [
+        "martinez"
+      ],
+      "min_desde_final": -97,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101367552731422841",
+      "created_at": "2026-09-19T17:47:20.000Z",
+      "text": "https://t.co/fD2xta4oHi",
+      "likes": 19,
+      "vistas": 1262,
+      "video": 19,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101364857614344249",
+      "created_at": "2026-09-19T17:36:38.000Z",
+      "text": "🇦🇷🔝 EL GOL DE LAUTARO MARTÍNEZ ANTE ROMA PARA EL DESCUENTO DE INTER.  https://t.co/XY1ObfZPOY",
+      "likes": 98,
+      "vistas": 3984,
+      "video": 28,
+      "partido": "Gimnasia LP 2-2 Banfield",
+      "game_id": 2614507,
+      "por": [
+        "martinez"
+      ],
+      "min_desde_final": -108,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101364232751128878",
+      "created_at": "2026-09-19T17:34:09.000Z",
+      "text": "https://t.co/XY1ObfZPOY",
+      "likes": 13,
+      "vistas": 1412,
+      "video": 28,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101352298899296719",
+      "created_at": "2026-09-19T16:46:43.000Z",
+      "text": "🪄 LOS PASES DE PAULO DYBALA, POR FAVOR.  https://t.co/vL1NuEnH9l https://t.co/Ig285Tf2l9",
+      "likes": 49,
+      "vistas": 3546,
+      "video": 20,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101352117801750630",
+      "created_at": "2026-09-19T16:46:00.000Z",
+      "text": "🇦🇷😮‍💨 GRAN PASE DE PAULO DYBALA Y ASISTENCIA DE NAHUEL MOLINA ANTE INTER.  https://t.co/hXT49vbRxH",
+      "likes": 116,
+      "vistas": 8568,
+      "video": 29,
+      "partido": "Gimnasia LP 2-2 Banfield",
+      "game_id": 2614507,
+      "por": [
+        "molina"
+      ],
+      "min_desde_final": -159,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101322528694173736",
+      "created_at": "2026-09-19T14:48:26.000Z",
+      "text": "🇦🇷🔝 La reacción de Juan Pablo Vojvoda al GOLAZO de Ignacio Rodríguez ante Sarmiento en el Cilindro. https://t.co/yQa7RCgIoh",
+      "likes": 105,
+      "vistas": 7867,
+      "video": 44,
+      "partido": "Racing Club 3-1 Sarmiento",
+      "game_id": 2614511,
+      "por": [
+        "sarmiento",
+        "rodriguez"
+      ],
+      "min_desde_final": 758,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101305349470830604",
+      "created_at": "2026-09-19T13:40:10.000Z",
+      "text": "🇦🇷🎯 PFF, QUE GOLAZO DE EMILIANO BUENDÍA. https://t.co/ChJPaHpIMP",
+      "likes": 665,
+      "vistas": 11957,
+      "video": 16,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101305275768565863",
+      "created_at": "2026-09-19T13:39:52.000Z",
+      "text": "https://t.co/ChJPaHpIMP",
+      "likes": 9,
+      "vistas": 1208,
+      "video": 16,
+      "partido": null,
+      "game_id": null,
+      "por": [],
+      "min_desde_final": null,
+      "marcas": []
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101300015318639027",
+      "created_at": "2026-09-19T13:18:58.000Z",
+      "text": "🇦🇷😮‍💨 Este ángulo del GOLAZO de Gonzalo Escudero.  https://t.co/cGiyRPLODg",
+      "likes": 341,
+      "vistas": 5692,
+      "video": 20,
+      "partido": "Central Córdoba 2-2 Defensa y Justicia",
+      "game_id": 2614502,
+      "por": [
+        "angulo"
+      ],
+      "min_desde_final": 864,
+      "marcas": [
+        "jugada/gol"
+      ]
+    },
+    {
+      "cuenta": "juegosimple__",
+      "id": "2101128626737393719",
+      "created_at": "2026-09-19T01:57:56.000Z",
+      "text": "🎯 QUE BOMBAZO DE IGNACIO RODRÍGUEZ.\n\n🇦🇷 RACING CLUB LE GANA 3-1 A SARMIENTO.  https://t.co/rEYkGxe9wf",
+      "likes": 91,
+      "vistas": 3771,
+      "video": 66,
+      "partido": "Racing Club 3-1 Sarmiento",
+      "game_id": 2614511,
+      "por": [
+        "racing club",
+        "racing",
+        "sarmiento",
+        "rodriguez"
+      ],
+      "min_desde_final": -12,
+      "marcas": []
+    }
+  ],
+  "youtube": [
+    {
+      "id": "zQDvXKyguNs",
+      "titulo": "EN VIVO: entrenamiento abierto de la Selección Argentina en la previa del amistoso vs. Bolivia",
+      "fecha": "2026-09-29T19:41:32+00:00"
+    },
+    {
+      "id": "Ulg-Dfz04Gw",
+      "titulo": "¿SE QUEDA SCALONI? | MAÑANA JUEGA ARGENTINA | NO ES PARA TANTO⚡️",
+      "fecha": "2026-09-29T18:54:38+00:00"
+    },
+    {
+      "id": "5NwH-BWGW0w",
+      "titulo": "EN VIVO: Lionel Scaloni habla en conferencia de prensa en la previa Selección Argentina vs. Bolivia",
+      "fecha": "2026-09-29T18:38:33+00:00"
+    },
+    {
+      "id": "svAsposgwgY",
+      "titulo": "EN VIVO: entrenamiento abierto de la Selección Argentina en la previa de los amistosos",
+      "fecha": "2026-09-28T21:02:29+00:00"
+    },
+    {
+      "id": "xPLZ_cAmivs",
+      "titulo": "MERCEDES DIZ, de River y Selección Argentina, con Ángela Lerena - Capítulo 7 - T8 - #TNTGolFem",
+      "fecha": "2026-09-28T19:22:50+00:00"
+    },
+    {
+      "id": "uMoeRdLjVq4",
+      "titulo": "🔴 EN VIVO: RACING vs. BOCA | CLÁSICO POR COPA ARGENTINA | #ExperienciaTNTSports",
+      "fecha": "2026-09-28T00:37:05+00:00"
+    },
+    {
+      "id": "qOfNYk3tomg",
+      "titulo": "LA PREVIA DE RACING - BOCA | FECHA FIFA PARA ARGENTINA | NO ES PARA TANTO⚡️",
+      "fecha": "2026-09-24T23:54:05+00:00"
+    },
+    {
+      "id": "hAkYBKaR9JI",
+      "titulo": "HABLÓ LIONEL SCALONI: qué dijo de su futuro y el entrenamiento abierto de la Selección Argentina HOY",
+      "fecha": "2026-09-24T16:14:27+00:00"
+    },
+    {
+      "id": "D63Hq46v6No",
+      "titulo": "SIGUE LA POLÉMICA DE VÉLEZ - BOCA | NO ES PARA TANTO⚡️",
+      "fecha": "2026-09-23T23:46:49+00:00"
+    },
+    {
+      "id": "ZiW2JkZ7_Vw",
+      "titulo": "ALMA VELASCO, de Levante y Selección Argentina, con Ángela Lerena - Capítulo 6 - T8 - #TNTGolFem",
+      "fecha": "2026-09-23T18:30:07+00:00"
+    },
+    {
+      "id": "jPrV54tFEJc",
+      "titulo": "AGUSNETA PELEA EN PÁRENSE DE MANOS | NO ES PARA TANTO⚡️",
+      "fecha": "2026-09-23T00:03:02+00:00"
+    },
+    {
+      "id": "qXLuKanpVqE",
+      "titulo": "LO QUE DEJÓ LA FECHA 10: Boca volvió a ganar, Huracán pudo con River y más TNT Data Sports by Betano",
+      "fecha": "2026-09-22T17:47:28+00:00"
+    },
+    {
+      "id": "YCn2PZoeYKs",
+      "titulo": "La mejor jugada del partido fue el gol de Blondel 🔝",
+      "fecha": "2026-09-22T17:07:24+00:00"
+    },
+    {
+      "id": "3DeCxHxaPjc",
+      "titulo": "Entrevista con DIEGO MARTÍNEZ | El DT de Huracán, mano a mano con TNT Sports",
+      "fecha": "2026-09-22T16:35:25+00:00"
+    },
+    {
+      "id": "DzZVjjzCW14",
+      "titulo": "SHOW DE GOLES ⚽ FECHA 10 - Torneo Clausura 2026",
+      "fecha": "2026-09-22T14:46:27+00:00"
+    }
+  ]
+}

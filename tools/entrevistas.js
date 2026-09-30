@@ -264,6 +264,15 @@ async function armarFotos(p, el, dir, rel) {
   if (el.sujeto && ['otra_persona', 'dirigente', 'arbitro'].includes(el.sujeto_tipo)) {
     try { const w = await fotoWikimedia(el.sujeto, path.join(dir, 'sujeto.jpg')); if (w) fotos.push({ archivo: rel + '/sujeto.jpg', fuente: w.fuente, pos: { x: 50, y: 30, zoom: 1 } }); } catch (e) { log('wikimedia: ' + e.message); }
   }
+  // Declaración propia: la foto grande es del que habla (cuadros del video a buena resolución).
+  const propia = !el.sujeto || ['mismo', 'nadie', 'club'].includes(el.sujeto_tipo);
+  if (propia && el.e.video && el.e.video.mp4) {
+    try {
+      const { sacarCuadros } = require('./frases.js');
+      (await sacarCuadros(el.e.video.mp4, el.e.video.seg, dir, 4)).slice(1, 3)
+        .forEach(c => fotos.push({ archivo: rel + '/' + c.archivo, fuente: 'video de @' + el.e.cuenta + ', ' + c.seg + ' s', pos: { x: 50, y: 10, zoom: 1.35 } }));   // zoom: afuera el zócalo y el marcador de la transmisión
+    } catch (e) { log('cuadros del video: ' + e.message); }
+  }
   const partido = 'fotos-partido/' + p.game_id + '-original.jpg';
   fotos.push({ archivo: partido, fuente: 'foto del partido' });
   if (el.e.video && el.e.video.miniatura) {
@@ -320,7 +329,7 @@ async function main() {
       game_id: p.game_id, matchday: p.matchday, partido: p.nombre,
       fuente: { red: 'x', url: `https://x.com/${el.e.cuenta}/status/${el.e.id}`, cuenta: '@' + el.e.cuenta, fecha: el.e.fecha, video: el.e.video_id !== el.e.id ? `https://x.com/${el.e.cuenta}/status/${el.e.video_id}` : undefined },
       tuit: el.e.texto, polemica: el.polemica, por_que: el.por_que, elegida_por: el.elegida_por,
-      fotos: f.fotos, foto: 0, foto_autor: f.foto_autor, jugador_id: f.hablante_jugador_id, diseno: 'mayus', v: 1,
+      fotos: f.fotos, foto: 0, foto_autor: f.foto_autor, tarjeta: !!(el.sujeto && !['mismo', 'nadie', 'club'].includes(el.sujeto_tipo)), jugador_id: f.hablante_jugador_id, diseno: 'mayus', v: 1,
     });
   }
   if (DRY) { console.log(JSON.stringify(nuevas, null, 2)); return; }

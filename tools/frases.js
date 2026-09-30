@@ -140,4 +140,5 @@ async function main() {
   console.log(`frases.json: ${id} (v${frase.v}) con ${opciones.length} fotos`);
 }
 
-main().catch(e => { console.error(e.message || e); process.exit(1); });
+if (require.main === module) main().catch(e => { console.error(e.message || e); process.exit(1); });
+module.exports = { sacarCuadros };

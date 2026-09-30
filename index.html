@@ -2249,6 +2249,13 @@ html { scroll-behavior: smooth; }
 .card-fr-mayus .fr-pastilla { min-width: 351px; height: 79px; padding: 0 34px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
 .card-fr-mayus .fr-pastilla span { font-size: 29.12px; line-height: 32.13px; white-space: nowrap; -webkit-text-stroke: 3.68px #000; text-shadow: 0 2.1px 0 #000; }
 
+/* Tarjeta sin foto: la frase es del que está en la foto grande; va sólo su nombre, alineada
+   al mismo borde derecho y la misma base que la tarjeta con foto. */
+.card-fr .fr-tarjeta.fr-solo-nombre { width: auto; min-width: 0; height: 120px; padding: 0 44px; display: flex; align-items: center; }
+.card-fr .fr-solo-nombre .fr-nombre { position: static; width: auto; height: auto; }
+.card-fr .fr-solo-nombre .fr-nombre span { white-space: nowrap; }
+.card-fr-globo .fr-tarjeta.fr-solo-nombre { left: auto; right: 40px; top: 1190px; }
+.card-fr-banda .fr-tarjeta.fr-solo-nombre { left: auto; right: 28px; top: 900px; }
 /* Preguntas rápidas (diseño provisorio, sin frame en Figma): mismo lenguaje que "frase 3". */
 .card-fr-preguntas .fr-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.92) 62%, #000 100%); }
 .card-fr-preguntas .fr-pila { position: absolute; left: 50px; bottom: 43px; width: 981px; display: flex; flex-direction: column; align-items: flex-start; }
@@ -3896,11 +3903,11 @@ async function frCargar() {
 }
 function frEstado(f) {
   let e = null; try { e = JSON.parse(localStorage.getItem(FR_KEY + f.id)); } catch (x) {}
-  const base = { texto: f.texto || '', texto_corto: f.texto_corto || '', usar_corto: !!(f.usar_corto && f.texto_corto), autor: f.autor || '', foto: f.foto || 0, preguntas: f.preguntas || [], diseno: f.diseno || 'mayus' };
+  const base = { texto: f.texto || '', texto_corto: f.texto_corto || '', usar_corto: !!(f.usar_corto && f.texto_corto), autor: f.autor || '', foto: f.foto || 0, preguntas: f.preguntas || [], diseno: f.diseno || 'mayus', tarjeta: frConTarjeta(f) };
   return e && e.v === (f.v || 1) ? Object.assign(base, e.cambios) : base;
 }
 function frGuardar(f, st) {
-  const cambios = { texto: st.texto, texto_corto: st.texto_corto, usar_corto: st.usar_corto, autor: st.autor, foto: st.foto, diseno: st.diseno };
+  const cambios = { texto: st.texto, texto_corto: st.texto_corto, usar_corto: st.usar_corto, autor: st.autor, foto: st.foto, diseno: st.diseno, tarjeta: st.tarjeta };
   try { localStorage.setItem(FR_KEY + f.id, JSON.stringify({ v: f.v || 1, cambios })); } catch (e) {}
 }
 /* La frase a mostrar; el globo y la banda la llevan entre comillas (si no las trae ya). */
@@ -3908,11 +3915,19 @@ function frTexto(st, comillas) {
   let t = String((st.usar_corto && st.texto_corto) ? st.texto_corto : st.texto).trim().replace(/^["“«]+|["”»]+$/g, '');
   return comillas ? '“' + t + '”' : t;
 }
+/* Con foto chica sólo si la frase habla de otro (st.tarjeta); si no, el nombre solo. */
+function frTarjetaHtml(st) {
+  const autor = gnEscape(st.autor);
+  return st.tarjeta ? `<div class="fr-tarjeta"><div class="fr-autor-foto"></div><div class="fr-nombre"><span>${autor}</span></div></div>`
+    : `<div class="fr-tarjeta fr-solo-nombre"><div class="fr-nombre"><span>${autor}</span></div></div>`;
+}
+/* Si no se dijo, se deduce: hay foto chica cuando la frase apunta a otra persona. */
+const frConTarjeta = f => f.tarjeta != null ? !!f.tarjeta : !!(f.sujeto && !['mismo', 'nadie', 'club'].includes(f.sujeto_tipo));
 function buildFrase(k, st) {
   const card = document.createElement('div');
   card.className = 'card card-fr card-fr-' + k;
   const autor = gnEscape(st.autor);
-  const tarjeta = `<div class="fr-tarjeta"><div class="fr-autor-foto"></div><div class="fr-nombre"><span>${autor}</span></div></div>`;
+  const tarjeta = frTarjetaHtml(st);
   let html = '<div class="rn-foto"></div>';
   if (k === 'globo') html += `<img class="fr-globo" src="icons/frase-globo.svg" alt=""><div class="fr-texto"><span>${gnEscape(frTexto(st, true))}</span></div>` + tarjeta;
   if (k === 'banda') html += '<img class="fr-curva fr-curva-b" src="icons/frase-curva-blanca.svg" alt=""><img class="fr-curva fr-curva-c" src="icons/frase-curva-celeste.svg" alt="">' +
@@ -3944,7 +3959,11 @@ function frAjustar(card, k) {
   }
   if (k === 'preguntas') frAjustarPreguntas(card);
   const nom = card.querySelector('.fr-nombre span');
-  if (nom) {
+  if (nom && card.querySelector('.fr-solo-nombre')) {
+    nom.style.fontSize = ''; nom.style.lineHeight = '';
+    let f = 1;
+    while (nom.offsetWidth > 480 && f > 0.5) { f -= 0.04; nom.style.fontSize = (37.67 * f) + 'px'; nom.style.lineHeight = (41.56 * f) + 'px'; }
+  } else if (nom) {
     nom.style.fontSize = ''; nom.style.lineHeight = '';
     let f = 1;
     // Dos renglones como mucho y ninguna palabra más ancha que el lugar.
@@ -3992,11 +4011,17 @@ function frArmar(row, panel, f) {
   const ajustar = () => cards.forEach(c => frAjustar(c.card, c.k));
   const fotoIdx = () => Math.max(0, Math.min(fotos.length - 1, st.foto || 0));
   const fondo = () => { const o = fotos[fotoIdx()]; frPonerFondo(cards, f, o && o.archivo, o && o.pos); };
-  const autorFoto = (src, recorte) => cards.forEach(c => frFotoAutor(c.card, src, recorte));
+  const autorFoto = (src, recorte) => { autorActual = [src, recorte]; cards.forEach(c => frFotoAutor(c.card, src, recorte)); };
   // Primera vez: respeta encuadres guardados; después, cambiar de foto vuelve al sugerido.
   cards.forEach(c => { delete c.card.dataset.src; });
   fondo();
-  if (f.foto_autor) autorFoto(f.foto_autor.archivo, f.foto_autor.recorte);
+  let autorActual = f.foto_autor ? [f.foto_autor.archivo, f.foto_autor.recorte] : null;
+  const ponerTarjeta = () => {
+    cards.forEach(c => { const t = c.card.querySelector('.fr-tarjeta'); if (t) t.outerHTML = frTarjetaHtml(st); });
+    if (autorActual) cards.forEach(c => frFotoAutor(c.card, autorActual[0], autorActual[1]));
+    ajustar();
+  };
+  if (autorActual) autorFoto(autorActual[0], autorActual[1]);
 
   const fuente = f.fuente || {};
   panel.innerHTML =
@@ -4008,6 +4033,7 @@ function frArmar(row, panel, f) {
     ` · autor <input type="text" class="fr-in-autor" style="width:220px" value="${gnEscape(st.autor)}"></div>` +
     '<div class="fr-fila">fondo: ' + (fotos.length > 1 ? '<button type="button" class="fr-prev">‹</button><span class="fr-foto-lbl"></span><button type="button" class="fr-next">otra foto ›</button>' : '<span class="fr-foto-lbl"></span>') +
     '<label class="fr-subir">subir archivo<input type="file" accept="image/*" class="fr-in-fondo"></label><button type="button" class="fr-link-fondo">pegar link</button></div>' +
+    '<div class="fr-fila">foto chica del que habla (sólo si la frase es sobre otro): <button type="button" class="fr-tj" data-t="1">con foto chica</button><button type="button" class="fr-tj" data-t="0">sólo el nombre</button></div>' +
     '<div class="fr-fila">foto del autor: <label class="fr-subir">subir archivo<input type="file" accept="image/*" class="fr-in-autorfoto"></label><button type="button" class="fr-link-autor">pegar link</button>' +
     '<button type="button" class="fr-autor-fondo">usar la del fondo</button></div>';
   const $ = s => panel.querySelector(s);
@@ -4036,6 +4062,9 @@ function frArmar(row, panel, f) {
   leerArchivo($('.fr-in-autorfoto'), src => autorFoto(src, null));
   $('.fr-link-autor').addEventListener('click', () => { const u = prompt('Pegá el link de la foto del autor:'); if (u) autorFoto(u.trim(), null); });
   $('.fr-autor-fondo').addEventListener('click', () => { const src = cards[0].card.dataset.src; if (src) autorFoto(src, null); });
+  const pintarTj = () => panel.querySelectorAll('.fr-tj').forEach(b => b.classList.toggle('is-on', (b.dataset.t === '1') === !!st.tarjeta));
+  panel.querySelectorAll('.fr-tj').forEach(b => b.addEventListener('click', () => { st.tarjeta = b.dataset.t === '1'; frGuardar(f, st); pintarTj(); ponerTarjeta(); }));
+  pintarTj();
   pintarUsar(); pintarLbl();
   frPanelPublicar(panel, f, st, disenos, () => frGuardar(f, st));
   document.fonts.ready.then(ajustar);
