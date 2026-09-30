@@ -228,7 +228,8 @@ function elegirConReglas(p, cands) {
   const preguntas = preguntasDe(e.texto);
   // De TNT: la cita secundaria (🗣️"…") suele venir en minúscula y más completa que el título.
   const frase = aOracion(frases.slice().sort((a, b) => (a === a.toUpperCase()) - (b === b.toUpperCase()) || b.length - a.length)[0] || '', nombres);
-  return { e, frase, hablante: hablanteReglas(e, p), sujeto: '', sujeto_tipo: 'mismo', formato: preguntas ? 'preguntas' : 'frase', preguntas: preguntas || [], polemica: pts, por_que: 'reglas: ' + pts + ' puntos de palabras polémicas', elegida_por: 'reglas' };
+  const deArbitro = /arbitr|referi|\bjuez\b/.test(sinAcentos(e.texto));
+  return { e, frase, hablante: hablanteReglas(e, p), sujeto: deArbitro ? 'árbitro' : '', sujeto_tipo: deArbitro ? 'arbitro' : 'mismo', formato: preguntas ? 'preguntas' : 'frase', preguntas: preguntas || [], polemica: pts, por_que: 'reglas: ' + pts + ' puntos de palabras polémicas', elegida_por: 'reglas' };
 }
 
 // ── Fotos ─────────────────────────────────────────────────────────────
@@ -239,13 +240,23 @@ async function bajar(url, destino) {
   fs.writeFileSync(destino, Buffer.from(await r.arrayBuffer()));
   return destino;
 }
-/* Retrato libre de Wikimedia Commons para alguien que no es de la LPF (vertical, grande). */
-async function fotoWikimedia(nombre, destino) {
-  const u = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url|size&iiurlwidth=1600&format=json&gsrsearch=' + encodeURIComponent(nombre + ' filetype:bitmap');
+/* El árbitro del partido, de la base (fixtures.referee_id → referee_universe). */
+async function arbitroDe(gameId) {
+  const f = await api('fixtures?select=referee_id&game_id=eq.' + gameId, 'winning_lpf').catch(() => []);
+  if (!f[0] || !f[0].referee_id) return null;
+  const r = await api('referee_universe?select=known_name,first_name,last_name&referee_id=eq.' + f[0].referee_id, 'winning_lpf').catch(() => []);
+  return r[0] ? (r[0].known_name || r[0].first_name + ' ' + r[0].last_name) : null;
+}
+/* Retrato libre de Wikimedia Commons para alguien que no es de la LPF. El título del archivo
+   tiene que traer el nombre completo (hay homónimos: "Darío Herrera" también es un ministro de
+   Ecuador); si es árbitro, además "referee" o "árbitro". */
+async function fotoWikimedia(nombre, destino, tipo) {
+  const arbitro = tipo === 'arbitro';
+  const u = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url|size&iiurlwidth=1600&format=json&gsrsearch=' + encodeURIComponent(nombre + (arbitro ? ' referee' : '') + ' filetype:bitmap');
   const j = await (await fetch(u, { headers: { 'User-Agent': 'WinningRecap/1.0 (luchi-dev/winning-recap)' } })).json();
-  const ap = sinAcentos(nombre).split(' ').pop();
+  const palabras = sinAcentos(nombre).split(/\s+/).filter(w => w.length > 2);
   const fotos = Object.values((j.query || {}).pages || {}).map(x => ({ t: x.title, ...(x.imageinfo || [])[0] }))
-    .filter(x => x.width >= 700 && sinAcentos(x.t).includes(ap) && !/logo|escudo|firma|signature|map|mapa/i.test(x.t))
+    .filter(x => x.width >= 700 && palabras.every(w => sinAcentos(x.t).includes(w)) && (!arbitro || /referee|arbitro|árbitro/i.test(x.t)) && !/logo|escudo|firma|signature|map|mapa/i.test(x.t))
     .sort((a, b) => (b.height / b.width) - (a.height / a.width));
   if (!fotos.length) return null;
   await bajar(fotos[0].thumburl || fotos[0].url, destino);
@@ -262,7 +273,7 @@ async function armarFotos(p, el, dir, rel) {
   const fotos = [], sujetoJug = p.jugadores.find(j => el.sujeto && sinAcentos(el.sujeto).includes(j.apellido) && j.apellido.length > 3);
   // Fondo: de quién habla la frase.
   if (el.sujeto && ['otra_persona', 'dirigente', 'arbitro'].includes(el.sujeto_tipo)) {
-    try { const w = await fotoWikimedia(el.sujeto, path.join(dir, 'sujeto.jpg')); if (w) fotos.push({ archivo: rel + '/sujeto.jpg', fuente: w.fuente, pos: { x: 50, y: 30, zoom: 1 } }); } catch (e) { log('wikimedia: ' + e.message); }
+    try { const w = await fotoWikimedia(el.sujeto, path.join(dir, 'sujeto.jpg'), el.sujeto_tipo); if (w) fotos.push({ archivo: rel + '/sujeto.jpg', fuente: w.fuente, pos: { x: 50, y: 30, zoom: 1 } }); else log('sin foto libre de ' + el.sujeto + ': queda la del partido (se puede subir a mano)'); } catch (e) { log('wikimedia: ' + e.message); }
   }
   // Declaración propia: la foto grande es del que habla (cuadros del video a buena resolución).
   const propia = !el.sujeto || ['mismo', 'nadie', 'club'].includes(el.sujeto_tipo);
@@ -320,6 +331,7 @@ async function main() {
     if (!cands.length) continue;
     const el = process.env.ANTHROPIC_API_KEY ? await elegirConClaude(p, cands) : elegirConReglas(p, cands);
     if (!el || (!el.frase && el.formato === 'frase')) { log(`${p.nombre}: nada para armar`); continue; }
+    if (el.sujeto_tipo === 'arbitro') { const a = await arbitroDe(p.game_id); if (a) el.sujeto = a; }
     const id = 'x-' + el.e.id, rel = 'frases/' + id, dir = path.join(RAIZ, rel);
     log(`${p.nombre}: ELEGIDA (${el.elegida_por}, ${el.por_que}) → "${el.frase}" — ${el.hablante || '¿?'}${el.sujeto ? ' · habla de ' + el.sujeto + ' (' + el.sujeto_tipo + ')' : ''}`);
     const f = DRY ? { fotos: [], foto_autor: null } : await armarFotos(p, el, dir, rel);

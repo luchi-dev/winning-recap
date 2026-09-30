@@ -88,7 +88,7 @@
       "texto_corto": "",
       "usar_corto": false,
       "autor": "Omar De Felippe",
-      "sujeto": "Herrera (árbitro)",
+      "sujeto": "Darío Herrera",
       "sujeto_tipo": "arbitro",
       "game_id": 2614505,
       "matchday": 10,
@@ -104,6 +104,15 @@
       "por_que": "reglas: 5 puntos de palabras polémicas",
       "elegida_por": "reglas",
       "fotos": [
+        {
+          "archivo": "frases/x-2101501215737614545/sujeto.jpg",
+          "fuente": "Wikimedia Commons: Darío Herrera (referee).png",
+          "pos": {
+            "x": 50,
+            "y": 30,
+            "zoom": 1
+          }
+        },
         {
           "archivo": "fotos-partido/2614505-original.jpg",
           "fuente": "foto del partido"
@@ -124,7 +133,7 @@
         ]
       },
       "diseno": "mayus",
-      "v": 2,
+      "v": 3,
       "tarjeta": true
     },
     {
