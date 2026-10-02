@@ -1040,7 +1040,7 @@ body {
 .card-rk.export-transparent { background: transparent; }
 .card-rk.export-transparent .rk-bg { display: none; }
 .card-rk .rk-bg { position: absolute; left: 0; top: 0; width: 1080px; height: 1350px; background-color: #1a1a1a; }
-.card-rk .rk-comp { position: absolute; transform-origin: 0 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); pointer-events: none; }
+.card-rk .rk-comp { position: absolute; transform-origin: 0 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); cursor: move; touch-action: none; }
 .gl-ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 11px; color: #9a9aa8; margin-top: 6px; width: 324px; }
 .gl-ctl input { font: 11px system-ui; background: #222; color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 2px 4px; }
 
@@ -7164,16 +7164,36 @@ async function loadGoleadores(matchday) {
     '<label>destacado <select class="gl-destacado"></select></label>';
   const nota = document.createElement('div'); nota.className = 'rn-sinfoto';
   const ctlP = document.createElement('div'); ctlP.className = 'pv-ctl';
-  ctlP.innerHTML = '<label>posición <select class="rk-pos"><option value="izq">izquierda</option><option value="centro" selected>centro</option><option value="der">derecha</option></select></label>' +
+  ctlP.innerHTML = '<label>posición <select class="rk-pos"><option value="izq-abajo">abajo izquierda</option><option value="centro-abajo">abajo centro</option><option value="der-abajo">abajo derecha</option><option value="izq-medio">medio izquierda</option><option value="centro-medio" selected>medio centro</option><option value="der-medio">medio derecha</option></select></label>' +
     '<label>tamaño <input type="range" class="rk-tam" min="120" max="260" value="190"></label>';
   const notaP = document.createElement('div'); notaP.className = 'rn-sinfoto';
 
+  // Márgenes pensados para Instagram: la grilla del perfil recorta ~34px de cada costado
+  // (muestra 3:4), así que el ranking queda a 70 de los costados y a 90 de abajo.
+  const RK_MX = 70, RK_MY = 90;
+  let cx = 0, cy = 0, movido = false;   // esquina del ranking en px de la placa; movido = lo arrastró a mano
   const ubicar = () => {
-    const s = ctlP.querySelector('.rk-tam').value / 100, pos = ctlP.querySelector('.rk-pos').value, ancho = 322 * s;
-    comp.style.left = (pos === 'izq' ? 60 : pos === 'der' ? 1080 - 60 - ancho : (1080 - ancho) / 2) + 'px';
-    comp.style.top = (1350 - 464 * s) / 2 + 'px';
+    const s = ctlP.querySelector('.rk-tam').value / 100, ancho = 322 * s, alto = 464 * s;
+    if (!movido) {
+      const [hz, vt] = ctlP.querySelector('.rk-pos').value.split('-');
+      cx = hz === 'izq' ? RK_MX : hz === 'der' ? 1080 - RK_MX - ancho : (1080 - ancho) / 2;
+      cy = vt === 'abajo' ? 1350 - RK_MY - alto : (1350 - alto) / 2;
+    }
+    // Nunca se sale de la placa.
+    cx = Math.max(0, Math.min(1080 - ancho, cx)); cy = Math.max(0, Math.min(1350 - alto, cy));
+    comp.style.left = cx + 'px'; comp.style.top = cy + 'px';
     comp.style.transform = 'scale(' + s + ')';
   };
+  // Arrastrar el ranking lo mueve a él (arrastrar el resto de la placa mueve la foto).
+  let agarreRk = null;
+  comp.addEventListener('pointerdown', ev => { agarreRk = { x: ev.clientX, y: ev.clientY, cx, cy }; comp.setPointerCapture(ev.pointerId); ev.preventDefault(); ev.stopPropagation(); });
+  comp.addEventListener('pointermove', ev => {
+    if (!agarreRk) return;
+    const k = 1080 / (placa.getBoundingClientRect().width || 1080);
+    movido = true; cx = agarreRk.cx + (ev.clientX - agarreRk.x) * k; cy = agarreRk.cy + (ev.clientY - agarreRk.y) * k; ubicar();
+  });
+  const soltarRk = () => { agarreRk = null; };
+  comp.addEventListener('pointerup', soltarRk); comp.addEventListener('pointercancel', soltarRk);
   const pintar = () => {
     const def = GL_RANKINGS.find(r => r.id === rkId), html = glInnerHtml(filas, destacado, def.titulo);
     card.innerHTML = html; comp.innerHTML = html;
@@ -7194,12 +7214,12 @@ async function loadGoleadores(matchday) {
       filas = nuevas; rkId = id; destacado = 0; pintar();
     } catch (err) { console.warn('ranking', id, err); nota.textContent = 'no pude cargar ese ranking'; e.target.value = rkId; }
   });
-  ctlP.querySelector('.rk-pos').addEventListener('change', ubicar);
+  ctlP.querySelector('.rk-pos').addEventListener('change', () => { movido = false; ubicar(); });
   ctlP.querySelector('.rk-tam').addEventListener('input', ubicar);
   pintar(); ubicar();
   w.appendChild(ctl); w.appendChild(nota);
   wp.appendChild(ctlP); wp.appendChild(notaP);
-  fotoFondoControles(placa, placa.querySelector('.rk-bg'), ctlP, notaP, 'placa 1080x1350 · sin foto se descarga con fondo transparente');
+  fotoFondoControles(placa, placa.querySelector('.rk-bg'), ctlP, notaP, 'placa 1080x1350 · arrastrá el ranking para moverlo · sin foto se descarga con fondo transparente');
   row.appendChild(w); row.appendChild(wp); section.appendChild(row); container.appendChild(section);
 }
 
@@ -7586,7 +7606,7 @@ function fotoFondoControles(card, bg, ctl, nota, textoSin) {
     } else { bg.style.backgroundImage = bg.style.backgroundSize = bg.style.backgroundPosition = bg.style.backgroundRepeat = ''; }
     card.style.cursor = foto ? 'grab' : '';
     if (foto) card.dataset.fondoPropio = '1'; else delete card.dataset.fondoPropio;
-    nota.textContent = foto ? 'se descarga con tu foto de fondo · arrastrá la placa para mover la foto' : textoSin;
+    nota.textContent = foto ? 'se descarga con tu foto de fondo · arrastrá el fondo para mover la foto' : textoSin;
   };
   ctl.querySelector('.fx-in-foto').addEventListener('change', ev => {
     const f = ev.target.files[0]; if (!f) return;
