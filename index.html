@@ -7457,7 +7457,29 @@ async function renderFixturesCard(matchday, data) {
   const row = document.createElement('div');
   row.className = 'cards-row';
   const card = buildFixturesCard(matchday, dayMatches, stadiums);
-  row.appendChild(createCardWrapper(card, card.dataset.filename));
+  const w = createCardWrapper(card, card.dataset.filename);
+  // Fondo propio: sin foto se descarga transparente (como siempre); con foto, sale con la foto.
+  const ctl = document.createElement('div'); ctl.className = 'pv-ctl';
+  ctl.innerHTML = '<label>foto de fondo <input type="file" class="fx-in-foto" accept="image/*"></label>' +
+    '<label>oscurecer <input type="range" class="fx-in-osc" min="0" max="80" value="30"></label>' +
+    '<button type="button" class="fx-in-quitar">sin fondo</button>';
+  const nota = document.createElement('div'); nota.className = 'rn-sinfoto';
+  let foto = null;
+  const pintar = () => {
+    const bg = card.querySelector('.fx-bg'), a = ctl.querySelector('.fx-in-osc').value / 100;
+    bg.style.backgroundImage = foto ? `linear-gradient(rgba(0,0,0,${a}), rgba(0,0,0,${a})), url("${foto}")` : '';
+    if (foto) card.dataset.fondoPropio = '1'; else delete card.dataset.fondoPropio;
+    nota.textContent = foto ? 'se descarga con tu foto de fondo' : 'se descarga sin fondo (transparente)';
+  };
+  ctl.querySelector('.fx-in-foto').addEventListener('change', ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = () => { foto = r.result; pintar(); }; r.readAsDataURL(f);
+  });
+  ctl.querySelector('.fx-in-osc').addEventListener('input', pintar);
+  ctl.querySelector('.fx-in-quitar').addEventListener('click', () => { foto = null; ctl.querySelector('.fx-in-foto').value = ''; pintar(); });
+  pintar();
+  w.appendChild(ctl); w.appendChild(nota);
+  row.appendChild(w);
   section.appendChild(row);
   container.appendChild(section);
 }
@@ -7530,7 +7552,7 @@ async function exportarCard(cardEl) {
   cardEl.parentElement.style.overflow = 'visible';
 
   // Poster cards: transparent-bg export when no background uploaded
-  const hasBg = bgDataUrl !== null && !cardEl.classList.contains('card-rn') && !cardEl.classList.contains('card-fj') && !cardEl.classList.contains('card-pv') && !cardEl.classList.contains('card-hs') && !cardEl.classList.contains('card-ce');
+  const hasBg = cardEl.dataset.fondoPropio === '1' || bgDataUrl !== null && !cardEl.classList.contains('card-rn') && !cardEl.classList.contains('card-fj') && !cardEl.classList.contains('card-pv') && !cardEl.classList.contains('card-hs') && !cardEl.classList.contains('card-ce');
   if (isPoster && !hasBg) {
     cardEl.classList.add('export-transparent');
     const overlay = cardEl.querySelector('.bg-overlay');
