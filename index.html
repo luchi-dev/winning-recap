@@ -7408,17 +7408,17 @@ function fxRowHtml(m, stadiums, i, n) {
     `</div>`;
 }
 
-function buildFixturesCard(matchday, matches, stadiums) {
+function buildFixturesCard(matchday, matches, stadiums, titulo, archivo) {
   const card = document.createElement('div');
   card.className = 'card card-fixtures';
   card.dataset.exportW  = '1080';
   card.dataset.exportH  = '1350';
-  card.dataset.filename = 'comienza_fecha' + matchday;
+  card.dataset.filename = archivo || 'comienza_fecha' + matchday;
 
   card.innerHTML =
     '<div class="fx-bg"></div>' +
     '<div class="fx-title">' +
-      '<div class="fx-title-1">COMIENZA LA</div>' +
+      `<div class="fx-title-1">${gnEscape(titulo || 'COMIENZA LA')}</div>` +
       `<div class="fx-title-2">FECHA ${matchday}</div>` +
     '</div>' +
     matches.map((m, i) => fxRowHtml(m, stadiums, i, matches.length)).join('') +
@@ -7434,15 +7434,13 @@ async function renderFixturesCard(matchday, data) {
   const all = (data.matches || []).filter(m => m.kickoff_local);
   if (!all.length) return;
 
-  // Group by Buenos Aires calendar day, then keep the earliest day.
+  // Group by Buenos Aires calendar day: una placa por día de la fecha.
   const byDay = {};
   all.forEach(m => {
     const key = fxDayFmt.format(new Date(m.kickoff_local));
     (byDay[key] = byDay[key] || []).push(m);
   });
-  const firstDay = Object.keys(byDay).sort()[0];
-  const dayMatches = byDay[firstDay].sort(
-    (a, b) => new Date(a.kickoff_local) - new Date(b.kickoff_local));
+  const dias = Object.keys(byDay).sort();
 
   let stadiums = {};
   try {
@@ -7451,16 +7449,22 @@ async function renderFixturesCard(matchday, data) {
     console.warn('Stadium lookup failed; rendering without venues.', err);
   }
 
+  dias.forEach((dia, n) => {
+  const dayMatches = byDay[dia].sort(
+    (a, b) => new Date(a.kickoff_local) - new Date(b.kickoff_local));
+  // Primer día "COMIENZA LA", último "TERMINA LA", los del medio "CONTINÚA LA" (editable abajo).
+  const titulo = n === 0 ? 'COMIENZA LA' : (n === dias.length - 1 ? 'TERMINA LA' : 'CONTINÚA LA');
   const section = document.createElement('div');
   section.className = 'match-section';
-  section.innerHTML = `<h3>COMIENZA LA FECHA — ${dayMatches.length} partido(s) del ${firstDay}</h3>`;
+  section.innerHTML = `<h3>${titulo} FECHA — ${dayMatches.length} partido(s) del ${dia}</h3>`;
   const row = document.createElement('div');
   row.className = 'cards-row';
-  const card = buildFixturesCard(matchday, dayMatches, stadiums);
+  const card = buildFixturesCard(matchday, dayMatches, stadiums, titulo, n === 0 ? null : 'fecha' + matchday + '_dia' + (n + 1));
   const w = createCardWrapper(card, card.dataset.filename);
   // Fondo propio: sin foto se descarga transparente (como siempre); con foto, sale con la foto.
   const ctl = document.createElement('div'); ctl.className = 'pv-ctl';
-  ctl.innerHTML = '<label>foto de fondo <input type="file" class="fx-in-foto" accept="image/*"></label>' +
+  ctl.innerHTML = '<label>título <input class="fx-in-titulo" size="14" value="' + titulo + '"></label>' +
+    '<label>foto de fondo <input type="file" class="fx-in-foto" accept="image/*"></label>' +
     '<label>zoom <input type="range" class="fx-in-zoom" min="100" max="400" value="100"></label>' +
     '<label>oscurecer <input type="range" class="fx-in-osc" min="0" max="80" value="30"></label>' +
     '<button type="button" class="fx-in-centrar">centrar</button>' +
@@ -7504,11 +7508,13 @@ async function renderFixturesCard(matchday, data) {
   const soltar = () => { if (agarre) { agarre = null; card.style.cursor = foto ? 'grab' : ''; } };
   card.addEventListener('pointerup', soltar); card.addEventListener('pointercancel', soltar);
   ctl.querySelector('.fx-in-quitar').addEventListener('click', () => { foto = null; ctl.querySelector('.fx-in-foto').value = ''; pintar(); });
+  ctl.querySelector('.fx-in-titulo').addEventListener('input', ev => { card.querySelector('.fx-title-1').textContent = ev.target.value; });
   pintar();
   w.appendChild(ctl); w.appendChild(nota);
   row.appendChild(w);
   section.appendChild(row);
   container.appendChild(section);
+  });
 }
 
 // ── Export ──
