@@ -2874,15 +2874,18 @@ function rnOpcionesControles(wrapper, card, id, matchday) {
   if (dl) dl.addEventListener('click', () => rnRegistrar('descarga', id, matchday, card));
 }
 
-function rnFotoControles(wrapper, card, id) {
+/* Con `siempre` (slides de los especiales) los controles quedan a la vista, sin plegar, y la foto
+   se arrastra directo, sin tildar nada; el zoom va por la barrita (la rueda queda para la página). */
+function rnFotoControles(wrapper, card, id, siempre) {
   const ctl = document.createElement('div');
-  ctl.className = 'rn-foto-ctl';
+  ctl.className = 'rn-foto-ctl' + (siempre ? ' rn-foto-fijo' : '');
   ctl.innerHTML = '<label><input type="checkbox" class="rn-foto-mover"> mover / rueda = zoom</label>' +
     '<label>zoom <input type="range" class="rn-foto-zoom" min="0.5" max="3" step="0.01" value="1"></label>' +
     '<button type="button" class="rn-foto-centrar">centrar</button><span class="rn-foto-pos"></span>';
   wrapper.appendChild(ctl);
   const chk = ctl.querySelector('.rn-foto-mover');
   chk.addEventListener('change', () => card.classList.toggle('moviendo', chk.checked));
+  if (siempre) { chk.checked = true; card.classList.add('moviendo'); chk.parentElement.innerHTML = 'arrastrá la foto para moverla'; }
   ctl.querySelector('.rn-foto-centrar').addEventListener('click', () => { try { localStorage.removeItem(rnFotoKey(id)); } catch (e) {} rnFotoAplicar(card, id); });
   const setZoom = z => { const p = rnFotoLeer(id); p.zoom = Math.max(0.5, Math.min(3, +z || 1)); rnFotoGuardar(id, p); rnFotoAplicar(card, id); };
   ctl.querySelector('.rn-foto-zoom').addEventListener('input', e => setZoom(e.target.value));
@@ -2902,7 +2905,7 @@ function rnFotoControles(wrapper, card, id) {
     rnFotoGuardar(id, Object.assign(rnFotoLeer(id), { x, y })); rnFotoAplicar(card, id);
   });
   window.addEventListener('mouseup', () => { arr = null; });
-  card.addEventListener('wheel', e => { if (!chk.checked) return; e.preventDefault(); setZoom(rnFotoLeer(id).zoom * (e.deltaY < 0 ? 1.05 : 1 / 1.05)); }, { passive: false });
+  card.addEventListener('wheel', e => { if (!chk.checked || siempre) return; e.preventDefault(); setZoom(rnFotoLeer(id).zoom * (e.deltaY < 0 ? 1.05 : 1 / 1.05)); }, { passive: false });
   rnFotoAplicar(card, id);
 }
 
@@ -3943,7 +3946,7 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
     });
     ctl.appendChild(ceFotoSlide(w, card, idFoto, s.foto));
     w.appendChild(ctl);
-    rnFotoControles(w, card, idFoto);
+    rnFotoControles(w, card, idFoto, true);
     row.appendChild(w);
     document.fonts.ready.then(() => ceAjustarTexto(card));
   };
@@ -7941,7 +7944,7 @@ const rsEnJuego = m => !rsTerminado(m) && !!m.period && m.period !== 'PreMatch';
 /* Los controles de foto de cada placa van plegados, así la grilla queda pareja. */
 function rsPlegarControles() {
   document.querySelectorAll('#cardsView .card-wrapper').forEach(w => {
-    const sueltos = [...w.children].filter(c => c.matches('.rn-foto-ctl, .rn-opciones, .rn-foto-info'));
+    const sueltos = [...w.children].filter(c => c.matches('.rn-foto-ctl:not(.rn-foto-fijo), .rn-opciones, .rn-foto-info'));
     if (!sueltos.length) return;
     let d = w.querySelector(':scope > details.rs-mas');
     if (!d) {
