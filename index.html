@@ -7461,21 +7461,48 @@ async function renderFixturesCard(matchday, data) {
   // Fondo propio: sin foto se descarga transparente (como siempre); con foto, sale con la foto.
   const ctl = document.createElement('div'); ctl.className = 'pv-ctl';
   ctl.innerHTML = '<label>foto de fondo <input type="file" class="fx-in-foto" accept="image/*"></label>' +
+    '<label>zoom <input type="range" class="fx-in-zoom" min="100" max="400" value="100"></label>' +
     '<label>oscurecer <input type="range" class="fx-in-osc" min="0" max="80" value="30"></label>' +
+    '<button type="button" class="fx-in-centrar">centrar</button>' +
     '<button type="button" class="fx-in-quitar">sin fondo</button>';
   const nota = document.createElement('div'); nota.className = 'rn-sinfoto';
-  let foto = null;
+  // foto: data URL; fw/fh: tamaño real; dx/dy: corrimiento desde el centro, en px de la placa.
+  let foto = null, fw = 0, fh = 0, dx = 0, dy = 0;
   const pintar = () => {
     const bg = card.querySelector('.fx-bg'), a = ctl.querySelector('.fx-in-osc').value / 100;
-    bg.style.backgroundImage = foto ? `linear-gradient(rgba(0,0,0,${a}), rgba(0,0,0,${a})), url("${foto}")` : '';
+    if (foto) {
+      // Zoom 100 = la foto cubre justo la placa; nunca se deja ver un borde vacío.
+      const esc = Math.max(1080 / fw, 1350 / fh) * ctl.querySelector('.fx-in-zoom').value / 100;
+      const w = fw * esc, h = fh * esc, mx = (w - 1080) / 2, my = (h - 1350) / 2;
+      dx = Math.max(-mx, Math.min(mx, dx)); dy = Math.max(-my, Math.min(my, dy));
+      bg.style.backgroundImage = `linear-gradient(rgba(0,0,0,${a}), rgba(0,0,0,${a})), url("${foto}")`;
+      bg.style.backgroundRepeat = 'no-repeat';
+      bg.style.backgroundSize = `100% 100%, ${w}px ${h}px`;
+      bg.style.backgroundPosition = `0 0, ${dx - mx}px ${dy - my}px`;
+    } else { bg.style.backgroundImage = bg.style.backgroundSize = bg.style.backgroundPosition = bg.style.backgroundRepeat = ''; }
+    card.style.cursor = foto ? 'grab' : '';
     if (foto) card.dataset.fondoPropio = '1'; else delete card.dataset.fondoPropio;
-    nota.textContent = foto ? 'se descarga con tu foto de fondo' : 'se descarga sin fondo (transparente)';
+    nota.textContent = foto ? 'se descarga con tu foto de fondo · arrastrá la placa para mover la foto' : 'se descarga sin fondo (transparente)';
   };
   ctl.querySelector('.fx-in-foto').addEventListener('change', ev => {
     const f = ev.target.files[0]; if (!f) return;
-    const r = new FileReader(); r.onload = () => { foto = r.result; pintar(); }; r.readAsDataURL(f);
+    const r = new FileReader();
+    r.onload = () => { const im = new Image(); im.onload = () => { foto = r.result; fw = im.naturalWidth; fh = im.naturalHeight; dx = dy = 0; ctl.querySelector('.fx-in-zoom').value = 100; pintar(); }; im.src = r.result; };
+    r.readAsDataURL(f);
   });
   ctl.querySelector('.fx-in-osc').addEventListener('input', pintar);
+  ctl.querySelector('.fx-in-zoom').addEventListener('input', pintar);
+  ctl.querySelector('.fx-in-centrar').addEventListener('click', () => { dx = dy = 0; pintar(); });
+  // Arrastrar la placa mueve la foto (el movimiento en pantalla se pasa a px de la placa).
+  let agarre = null;
+  card.addEventListener('pointerdown', ev => { if (!foto) return; agarre = { x: ev.clientX, y: ev.clientY, dx, dy }; card.setPointerCapture(ev.pointerId); card.style.cursor = 'grabbing'; ev.preventDefault(); });
+  card.addEventListener('pointermove', ev => {
+    if (!agarre) return;
+    const k = 1080 / (card.getBoundingClientRect().width || 1080);
+    dx = agarre.dx + (ev.clientX - agarre.x) * k; dy = agarre.dy + (ev.clientY - agarre.y) * k; pintar();
+  });
+  const soltar = () => { if (agarre) { agarre = null; card.style.cursor = foto ? 'grab' : ''; } };
+  card.addEventListener('pointerup', soltar); card.addEventListener('pointercancel', soltar);
   ctl.querySelector('.fx-in-quitar').addEventListener('click', () => { foto = null; ctl.querySelector('.fx-in-foto').value = ''; pintar(); });
   pintar();
   w.appendChild(ctl); w.appendChild(nota);
