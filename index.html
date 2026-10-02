@@ -1666,6 +1666,9 @@ body {
 /* "ESTUDIANTES VS GIMNASIA": Canaro Black 65,8, borde negro 5,6 y sombra 0/6; cada equipo en su color. */
 .card-pv .pv-vs { position: absolute; left: 40px; width: 1000px; top: 1158px; text-align: center; font-family: 'CanaroBlack', 'Canaro', sans-serif; font-weight: 900; font-size: 65.8px; line-height: 70px; color: #fff;
   -webkit-text-stroke: 11.2px #000; paint-order: stroke fill; text-shadow: 0 6px 0 #000; text-transform: uppercase; white-space: nowrap; }
+/* Sin la línea de equipos: el texto libre baja a ocupar su lugar (1350 - 1158 - 70). */
+.card-pv.pv-sin-vs .pv-vs { display: none; }
+.card-pv.pv-sin-vs .pv-texto { bottom: 122px; }
 /* ══ HISTORIAL ════════════════════════════════════════════════════════
    Frame "historail template" del Figma (Social Media Clausura, página
    "templates para automatizar", nodo 1174-9908), sin las dos fotos, la raya
@@ -1751,6 +1754,7 @@ body {
 .card-ce-portada .ce-escudo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .card-ce-portada .ce-escudo-local  { left: 50px; top: 385px; }
 .card-ce-portada .ce-escudo-visita { left: 592px; top: 385px; }   /* espejo del local respecto de x=541 */
+.card-ce-portada .ce-escudo-solo   { left: 320px; top: 385px; }
 .card-ce-portada .ce-linea { top: 1009px; font-size: 35.9px; line-height: 44px; -webkit-text-stroke-width: 4.5px; text-shadow: 0 2.6px 0 #000; text-transform: none; }
 /* Título: blanco, con el nombre de cada club en su color (palabra entera, no cortada
    por el separador: "BOC" en rojo y "A" en blanco quedaba raro). */
@@ -3360,15 +3364,24 @@ async function pvAgregar(row, fx, j, match, datos, matchday) {
   const ctl = document.createElement('div'); ctl.className = 'pv-ctl';
   ctl.innerHTML = '<label>local <input class="pv-in-local" size="14" value="' + gnEscape(p.home.nombre) + '"></label>' +
     '<label>visitante <input class="pv-in-visita" size="14" value="' + gnEscape(p.away.nombre) + '"></label>' +
-    '<label>texto de abajo <input class="pv-in-texto" size="34" placeholder="ej. LOS 5 MEJORES DE CADA EQUIPO DEL CLÁSICO"></label>';
+    '<label>texto de abajo <input class="pv-in-texto" size="34" placeholder="ej. LOS 5 MEJORES DE CADA EQUIPO DEL CLÁSICO"></label>' +
+    '<label>línea de equipos <input class="pv-in-linea" size="28" placeholder="vacío = local vs visitante"></label>' +
+    '<label><input type="checkbox" class="pv-in-vs" checked> mostrarla</label>';
   const repintar = () => {
     p.home.nombre = ctl.querySelector('.pv-in-local').value.trim();
     p.away.nombre = ctl.querySelector('.pv-in-visita').value.trim();
     p.texto = ctl.querySelector('.pv-in-texto').value;
     card.querySelector('.pv-titulo').textContent = p.home.nombre + ' vs ' + p.away.nombre;
-    card.querySelector('.pv-eq-local').textContent = p.home.nombre;
-    card.querySelector('.pv-eq-visita').textContent = p.away.nombre;
+    // Línea de equipos escrita a mano: si tiene " vs ", cada lado va en el color de su club; si no, todo en blanco.
+    const linea = ctl.querySelector('.pv-in-linea').value.trim();
+    const corte = linea.split(/\s+vs\.?\s+/i);
+    const libre = linea && corte.length !== 2;
+    card.querySelector('.pv-eq-local').textContent = !linea ? p.home.nombre : (libre ? linea : corte[0]);
+    card.querySelector('.pv-eq-visita').textContent = !linea ? p.away.nombre : (libre ? '' : corte[1]);
+    card.querySelector('.pv-eq-local').style.color = libre ? '#fff' : p.home.color;
+    card.querySelector('.pv-vs-vs').style.display = libre ? 'none' : '';
     card.querySelector('.pv-texto').textContent = p.texto;
+    card.classList.toggle('pv-sin-vs', !ctl.querySelector('.pv-in-vs').checked);
     pvAjustarTexto(card);
   };
   ctl.querySelectorAll('input').forEach(i => i.addEventListener('input', repintar));
@@ -3494,7 +3507,7 @@ async function hsAgregar(row, fx, match, matchday) {
 
 /* Fotos de la placa historial: una por mitad (541x1350). Se suben a mano y
    viven sólo en la página abierta (una data URL no entra en localStorage). */
-function hsFotoControles(wrapper, card, nomLocal, nomVisita) {
+function hsFotoControles(wrapper, card, nomLocal, nomVisita, iniciales) {
   const W = 541, H = 1350;
   const est = { local: { src: null, nat: null, x: 50, y: 50, zoom: 1 }, visita: { src: null, nat: null, x: 50, y: 50, zoom: 1 } };
   const ctl = document.createElement('div'); ctl.className = 'hs-foto-ctl';
@@ -3569,6 +3582,8 @@ function hsFotoControles(wrapper, card, nomLocal, nomVisita) {
     aplicar(lado);
   }, { passive: false });
   aplicar('local');
+  // Fotos que ya vienen cargadas (p. ej. las de un especial, desde especiales.json).
+  if (iniciales) ['local', 'visita'].forEach(lado => { if (iniciales[lado]) poner(lado, iniciales[lado]); });
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -3637,7 +3652,8 @@ function buildClasicoPortada(e, ctx) {
     '<div class="hs-fondo"></div><div class="hs-foto hs-foto-local"></div><div class="hs-foto hs-foto-visita"></div><div class="hs-sep"></div><div class="hs-scrim"></div>' +
     `<div class="ce-t ce-linea">${gnEscape(e.portada.linea || ctx.lineaAuto)}</div>` +
     `<div class="ce-tit ce-tit-1">${ceTituloInner(e.portada.titulo1, cePalabras(e, ctx))}</div><div class="ce-tit ce-tit-2">${ceTituloInner(e.portada.titulo2, cePalabras(e, ctx))}</div>` +
-    ceEscudo('local', e.home_id) + ceEscudo('visita', e.away_id) +
+    // Sin away_id (un especial de un solo club): un escudo solo, al medio.
+    (e.away_id == null ? ceEscudo('solo', e.home_id) : ceEscudo('local', e.home_id) + ceEscudo('visita', e.away_id)) +
     `<div class="rn-wordmark">${WINNING_LOGO_HTML}</div>`;
   return el;
 }
@@ -3696,7 +3712,7 @@ function ceAjustarTexto(card) {
 }
 
 /* Foto a sangre de un slide: se sube a mano y se mueve con los controles de siempre. */
-function ceFotoSlide(wrapper, card, idFoto) {
+function ceFotoSlide(wrapper, card, idFoto, inicial) {
   const fila = document.createElement('div'); fila.className = 'ce-fila';
   fila.innerHTML = '<span>foto</span><label class="ce-subir">subir archivo<input type="file" accept="image/*"></label>' +
     '<button type="button" class="ce-link">pegar link</button><button type="button" class="ce-sinfoto">quitar</button>';
@@ -3715,6 +3731,7 @@ function ceFotoSlide(wrapper, card, idFoto) {
   // Un link puede fallar al exportar si el sitio de origen no lo permite; el archivo siempre anda.
   fila.querySelector('.ce-link').addEventListener('click', () => { const u = prompt('Pegá el link de la foto (termina en .jpg, .png o .webp):'); if (u) poner(u.trim()); });
   fila.querySelector('.ce-sinfoto').addEventListener('click', () => poner(null));
+  if (inicial) poner(inicial);   // foto que ya viene en especiales.json
   return fila;
 }
 
@@ -3757,9 +3774,10 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
   const wp = createCardWrapper(portada, base + '_00_portada');
   engancharDescarga(wp, portada);
   const cp = document.createElement('div'); cp.className = 'ce-ctl';
+  const rotP = (id, n) => e.away_id == null ? String(n) : corto(id);   // portada de un solo club: palabra 1 / palabra 2
   cp.innerHTML = campo('línea', 'ce-in-linea', e.portada.linea || '') + campo('título 1', 'ce-in-t1', e.portada.titulo1) + campo('título 2', 'ce-in-t2', e.portada.titulo2) +
-    campo('palabra ' + corto(e.home_id), 'ce-in-pl', e.portada.palabra_local) + campo('palabra ' + corto(e.away_id), 'ce-in-pv', e.portada.palabra_visita) +
-    `<div class="ce-fila"><span>color ${gnEscape(corto(e.home_id))}</span><input type="color" class="ce-in-cl" value="${e.portada.color_local || ctx.colorLocal}"><span>color ${gnEscape(corto(e.away_id))}</span><input type="color" class="ce-in-cv" value="${e.portada.color_visita || ctx.colorVisita}"></div>`;
+    campo('palabra ' + rotP(e.home_id, 1), 'ce-in-pl', e.portada.palabra_local) + campo('palabra ' + rotP(e.away_id, 2), 'ce-in-pv', e.portada.palabra_visita) +
+    `<div class="ce-fila"><span>color ${gnEscape(rotP(e.home_id, 1))}</span><input type="color" class="ce-in-cl" value="${e.portada.color_local || ctx.colorLocal}"><span>color ${gnEscape(rotP(e.away_id, 2))}</span><input type="color" class="ce-in-cv" value="${e.portada.color_visita || ctx.colorVisita}"></div>`;
   // Qué palabra del título lleva el color de cada club (por defecto, el nombre del club).
   const nombreDeEquipo = id => { const t = match && (match.home_team.id === id ? match.home_team : match.away_team.id === id ? match.away_team : null); return t ? String(t.name || '').toUpperCase() : ''; };
   if (e.portada.palabra_local == null) e.portada.palabra_local = nombreDeEquipo(e.home_id);
@@ -3776,7 +3794,8 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
     ceAjustarTexto(portada); guardar();
   });
   wp.appendChild(cp);
-  hsFotoControles(wp, portada, corto(e.home_id), corto(e.away_id));
+  hsFotoControles(wp, portada, e.away_id == null ? 'izquierda' : corto(e.home_id), e.away_id == null ? 'derecha' : corto(e.away_id),
+    { local: e.portada.foto_local, visita: e.portada.foto_visita });
   row.appendChild(wp);
 
   // ── Slides ──
@@ -3811,7 +3830,7 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
       if (!confirm('¿Quitar este slide?')) return;
       e.slides.splice(e.slides.indexOf(s), 1); w.remove(); guardar(); rotular();
     });
-    ctl.appendChild(ceFotoSlide(w, card, idFoto));
+    ctl.appendChild(ceFotoSlide(w, card, idFoto, s.foto));
     w.appendChild(ctl);
     rnFotoControles(w, card, idFoto);
     row.appendChild(w);
@@ -3856,12 +3875,12 @@ async function pintarEspeciales(matchday) {
     const e = JSON.parse(JSON.stringify(orig)); e.portada = e.portada || {};
     const tipo = CE_TIPOS[e.tipo];
     const m = matches.find(x => x.home_team.id === e.home_id && x.away_team.id === e.away_id);
-    const nombre = m ? m.home_team.name + ' vs ' + m.away_team.name : e.home_id + ' vs ' + e.away_id;
+    const nombre = e.nombre || (m ? m.home_team.name + ' vs ' + m.away_team.name : e.home_id + ' vs ' + e.away_id);
     const clave = currentComp + '-' + currentSeason + '-' + matchday + '.' + e.tipo + '.' + e.home_id + '-' + e.away_id;
     const section = document.createElement('div');
     section.className = 'match-section match-acordeon';
     section.innerHTML = '<button type="button" class="match-head ce-head"><span class="match-flecha">▸</span>' +
-      `<h3>${gnEscape(tipo.rotulo)} · ${gnEscape(nombre)}</h3><span class="match-estado">${tipo.placas(e)} placas</span></button>` +
+      `<h3>${gnEscape(e.rotulo || tipo.rotulo)} · ${gnEscape(nombre)}</h3><span class="match-estado">${tipo.placas(e)} placas</span></button>` +
       '<div class="cards-row" style="display:none"></div>';
     const row = section.querySelector('.cards-row');
     section.querySelector('.match-head').addEventListener('click', async () => {

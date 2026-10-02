@@ -1,0 +1,31 @@
+# Publica index.html en https://winning.com.ar/iloveneuquen/index.html cada vez
+# que cambia en main (o a mano con el botón "Run workflow"). Es lo mismo que hace
+# publicar.bat con la página, pero sin depender del AWS CLI de la compu.
+# Sólo sube index.html: fotos, captions, frases y demás siguen por sus caminos.
+name: Publicar la página
+
+on:
+  push:
+    branches: [main]
+    paths: ['index.html']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BUCKET: s3://winning-com-ar/iloveneuquen
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Subir index.html
+        run: |
+          aws s3 cp index.html $BUCKET/index.html --content-type "text/html" --cache-control "no-cache" --only-show-errors
+          echo "Listo: https://winning.com.ar/iloveneuquen/index.html"
