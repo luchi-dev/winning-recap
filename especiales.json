@@ -61,7 +61,21 @@
         "color_local": "#4972c6",
         "color_visita": "#f3c622",
         "foto_local": "especiales/remontadas-3-2/fotos-hd/69.jpg",
-        "foto_visita": "especiales/remontadas-3-2/fotos-hd/63.jpg"
+        "foto_visita": "especiales/remontadas-3-2/fotos-hd/63.jpg",
+        "captions": [
+          {
+            "titulo": "Opción A · el dato: catorce veces en la historia",
+            "texto": "🔥 BOCA PERDÍA 0-2 Y GANÓ 3-2 | LAS REMONTADAS\n\nBoca dio vuelta un 0-2 para ganar 3-2 catorce veces en toda su historia.\n\nLa última fue el domingo: Racing ganaba 2-0 por los cuartos de final de la Copa Argentina y Enner Valencia hizo los tres.\n\nLa anterior había sido en 2013, el día en que Carlos Bianchi volvió al banco contra Quilmes.\n\nAcá van tres de las catorce. ¿Con cuál se quedan ustedes?",
+            "texto_corto": "🔥 BOCA PERDÍA 0-2 Y GANÓ 3-2 | LAS REMONTADAS\n\nCatorce veces en su historia Boca dio vuelta un 0-2 para ganar 3-2.\n\nLa última, el domingo: los tres de Enner Valencia a Racing.\n\nAcá van tres. ¿Con cuál se quedan ustedes?",
+            "texto_x": "Boca dio vuelta un 0-2 para ganar 3-2 catorce veces en su historia. La última, el domingo, con los tres de Enner Valencia a Racing.\n\nAcá van tres de las catorce. ¿Con cuál se quedan ustedes?"
+          },
+          {
+            "titulo": "Opción B · arranca por Valencia y los trece años",
+            "texto": "🔥 BOCA PERDÍA 0-2 Y GANÓ 3-2 | LAS REMONTADAS\n\nEnner Valencia metió a Boca en una lista de catorce partidos: los que perdía 0-2 y terminó ganando 3-2.\n\nPasaron trece años entre la remontada anterior, contra Quilmes en 2013, y la del domingo contra Racing.\n\nLa primera de todas fue en la final de la Copa Ibarguren de 1924.\n\nElegimos tres. ¿Cuál de estas vieron ustedes?",
+            "texto_corto": "🔥 BOCA PERDÍA 0-2 Y GANÓ 3-2 | LAS REMONTADAS\n\nEnner Valencia sumó el partido número catorce a la lista: Boca perdía 0-2 y ganó 3-2.\n\nLa anterior había sido hace trece años, contra Quilmes.\n\nElegimos tres. ¿Cuál vieron ustedes?",
+            "texto_x": "Trece años después, Boca volvió a ganar 3-2 un partido que perdía 0-2. Es la vez número catorce en su historia.\n\nElegimos tres de esas remontadas. ¿Cuál vieron ustedes?"
+          }
+        ]
       },
       "slides": [
         {
@@ -73,7 +87,21 @@
           "goles_visita": 2,
           "foto": "especiales/remontadas-3-2/fotos-hd/69.jpg",
           "autores_local": "Valencia 72', 80', 89'",
-          "autores_visita": "Lodico 19'\nA. Martínez 47'"
+          "autores_visita": "Lodico 19'\nA. Martínez 47'",
+          "captions": [
+            {
+              "titulo": "Opción A · Valencia lo dio vuelta solo",
+              "texto": "🔥 LOS TRES DE VALENCIA | BOCA 3-2 RACING\n\nEnner Valencia dio vuelta solo un partido que Boca perdía 0-2.\n\nRacing ganaba por dos en Rosario y los tres goles de Boca llegaron después de los 70 minutos.\n\nFue por los cuartos de final de la Copa Argentina, y es la vez número catorce que Boca gana 3-2 un partido que perdía 0-2.\n\n¿Dónde lo vieron ustedes?",
+              "texto_corto": "🔥 LOS TRES DE VALENCIA | BOCA 3-2 RACING\n\nEnner Valencia dio vuelta solo un partido que Boca perdía 0-2.\n\nLos tres goles llegaron después de los 70 minutos, por los cuartos de la Copa Argentina.\n\n¿Dónde lo vieron ustedes?",
+              "texto_x": "Enner Valencia dio vuelta solo un partido que Boca perdía 0-2: tres goles después de los 70 minutos contra Racing, por la Copa Argentina.\n\n¿Dónde lo vieron ustedes?"
+            },
+            {
+              "titulo": "Opción B · trece años sin una así",
+              "texto": "🔥 LOS TRES DE VALENCIA | BOCA 3-2 RACING\n\nBoca no ganaba 3-2 un partido que perdía 0-2 desde 2013.\n\nEnner Valencia cortó esa espera con tres goles en el tramo final contra Racing, en el Gigante de Arroyito.\n\nEl premio fue la semifinal de la Copa Argentina.\n\n¿Lo daban por perdido cuando estaba 0-2?",
+              "texto_corto": "🔥 LOS TRES DE VALENCIA | BOCA 3-2 RACING\n\nBoca no ganaba 3-2 un partido que perdía 0-2 desde 2013.\n\nEnner Valencia lo resolvió con tres goles en el tramo final contra Racing.\n\n¿Lo daban por perdido cuando estaba 0-2?",
+              "texto_x": "Boca no ganaba 3-2 un partido que perdía 0-2 desde 2013. Enner Valencia lo resolvió con tres goles en el tramo final contra Racing.\n\n¿Lo daban por perdido cuando estaba 0-2?"
+            }
+          ]
         },
         {
           "titulo": "LA VUELTA\nDE BIANCHI",
@@ -84,7 +112,21 @@
           "goles_visita": 2,
           "foto": "especiales/remontadas-3-2/fotos-hd/63.jpg",
           "autores_local": "Erviti 37'\nBurdisso 67', 81'",
-          "autores_visita": "Olivera 5'\nMenéndez 8'"
+          "autores_visita": "Olivera 5'\nMenéndez 8'",
+          "captions": [
+            {
+              "titulo": "Opción A · Bianchi volvió y a los 8 minutos perdía 0-2",
+              "texto": "🔥 LA VUELTA DE BIANCHI | BOCA 3-2 QUILMES\n\nCarlos Bianchi volvió a dirigir a Boca y a los ocho minutos perdía 0-2.\n\nWalter Erviti descontó antes del entretiempo y Guillermo Burdisso, un defensor, hizo los dos que faltaban.\n\nCon el partido 2-2, Agustín Orion le atajó un penal a Martín Cauteruccio.\n\nEn sus ciclos anteriores, Bianchi nunca había dado vuelta un 0-2 con Boca.\n\n¿Se acuerdan de ese partido en la Bombonera?",
+              "texto_corto": "🔥 LA VUELTA DE BIANCHI | BOCA 3-2 QUILMES\n\nCarlos Bianchi volvió a dirigir a Boca y a los ocho minutos perdía 0-2.\n\nGuillermo Burdisso hizo dos goles y Agustín Orion atajó un penal con el partido 2-2.\n\n¿Se acuerdan de ese partido?",
+              "texto_x": "Carlos Bianchi volvió a dirigir a Boca y a los ocho minutos perdía 0-2 contra Quilmes. Terminó 3-2, con dos goles de Guillermo Burdisso y un penal atajado por Agustín Orion.\n\n¿Se acuerdan de ese partido?"
+            },
+            {
+              "titulo": "Opción B · lo que Bianchi nunca había hecho",
+              "texto": "🔥 LA VUELTA DE BIANCHI | BOCA 3-2 QUILMES\n\nCarlos Bianchi ganó todo con Boca, pero nunca había dado vuelta un 0-2 hasta el día de su regreso.\n\nQuilmes hizo dos goles en ocho minutos en la primera fecha del Torneo Final 2013.\n\nGuillermo Burdisso empató y lo ganó, y en el medio Agustín Orion atajó un penal.\n\n¿Qué recuerdan del tercer ciclo de Bianchi?",
+              "texto_corto": "🔥 LA VUELTA DE BIANCHI | BOCA 3-2 QUILMES\n\nCarlos Bianchi nunca había dado vuelta un 0-2 con Boca hasta el día de su regreso.\n\nGuillermo Burdisso empató y lo ganó, y Agustín Orion atajó un penal en el medio.\n\n¿Qué recuerdan del tercer ciclo de Bianchi?",
+              "texto_x": "Carlos Bianchi nunca había dado vuelta un 0-2 con Boca hasta el día de su regreso, en 2013: 3-2 a Quilmes después de ir perdiendo a los ocho minutos.\n\n¿Qué recuerdan del tercer ciclo de Bianchi?"
+            }
+          ]
         },
         {
           "titulo": "CON UNO\nMENOS",
@@ -95,7 +137,21 @@
           "goles_visita": 2,
           "foto": "especiales/remontadas-3-2/fotos/59.jpg",
           "autores_local": "Gago 69'\nPalacio 75', 88'",
-          "autores_visita": "Pellegrino 27'\nZárate 34'"
+          "autores_visita": "Pellegrino 27'\nZárate 34'",
+          "captions": [
+            {
+              "titulo": "Opción A · 0-2 y con diez antes del entretiempo",
+              "texto": "🔥 CON UNO MENOS | BOCA 3-2 VÉLEZ\n\nBoca perdía 0-2 y se quedó con diez antes del entretiempo.\n\nA Juan Krupoviesa lo expulsaron a los 39 minutos, con Vélez dos goles arriba en la Bombonera.\n\nFernando Gago descontó y Rodrigo Palacio hizo los otros dos, el del triunfo a los 88.\n\nVélez terminó el partido con nueve.\n\n¿Cuál es la remontada de Boca que más gritaron ustedes?",
+              "texto_corto": "🔥 CON UNO MENOS | BOCA 3-2 VÉLEZ\n\nBoca perdía 0-2 y se quedó con diez antes del entretiempo.\n\nFernando Gago descontó y Rodrigo Palacio hizo los otros dos, el del triunfo a los 88.\n\n¿Cuál es la remontada de Boca que más gritaron ustedes?",
+              "texto_x": "Boca perdía 0-2 con Vélez y se quedó con diez antes del entretiempo. Ganó 3-2: uno de Fernando Gago y dos de Rodrigo Palacio, el último a los 88.\n\n¿Cuál es la remontada de Boca que más gritaron ustedes?"
+            },
+            {
+              "titulo": "Opción B · Gago y Palacio en veinte minutos",
+              "texto": "🔥 CON UNO MENOS | BOCA 3-2 VÉLEZ\n\nFernando Gago y Rodrigo Palacio dieron vuelta en veinte minutos un partido que parecía perdido.\n\nBoca jugaba con diez desde el primer tiempo y perdía 0-2 por la fecha 9 del Apertura 2006.\n\nGago descontó a los 69 y Palacio hizo el segundo a los 75 y el tercero a los 88.\n\nVélez tuvo dos expulsados y terminó con nueve.\n\n¿Estuvieron en la Bombonera ese día?",
+              "texto_corto": "🔥 CON UNO MENOS | BOCA 3-2 VÉLEZ\n\nFernando Gago y Rodrigo Palacio dieron vuelta en veinte minutos un partido que Boca perdía 0-2 y con diez.\n\nGago a los 69, Palacio a los 75 y a los 88.\n\n¿Estuvieron en la Bombonera ese día?",
+              "texto_x": "Fernando Gago y Rodrigo Palacio dieron vuelta en veinte minutos un partido que Boca perdía 0-2 y con diez: 3-2 a Vélez en el Apertura 2006.\n\n¿Estuvieron en la Bombonera ese día?"
+            }
+          ]
         }
       ]
     }

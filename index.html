@@ -1784,6 +1784,10 @@ body {
 .card-ce-slide .ce-gol-local  { left: 345px; }
 .card-ce-slide .ce-gol-visita { left: 543px; }
 .card-ce-slide .ce-barra { position: absolute; left: 538px; top: 971px; width: 3px; height: 91px; background: #fff; border-radius: 20px; }
+/* Captions de un especial, debajo de su placa: una caja por opción, apiladas. */
+.card-wrapper > .ce-captions { display: block; width: 324px; min-width: 0; max-width: 324px; margin-top: 10px; }
+.card-wrapper > .ce-captions .cap-caja { margin-bottom: 8px; }
+.card-wrapper > .ce-captions .cap-head { flex-wrap: wrap; gap: 4px; }
 /* Autores de los goles: igual que los eventos de la placa resultado (pelota + Canaro Bold 23,36),
    dos columnas de 390 con la pelota por fuera en x=105 y x=938. */
 .card-ce-slide .ce-goles { position: absolute; top: 1150px; min-height: 33px; }
@@ -3823,12 +3827,15 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
 
   // Lo editado a mano vale mientras especiales.json no traiga una versión nueva de este especial.
   const kGuardado = CE_KEY + clave;
-  const slidesJson = e.slides || [];
+  const slidesJson = e.slides || [], captionsPortada = (e.portada || {}).captions;
   try { const g = JSON.parse(localStorage.getItem(kGuardado) || 'null'); if (g && g.v === (e.v || 0)) { e.portada = g.portada; e.slides = g.slides; } } catch (err) {}
   // Lo guardado antes de que existieran los autores de los goles los toma de especiales.json (mismo partido = mismo "dato").
+  if (e.portada) e.portada.captions = captionsPortada;
   (e.slides || []).forEach(s => {
+    const o = slidesJson.find(x => x.dato === s.dato);
+    if (o) s.captions = o.captions;
     if (s.autores_local != null || s.autores_visita != null) return;
-    const o = slidesJson.find(x => x.dato === s.dato); if (!o || o.autores_local == null) return;
+    if (!o || o.autores_local == null) return;
     const inv = o.local_id !== s.local_id;
     s.autores_local = inv ? o.autores_visita : o.autores_local; s.autores_visita = inv ? o.autores_local : o.autores_visita;
   });
@@ -3846,6 +3853,17 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
   const rotular = () => { acciones.querySelector('.ce-bajar-todo').textContent = 'descargar las ' + cards().length + ' placas'; pintarBarraEspeciales(); };
   const nombreDe = card => { const i = cards().indexOf(card); return base + '_' + String(i).padStart(2, '0') + (i === 0 ? '_portada' : '_' + fjSinAcentos(card.querySelector('.ce-titulo').textContent).replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 30)); };
   const engancharDescarga = (w, card) => { const dl = w.querySelector('.download-btn'); const n = dl.cloneNode(true); dl.replaceWith(n); n.addEventListener('click', () => downloadCard(card, nombreDe(card))); };
+
+  // Captions de una placa (especiales.json): una caja por opción, con Completa / Corta / X y Copiar.
+  const ponerCaptions = (w, lista, id) => {
+    if (!Array.isArray(lista) || !lista.length) return;
+    const panel = document.createElement('div'); panel.className = 'cap-panel is-escritos ce-captions';
+    lista.filter(c => c && c.texto).forEach((c, i) => panel.appendChild(
+      capCaja('especial', matchday, clave + ':' + id + ':' + i + ':v' + (e.v || 0), gnEscape(c.titulo || ('Caption ' + (i + 1))), c.texto, capVersiones(c))));
+    w.appendChild(panel);
+  };
+  // Para distinguir las cajas de cada slide aunque cambie el orden: un número sacado de su "dato".
+  const idDe = s => { let n = 0; for (const ch of String(s.dato || s.titulo || '')) n = (n * 31 + ch.charCodeAt(0)) % 1000003; return 's' + n; };
 
   // ── Portada ──
   const portada = buildClasicoPortada(e, ctx);
@@ -3906,6 +3924,7 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
   }
   hsFotoControles(wp, portada, e.away_id == null ? 'izquierda' : corto(e.home_id), e.away_id == null ? 'derecha' : corto(e.away_id),
     { local: e.portada.foto_local, visita: e.portada.foto_visita }, e.portada.una_foto ?? (e.away_id == null));
+  ponerCaptions(wp, e.portada.captions, 'portada');
   row.appendChild(wp);
 
   // ── Slides ──
@@ -3947,6 +3966,7 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
     ctl.appendChild(ceFotoSlide(w, card, idFoto, s.foto));
     w.appendChild(ctl);
     rnFotoControles(w, card, idFoto, true);
+    ponerCaptions(w, s.captions, idDe(s));
     row.appendChild(w);
     document.fonts.ready.then(() => ceAjustarTexto(card));
   };
