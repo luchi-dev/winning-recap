@@ -1035,6 +1035,12 @@ body {
 .card-gl .gl-goles { position: absolute; right: 15px; top: 0; line-height: 44px; text-align: right; font-family: 'CanaroExtraBold', 'Canaro', sans-serif; font-weight: 800; font-size: 20.1px; }
 .card-gl .gl-pie { position: absolute; left: 0; top: 424px; width: 322px; height: 40px; background: #292929; box-shadow: inset 0 -2px 2px rgba(255,255,255,.10); }
 .card-gl .gl-pie img { position: absolute; left: 90px; top: 11px; width: 142px; height: 14px; }
+/* Placa de ranking (1080x1350): el mismo componente, agrandado, sobre una foto propia. */
+.card-rk { background: #1a1a1a; }
+.card-rk.export-transparent { background: transparent; }
+.card-rk.export-transparent .rk-bg { display: none; }
+.card-rk .rk-bg { position: absolute; left: 0; top: 0; width: 1080px; height: 1350px; background-color: #1a1a1a; }
+.card-rk .rk-comp { position: absolute; transform-origin: 0 0; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); pointer-events: none; }
 .gl-ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 11px; color: #9a9aa8; margin-top: 6px; width: 324px; }
 .gl-ctl input { font: 11px system-ui; background: #222; color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 2px 4px; }
 
@@ -7037,19 +7043,92 @@ async function glCargar(matchday) {
     .sort((a, b) => b.goles - a.goles || a.penales - b.penales || a.nombre.localeCompare(b.nombre)).slice(0, 5);
 }
 
-function buildGoleadoresCard(filas, matchday, destacado) {
-  if (destacado === undefined) destacado = 0;
-  const card = document.createElement('div');
-  card.className = 'card card-gl';
-  card.dataset.exportW = '322'; card.dataset.exportH = '464'; card.dataset.exportPixelRatio = '3';
-  card.dataset.filename = 'goleadores_' + (currentComp === 384 ? 'apertura' : 'clausura') + '_f' + matchday;
-  card.innerHTML = '<div class="gl-card">' +
-    '<div class="gl-sub">Ranking de</div><div class="gl-titulo">GOLEADORES</div>' +
+/* Los rankings del selector. Goleadores sale de goal_events (glCargar); los de
+   `campo` suman esa columna de player_match_stats; puntos y vallas tienen su cuenta. */
+const GL_RANKINGS = [
+  { id: 'goleadores', titulo: 'GOLEADORES' },
+  { id: 'asistencias', titulo: 'ASISTENCIAS', campo: 'goal_assist' },
+  { id: 'puntos', titulo: 'PUNTOS' },
+  { id: 'atajadas', titulo: 'ATAJADAS', campo: 'saves' },
+  { id: 'vallas', titulo: 'VALLAS INVICTAS' },
+  { id: 'pases_clave', titulo: 'PASES CLAVE', campo: 'total_att_assist' },
+  { id: 'remates_al_arco', titulo: 'REMATES AL ARCO', campo: 'ontarget_scoring_att' },
+  { id: 'recuperaciones', titulo: 'RECUPERACIONES', campo: 'ball_recovery' },
+  { id: 'quites', titulo: 'QUITES', campo: 'won_tackle' },
+  { id: 'amarillas', titulo: 'AMARILLAS', campo: 'yellow_card' },
+];
+const GL_CAMPOS = 'game_id, player_id, mins_played, goals_conceded, ' + GL_RANKINGS.filter(r => r.campo).map(r => r.campo).join(', ');
+const glCache = {};
+/* Todas las filas de player_match_stats del torneo hasta la fecha (de a 15 partidos: el tope es 1000 filas por pedido). */
+function glStats(matchday) {
+  const clave = 'st-' + currentComp + '-' + currentSeason + '-' + matchday;
+  return glCache[clave] = glCache[clave] || (async () => {
+    const fixR = await db.from('v_fixtures').select('game_id').eq('competition_id', currentComp).eq('season_id', currentSeason).lte('matchday', matchday);
+    const ids = (fixR.data || []).map(f => f.game_id), lotes = [];
+    for (let i = 0; i < ids.length; i += 15) lotes.push(ids.slice(i, i + 15));
+    const rs = await Promise.all(lotes.map(l => db.schema('winning_lpf').from('player_match_stats').select(GL_CAMPOS).in('game_id', l)));
+    rs.forEach(r => { if (r.error) throw r.error; });
+    return rs.flatMap(r => r.data || []);
+  })().catch(e => { delete glCache[clave]; throw e; });
+}
+/* Nombre y equipo (el último partido del jugador en la vista de puntos) de los candidatos; devuelve el top 5. */
+async function glConNombres(top) {
+  if (!top.length) return [];
+  const nomR = await db.from(MV_VIEW).select('player_id, player_name, team_id, matchday')
+    .eq('competition_id', currentComp).eq('season_id', currentSeason).in('player_id', top.map(p => p.player_id)).order('matchday', { ascending: false });
+  const info = {};
+  (nomR.data || []).forEach(r => { if (!info[r.player_id]) info[r.player_id] = r; });
+  const sinNombre = top.filter(p => !info[p.player_id]).map(p => p.player_id);
+  if (sinNombre.length) {
+    const puR = await db.schema('winning_lpf').from('player_universe').select('player_id, known_name, first_name, last_name').in('player_id', sinNombre);
+    (puR.data || []).forEach(r => { info[r.player_id] = { player_name: r.known_name || ((r.first_name || '') + ' ' + (r.last_name || '')).trim(), team_id: null }; });
+  }
+  return top.map(p => ({ ...p, nombre: (info[p.player_id] || {}).player_name || '', team_id: (info[p.player_id] || {}).team_id || null }))
+    .sort((a, b) => b.valor - a.valor || a.nombre.localeCompare(b.nombre)).slice(0, 5);
+}
+/* Las 5 filas de un ranking: { player_id, nombre, team_id, goles } (goles = el número que se muestra). */
+async function glCargarRanking(id, matchday) {
+  const def = GL_RANKINGS.find(r => r.id === id);
+  if (id === 'goleadores') return glCargar(matchday);
+  const por = {};
+  const sumar = (pid, v) => { if (!pid || !v) return; (por[pid] = por[pid] || { player_id: pid, valor: 0 }).valor += v; };
+  if (id === 'puntos') {
+    // Una consulta por fecha (cada una queda debajo de las 1000 filas).
+    const rs = await Promise.all(Array.from({ length: matchday }, (_, k) => db.from(MV_VIEW).select('player_id, total_points')
+      .eq('competition_id', currentComp).eq('season_id', currentSeason).eq('matchday', k + 1)));
+    rs.forEach(r => { if (r.error) throw r.error; (r.data || []).forEach(x => sumar(x.player_id, Number(x.total_points) || 0)); });
+  } else if (id === 'vallas') {
+    const [st, arqR] = await Promise.all([glStats(matchday), db.from(MV_VIEW).select('player_id')
+      .eq('competition_id', currentComp).eq('season_id', currentSeason).eq('position_code', 'ARQ').lte('matchday', matchday)]);
+    const arqueros = new Set((arqR.data || []).map(r => r.player_id));
+    st.forEach(r => { if (arqueros.has(r.player_id) && r.mins_played >= 90 && !r.goals_conceded) sumar(r.player_id, 1); });
+  } else {
+    (await glStats(matchday)).forEach(r => sumar(r.player_id, Number(r[def.campo]) || 0));
+  }
+  const top = Object.values(por).sort((a, b) => b.valor - a.valor).slice(0, 12);
+  return (await glConNombres(top)).map(p => ({ ...p, goles: id === 'puntos' ? fjPuntos(p.valor) : p.valor }));
+}
+
+function glInnerHtml(filas, destacado, titulo) {
+  // El título está dibujado para "GOLEADORES" (10 letras): los más largos se achican para entrar.
+  const tam = titulo.length > 11 ? ` style="font-size:${(37.7 * 11 / titulo.length).toFixed(1)}px"` : '';
+  return '<div class="gl-card">' +
+    `<div class="gl-sub">Ranking de</div><div class="gl-titulo"${tam}>${gnEscape(titulo)}</div>` +
     filas.map((p, i) => `<div class="gl-fila${i === destacado ? ' gl-destacada' : ''}" style="top:${118 + i * 59}px">` +
       `<div class="gl-pos">${i + 1}</div>` +
       (p.team_id ? `<img class="gl-escudo" src="badges/${p.team_id}.png" onerror="this.style.display='none'">` : '') +
       `<div class="gl-nombre">${gnEscape(p.nombre)}</div><div class="gl-goles">${p.goles}</div></div>`).join('') +
     '<div class="gl-pie"><img src="icons/ficha-wordmark.svg" alt="Winning"></div></div>';
+}
+function glArchivo(id, matchday) { return id + '_' + (currentComp === 384 ? 'apertura' : 'clausura') + '_f' + matchday; }
+
+function buildGoleadoresCard(filas, matchday, destacado) {
+  if (destacado === undefined) destacado = 0;
+  const card = document.createElement('div');
+  card.className = 'card card-gl';
+  card.dataset.exportW = '322'; card.dataset.exportH = '464'; card.dataset.exportPixelRatio = '3';
+  card.dataset.filename = glArchivo('goleadores', matchday);
+  card.innerHTML = glInnerHtml(filas, destacado, 'GOLEADORES');
   return card;
 }
 
@@ -7062,25 +7141,66 @@ async function loadGoleadores(matchday) {
   if (!filas.length) return;
   const section = document.createElement('div');
   section.className = 'match-section';
-  section.innerHTML = '<h3>RANKING DE GOLEADORES — ' + (currentComp === 384 ? 'Apertura' : 'Clausura') + ' hasta la fecha ' + matchday + '</h3>';
+  section.innerHTML = '<h3>RANKINGS — ' + (currentComp === 384 ? 'Apertura' : 'Clausura') + ' hasta la fecha ' + matchday + '</h3>';
   const row = document.createElement('div'); row.className = 'cards-row';
-  let card = buildGoleadoresCard(filas, matchday, 0);
+  let rkId = 'goleadores', destacado = 0;
+
+  // El componente suelto (como siempre) y la placa de 1080x1350 con el mismo componente sobre una foto.
+  const card = buildGoleadoresCard(filas, matchday, 0);
   const w = createCardWrapper(card, card.dataset.filename);
-  // Selector del puesto destacado (el del banner negro), o ninguno.
-  const ctl = document.createElement('div'); ctl.className = 'gl-ctl';
-  ctl.innerHTML = '<label>destacado <select class="gl-destacado"><option value="-1">ninguno</option>' +
-    filas.map((p, i) => `<option value="${i}"${i === 0 ? ' selected' : ''}>${i + 1}° ${gnEscape(p.nombre)}</option>`).join('') + '</select></label>';
-  ctl.querySelector('select').addEventListener('change', e => {
-    const nuevo = buildGoleadoresCard(filas, matchday, +e.target.value);
-    card.replaceWith(nuevo); card = nuevo;
-    const dl = w.querySelector('.download-btn'); const clon = dl.cloneNode(true); dl.replaceWith(clon);
-    clon.addEventListener('click', () => downloadCard(card, card.dataset.filename));
+  const placa = document.createElement('div');
+  placa.className = 'card card-rk';
+  placa.innerHTML = '<div class="rk-bg"></div><div class="card-gl rk-comp"></div>';
+  const comp = placa.querySelector('.rk-comp');
+  const wp = createCardWrapper(placa, 'placa_' + card.dataset.filename);
+  // El nombre del archivo cambia con el ranking: el botón lo lee al momento de descargar.
+  [[w, card], [wp, placa]].forEach(([wr, c]) => {
+    const dl = wr.querySelector('.download-btn'), clon = dl.cloneNode(true); dl.replaceWith(clon);
+    clon.addEventListener('click', () => downloadCard(c, wr.dataset.filename));
   });
-  w.appendChild(ctl);
+
+  const ctl = document.createElement('div'); ctl.className = 'gl-ctl';
+  ctl.innerHTML = '<label>ranking <select class="gl-ranking">' + GL_RANKINGS.map(r => `<option value="${r.id}">${r.titulo.charAt(0) + r.titulo.slice(1).toLowerCase()}</option>`).join('') + '</select></label>' +
+    '<label>destacado <select class="gl-destacado"></select></label>';
   const nota = document.createElement('div'); nota.className = 'rn-sinfoto';
-  nota.textContent = 'componente de 322x464, se descarga a 966x1392 · ' + filas.map(p => p.nombre.split(' ').slice(-1)[0] + ' ' + p.goles).join(', ');
-  w.appendChild(nota);
-  row.appendChild(w); section.appendChild(row); container.appendChild(section);
+  const ctlP = document.createElement('div'); ctlP.className = 'pv-ctl';
+  ctlP.innerHTML = '<label>posición <select class="rk-pos"><option value="izq">izquierda</option><option value="centro" selected>centro</option><option value="der">derecha</option></select></label>' +
+    '<label>tamaño <input type="range" class="rk-tam" min="120" max="260" value="190"></label>';
+  const notaP = document.createElement('div'); notaP.className = 'rn-sinfoto';
+
+  const ubicar = () => {
+    const s = ctlP.querySelector('.rk-tam').value / 100, pos = ctlP.querySelector('.rk-pos').value, ancho = 322 * s;
+    comp.style.left = (pos === 'izq' ? 60 : pos === 'der' ? 1080 - 60 - ancho : (1080 - ancho) / 2) + 'px';
+    comp.style.top = (1350 - 464 * s) / 2 + 'px';
+    comp.style.transform = 'scale(' + s + ')';
+  };
+  const pintar = () => {
+    const def = GL_RANKINGS.find(r => r.id === rkId), html = glInnerHtml(filas, destacado, def.titulo);
+    card.innerHTML = html; comp.innerHTML = html;
+    w.dataset.filename = card.dataset.filename = glArchivo(rkId, matchday);
+    wp.dataset.filename = placa.dataset.filename = 'placa_' + glArchivo(rkId, matchday);
+    ctl.querySelector('.gl-destacado').innerHTML = '<option value="-1">ninguno</option>' +
+      filas.map((p, i) => `<option value="${i}"${i === destacado ? ' selected' : ''}>${i + 1}° ${gnEscape(p.nombre)}</option>`).join('');
+    nota.textContent = 'componente de 322x464, se descarga a 966x1392 · ' + filas.map(p => p.nombre.split(' ').slice(-1)[0] + ' ' + p.goles).join(', ');
+  };
+  ctl.querySelector('.gl-destacado').addEventListener('change', e => { destacado = +e.target.value; pintar(); });
+  ctl.querySelector('.gl-ranking').addEventListener('change', async e => {
+    const id = e.target.value;
+    nota.textContent = 'cargando…';
+    try {
+      const nuevas = await glCargarRanking(id, matchday);
+      if (ctl.querySelector('.gl-ranking').value !== id) return;   // eligió otro mientras cargaba
+      if (!nuevas.length) { nota.textContent = 'ese ranking todavía no tiene datos'; e.target.value = rkId; return; }
+      filas = nuevas; rkId = id; destacado = 0; pintar();
+    } catch (err) { console.warn('ranking', id, err); nota.textContent = 'no pude cargar ese ranking'; e.target.value = rkId; }
+  });
+  ctlP.querySelector('.rk-pos').addEventListener('change', ubicar);
+  ctlP.querySelector('.rk-tam').addEventListener('input', ubicar);
+  pintar(); ubicar();
+  w.appendChild(ctl); w.appendChild(nota);
+  wp.appendChild(ctlP); wp.appendChild(notaP);
+  fotoFondoControles(placa, placa.querySelector('.rk-bg'), ctlP, notaP, 'placa 1080x1350 · sin foto se descarga con fondo transparente');
+  row.appendChild(w); row.appendChild(wp); section.appendChild(row); container.appendChild(section);
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -7440,6 +7560,57 @@ function buildFixturesCard(matchday, matches, stadiums, titulo, archivo) {
   return card;
 }
 
+/* Foto de fondo propia para una placa de 1080x1350: elegir archivo, zoom, oscurecer,
+   centrar, quitar, y arrastrar la placa para mover la foto. Agrega sus controles a
+   `ctl`. Sin foto la placa se descarga transparente; con foto, con la foto
+   (dataset.fondoPropio, que mira exportarCard). */
+function fotoFondoControles(card, bg, ctl, nota, textoSin) {
+  ctl.insertAdjacentHTML('beforeend', '<label>foto de fondo <input type="file" class="fx-in-foto" accept="image/*"></label>' +
+    '<label>zoom <input type="range" class="fx-in-zoom" min="100" max="400" value="100"></label>' +
+    '<label>oscurecer <input type="range" class="fx-in-osc" min="0" max="80" value="30"></label>' +
+    '<button type="button" class="fx-in-centrar">centrar</button>' +
+    '<button type="button" class="fx-in-quitar">sin fondo</button>');
+  // foto: data URL; fw/fh: tamaño real; dx/dy: corrimiento desde el centro, en px de la placa.
+  let foto = null, fw = 0, fh = 0, dx = 0, dy = 0;
+  const pintar = () => {
+    const a = ctl.querySelector('.fx-in-osc').value / 100;
+    if (foto) {
+      // Zoom 100 = la foto cubre justo la placa; nunca se deja ver un borde vacío.
+      const esc = Math.max(1080 / fw, 1350 / fh) * ctl.querySelector('.fx-in-zoom').value / 100;
+      const w = fw * esc, h = fh * esc, mx = (w - 1080) / 2, my = (h - 1350) / 2;
+      dx = Math.max(-mx, Math.min(mx, dx)); dy = Math.max(-my, Math.min(my, dy));
+      bg.style.backgroundImage = `linear-gradient(rgba(0,0,0,${a}), rgba(0,0,0,${a})), url("${foto}")`;
+      bg.style.backgroundRepeat = 'no-repeat';
+      bg.style.backgroundSize = `100% 100%, ${w}px ${h}px`;
+      bg.style.backgroundPosition = `0 0, ${dx - mx}px ${dy - my}px`;
+    } else { bg.style.backgroundImage = bg.style.backgroundSize = bg.style.backgroundPosition = bg.style.backgroundRepeat = ''; }
+    card.style.cursor = foto ? 'grab' : '';
+    if (foto) card.dataset.fondoPropio = '1'; else delete card.dataset.fondoPropio;
+    nota.textContent = foto ? 'se descarga con tu foto de fondo · arrastrá la placa para mover la foto' : textoSin;
+  };
+  ctl.querySelector('.fx-in-foto').addEventListener('change', ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { const im = new Image(); im.onload = () => { foto = r.result; fw = im.naturalWidth; fh = im.naturalHeight; dx = dy = 0; ctl.querySelector('.fx-in-zoom').value = 100; pintar(); }; im.src = r.result; };
+    r.readAsDataURL(f);
+  });
+  ctl.querySelector('.fx-in-osc').addEventListener('input', pintar);
+  ctl.querySelector('.fx-in-zoom').addEventListener('input', pintar);
+  ctl.querySelector('.fx-in-centrar').addEventListener('click', () => { dx = dy = 0; pintar(); });
+  // Arrastrar la placa mueve la foto (el movimiento en pantalla se pasa a px de la placa).
+  let agarre = null;
+  card.addEventListener('pointerdown', ev => { if (!foto) return; agarre = { x: ev.clientX, y: ev.clientY, dx, dy }; card.setPointerCapture(ev.pointerId); card.style.cursor = 'grabbing'; ev.preventDefault(); });
+  card.addEventListener('pointermove', ev => {
+    if (!agarre) return;
+    const k = 1080 / (card.getBoundingClientRect().width || 1080);
+    dx = agarre.dx + (ev.clientX - agarre.x) * k; dy = agarre.dy + (ev.clientY - agarre.y) * k; pintar();
+  });
+  const soltar = () => { if (agarre) { agarre = null; card.style.cursor = foto ? 'grab' : ''; } };
+  card.addEventListener('pointerup', soltar); card.addEventListener('pointercancel', soltar);
+  ctl.querySelector('.fx-in-quitar').addEventListener('click', () => { foto = null; ctl.querySelector('.fx-in-foto').value = ''; pintar(); });
+  pintar();
+}
+
 async function renderFixturesCard(matchday, data) {
   const container = document.getElementById('fixturesContainer');
   container.innerHTML = '';
@@ -7482,54 +7653,11 @@ async function renderFixturesCard(matchday, data) {
   // Fondo propio: sin foto se descarga transparente (como siempre); con foto, sale con la foto.
   const ctl = document.createElement('div'); ctl.className = 'pv-ctl';
   ctl.innerHTML = '<label>título 1 <input class="fx-in-titulo" size="14" value="' + titulo + '"></label>' +
-    '<label>título 2 <input class="fx-in-titulo2" size="14" value="FECHA ' + matchday + '"></label>' +
-    '<label>foto de fondo <input type="file" class="fx-in-foto" accept="image/*"></label>' +
-    '<label>zoom <input type="range" class="fx-in-zoom" min="100" max="400" value="100"></label>' +
-    '<label>oscurecer <input type="range" class="fx-in-osc" min="0" max="80" value="30"></label>' +
-    '<button type="button" class="fx-in-centrar">centrar</button>' +
-    '<button type="button" class="fx-in-quitar">sin fondo</button>';
+    '<label>título 2 <input class="fx-in-titulo2" size="14" value="FECHA ' + matchday + '"></label>';
   const nota = document.createElement('div'); nota.className = 'rn-sinfoto';
-  // foto: data URL; fw/fh: tamaño real; dx/dy: corrimiento desde el centro, en px de la placa.
-  let foto = null, fw = 0, fh = 0, dx = 0, dy = 0;
-  const pintar = () => {
-    const bg = card.querySelector('.fx-bg'), a = ctl.querySelector('.fx-in-osc').value / 100;
-    if (foto) {
-      // Zoom 100 = la foto cubre justo la placa; nunca se deja ver un borde vacío.
-      const esc = Math.max(1080 / fw, 1350 / fh) * ctl.querySelector('.fx-in-zoom').value / 100;
-      const w = fw * esc, h = fh * esc, mx = (w - 1080) / 2, my = (h - 1350) / 2;
-      dx = Math.max(-mx, Math.min(mx, dx)); dy = Math.max(-my, Math.min(my, dy));
-      bg.style.backgroundImage = `linear-gradient(rgba(0,0,0,${a}), rgba(0,0,0,${a})), url("${foto}")`;
-      bg.style.backgroundRepeat = 'no-repeat';
-      bg.style.backgroundSize = `100% 100%, ${w}px ${h}px`;
-      bg.style.backgroundPosition = `0 0, ${dx - mx}px ${dy - my}px`;
-    } else { bg.style.backgroundImage = bg.style.backgroundSize = bg.style.backgroundPosition = bg.style.backgroundRepeat = ''; }
-    card.style.cursor = foto ? 'grab' : '';
-    if (foto) card.dataset.fondoPropio = '1'; else delete card.dataset.fondoPropio;
-    nota.textContent = foto ? 'se descarga con tu foto de fondo · arrastrá la placa para mover la foto' : 'se descarga sin fondo (transparente)';
-  };
-  ctl.querySelector('.fx-in-foto').addEventListener('change', ev => {
-    const f = ev.target.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = () => { const im = new Image(); im.onload = () => { foto = r.result; fw = im.naturalWidth; fh = im.naturalHeight; dx = dy = 0; ctl.querySelector('.fx-in-zoom').value = 100; pintar(); }; im.src = r.result; };
-    r.readAsDataURL(f);
-  });
-  ctl.querySelector('.fx-in-osc').addEventListener('input', pintar);
-  ctl.querySelector('.fx-in-zoom').addEventListener('input', pintar);
-  ctl.querySelector('.fx-in-centrar').addEventListener('click', () => { dx = dy = 0; pintar(); });
-  // Arrastrar la placa mueve la foto (el movimiento en pantalla se pasa a px de la placa).
-  let agarre = null;
-  card.addEventListener('pointerdown', ev => { if (!foto) return; agarre = { x: ev.clientX, y: ev.clientY, dx, dy }; card.setPointerCapture(ev.pointerId); card.style.cursor = 'grabbing'; ev.preventDefault(); });
-  card.addEventListener('pointermove', ev => {
-    if (!agarre) return;
-    const k = 1080 / (card.getBoundingClientRect().width || 1080);
-    dx = agarre.dx + (ev.clientX - agarre.x) * k; dy = agarre.dy + (ev.clientY - agarre.y) * k; pintar();
-  });
-  const soltar = () => { if (agarre) { agarre = null; card.style.cursor = foto ? 'grab' : ''; } };
-  card.addEventListener('pointerup', soltar); card.addEventListener('pointercancel', soltar);
-  ctl.querySelector('.fx-in-quitar').addEventListener('click', () => { foto = null; ctl.querySelector('.fx-in-foto').value = ''; pintar(); });
+  fotoFondoControles(card, card.querySelector('.fx-bg'), ctl, nota, 'se descarga sin fondo (transparente)');
   ctl.querySelector('.fx-in-titulo').addEventListener('input', ev => { card.querySelector('.fx-title-1').textContent = ev.target.value; });
   ctl.querySelector('.fx-in-titulo2').addEventListener('input', ev => { card.querySelector('.fx-title-2').textContent = ev.target.value; });
-  pintar();
   w.appendChild(ctl); w.appendChild(nota);
   row.appendChild(w);
   });
