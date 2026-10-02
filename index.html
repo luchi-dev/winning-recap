@@ -3827,6 +3827,38 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
     ceAjustarTexto(portada); guardar();
   });
   wp.appendChild(cp);
+  // Escudo de la portada de un solo club: se puede sacar, achicar y arrastrar a otro lugar.
+  const escSolo = portada.querySelector('.ce-escudo-solo');
+  if (escSolo) {
+    const es = e.portada.escudo = Object.assign({ ver: false, tam: 50, x: null, y: null }, e.portada.escudo || {});
+    const ce = document.createElement('div'); ce.className = 'pv-ctl';
+    ce.innerHTML = '<label><input type="checkbox" class="ce-in-esc"> escudo</label><label>tamaño <input type="range" class="ce-in-esc-tam" min="20" max="120"></label><span>(arrastralo para moverlo)</span>';
+    ce.querySelector('.ce-in-esc').checked = es.ver; ce.querySelector('.ce-in-esc-tam').value = es.tam;
+    const pintarEsc = () => {
+      const an = 440 * es.tam / 100, al = 420 * es.tam / 100;
+      if (es.x == null) { es.x = (1080 - an) / 2; es.y = 90; }   // por defecto: arriba, al centro
+      es.x = Math.max(0, Math.min(1080 - an, es.x)); es.y = Math.max(0, Math.min(1350 - al, es.y));
+      Object.assign(escSolo.style, { display: es.ver ? '' : 'none', width: an + 'px', height: al + 'px', left: es.x + 'px', top: es.y + 'px', cursor: 'move', touchAction: 'none' });
+    };
+    ce.querySelector('.ce-in-esc').addEventListener('change', ev => { es.ver = ev.target.checked; pintarEsc(); guardar(); });
+    ce.querySelector('.ce-in-esc-tam').addEventListener('input', ev => {
+      // Se agranda desde el centro del escudo.
+      const antes = es.tam; es.tam = +ev.target.value;
+      es.x -= 440 * (es.tam - antes) / 200; es.y -= 420 * (es.tam - antes) / 200; pintarEsc(); guardar();
+    });
+    let ag = null;
+    escSolo.addEventListener('pointerdown', ev => { ag = { x: ev.clientX, y: ev.clientY, ex: es.x, ey: es.y }; escSolo.setPointerCapture(ev.pointerId); ev.preventDefault(); ev.stopPropagation(); });
+    escSolo.addEventListener('mousedown', ev => ev.stopPropagation());   // que no mueva la foto de atrás
+    escSolo.addEventListener('pointermove', ev => {
+      if (!ag) return;
+      const k = 1080 / (portada.getBoundingClientRect().width || 1080);
+      es.x = ag.ex + (ev.clientX - ag.x) * k; es.y = ag.ey + (ev.clientY - ag.y) * k; pintarEsc();
+    });
+    const soltarEsc = () => { if (ag) { ag = null; guardar(); } };
+    escSolo.addEventListener('pointerup', soltarEsc); escSolo.addEventListener('pointercancel', soltarEsc);
+    pintarEsc();
+    wp.appendChild(ce);
+  }
   hsFotoControles(wp, portada, e.away_id == null ? 'izquierda' : corto(e.home_id), e.away_id == null ? 'derecha' : corto(e.away_id),
     { local: e.portada.foto_local, visita: e.portada.foto_visita }, e.portada.una_foto ?? (e.away_id == null));
   row.appendChild(wp);
