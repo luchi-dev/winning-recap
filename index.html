@@ -3702,10 +3702,24 @@ function buildClasicoPortada(e, ctx) {
     `<div class="rn-wordmark">${WINNING_LOGO_HTML}</div>`;
   return el;
 }
-/* Los goles de un equipo como en la placa resultado: la pelota y los autores seguidos, separados por coma.
-   En el campo se escribe un jugador por renglón. Sin texto no se dibuja nada. */
+/* Los goles de un equipo con el formato de la placa resultado: la pelota y un "APELLIDO 72'" por gol,
+   en orden de minuto y separados por coma ("VALENCIA 72', VALENCIA 80' (P)"). En el campo se escribe un
+   jugador por renglón; si tiene varios goles ("Valencia 72', 80'") se repite el apellido en cada uno.
+   Sin texto no se dibuja nada. */
+function ceGolesLista(txt) {
+  const goles = [];
+  String(txt || '').split(String.fromCharCode(10)).map(x => x.trim()).filter(Boolean).forEach(renglon => {
+    const m = renglon.match(/^(.*?)\s+(\d.*)$/);
+    if (!m) { goles.push({ txt: renglon, min: 999 }); return; }   // renglón sin minuto: va tal cual, al final
+    m[2].split(',').map(x => x.trim()).filter(Boolean).forEach(g => {
+      const n = g.match(/(\d+)(?:\s*\+\s*(\d+))?/);
+      goles.push({ txt: m[1] + ' ' + g.replace(/\((p|e\/c)\)/i, x => x.toUpperCase()), min: n ? +n[1] + (n[2] ? +n[2] / 100 : 0) : 999 });
+    });
+  });
+  return goles.sort((a, b) => a.min - b.min).map(g => g.txt).join(', ');
+}
 function ceGolesHtml(txt) {
-  const t = String(txt || '').split(String.fromCharCode(10)).map(x => x.trim()).filter(Boolean).join(', ');
+  const t = ceGolesLista(txt);
   return t ? '<span class="rn-ico"><img src="icons/goal.png" alt=""></span><div class="rn-txt">' + gnEscape(t) + '</div>' : '';
 }
 function buildClasicoSlide(s) {
