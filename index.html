@@ -1784,6 +1784,10 @@ body {
 .card-ce-slide .ce-gol-local  { left: 345px; }
 .card-ce-slide .ce-gol-visita { left: 543px; }
 .card-ce-slide .ce-barra { position: absolute; left: 538px; top: 971px; width: 3px; height: 91px; background: #fff; border-radius: 20px; }
+/* Autores de los goles: dos columnas que se encuentran en el eje de la placa, debajo del resultado. */
+.card-ce-slide .ce-goles { position: absolute; top: 1150px; width: 450px; font-family: 'CanaroBook', 'Canaro', sans-serif; font-weight: 500; font-size: 28px; line-height: 35px; color: #fff; white-space: pre-line; text-shadow: 0 2px 0 #000; }
+.card-ce-slide .ce-goles-local  { left: 70px; text-align: right; }
+.card-ce-slide .ce-goles-visita { left: 560px; text-align: left; }
 .card-ce-slide .ce-escudo { position: absolute; top: 915px; width: 150px; height: 180px; }
 .card-ce-slide .ce-escudo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .card-ce-slide .ce-escudo-local  { left: 155px; }
@@ -3701,7 +3705,9 @@ function buildClasicoSlide(s) {
     `<div class="ce-pill"><span class="ce-dato">${gnEscape(s.dato || '')}</span></div>` +
     ceEscudo('local', s.local_id) +
     `<div class="ce-gol ce-gol-local">${gnEscape(s.goles_local ?? '-')}</div><span class="ce-barra"></span><div class="ce-gol ce-gol-visita">${gnEscape(s.goles_visita ?? '-')}</div>` +
-    ceEscudo('visita', s.visita_id);
+    ceEscudo('visita', s.visita_id) +
+    // Quién hizo los goles de cada equipo, un renglón por jugador, debajo del resultado.
+    `<div class="ce-goles ce-goles-local">${gnEscape(s.autores_local || '')}</div><div class="ce-goles ce-goles-visita">${gnEscape(s.autores_visita || '')}</div>`;
   return el;
 }
 /* Achica lo que no entra: renglones de la portada, el título del slide (hasta dos
@@ -3740,6 +3746,13 @@ function ceAjustarTexto(card) {
     const corte = entero.indexOf(' | ');
     if (corte < 0) probar(entero, 24, 14, 28 / 24);
     else if (!probar(entero, 24, 21, 28 / 24)) probar(entero.slice(0, corte) + SALTO + entero.slice(corte + 3), 23, 14, 1.15);
+  }
+  // Autores de los goles: hasta 4 renglones al tamaño base; con más, se achican para entrar.
+  const autores = Array.from(card.querySelectorAll('.ce-goles'));
+  if (autores.length) {
+    const renglones = Math.max(...autores.map(a => a.textContent.split(String.fromCharCode(10)).length));
+    const tam = renglones > 4 ? 28 * 4 / renglones : 28;
+    autores.forEach(a => { a.style.fontSize = tam + 'px'; a.style.lineHeight = (tam * 1.25) + 'px'; });
   }
   card.querySelectorAll('.ce-gol').forEach(g => { g.style.fontSize = (g.textContent.trim().length > 1 ? 150 : 244) + 'px'; });
 }
@@ -3786,7 +3799,15 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
 
   // Lo editado a mano vale mientras especiales.json no traiga una versión nueva de este especial.
   const kGuardado = CE_KEY + clave;
+  const slidesJson = e.slides || [];
   try { const g = JSON.parse(localStorage.getItem(kGuardado) || 'null'); if (g && g.v === (e.v || 0)) { e.portada = g.portada; e.slides = g.slides; } } catch (err) {}
+  // Lo guardado antes de que existieran los autores de los goles los toma de especiales.json (mismo partido = mismo "dato").
+  (e.slides || []).forEach(s => {
+    if (s.autores_local != null || s.autores_visita != null) return;
+    const o = slidesJson.find(x => x.dato === s.dato); if (!o || o.autores_local == null) return;
+    const inv = o.local_id !== s.local_id;
+    s.autores_local = inv ? o.autores_visita : o.autores_local; s.autores_visita = inv ? o.autores_local : o.autores_visita;
+  });
   const guardar = () => { try { localStorage.setItem(kGuardado, JSON.stringify({ v: e.v || 0, portada: e.portada, slides: e.slides })); } catch (err) {} };
   const base = 'clasico_f' + matchday + '_' + corto(e.home_id) + '_vs_' + corto(e.away_id);
   const campo = (rot, cls, val, tipo) => tipo === 'area'
@@ -3873,7 +3894,8 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
     const invertido = () => s.local_id !== e.home_id;
     ctl.innerHTML = campo('título', 'ce-in-titulo', s.titulo, 'area') + campo('dato', 'ce-in-dato', s.dato) +
       `<div class="ce-fila"><span class="ce-eq-l"></span><input type="text" class="ce-in-gol ce-in-gl" value="${gnEscape(s.goles_local ?? '')}"><span>-</span>` +
-      `<input type="text" class="ce-in-gol ce-in-gv" value="${gnEscape(s.goles_visita ?? '')}"><span class="ce-eq-v"></span><button type="button" class="ce-invertir">⇄ invertir</button><button type="button" class="ce-quitar-slide">quitar slide</button></div>`;
+      `<input type="text" class="ce-in-gol ce-in-gv" value="${gnEscape(s.goles_visita ?? '')}"><span class="ce-eq-v"></span><button type="button" class="ce-invertir">⇄ invertir</button><button type="button" class="ce-quitar-slide">quitar slide</button></div>` +
+      campo('goles izq.', 'ce-in-al', s.autores_local, 'area') + campo('goles der.', 'ce-in-av', s.autores_visita, 'area');
     const pintarEquipos = () => { ctl.querySelector('.ce-eq-l').textContent = corto(s.local_id); ctl.querySelector('.ce-eq-v').textContent = corto(s.visita_id); };
     pintarEquipos();
     ctl.addEventListener('input', () => {
@@ -3881,14 +3903,17 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
       s.goles_local = ctl.querySelector('.ce-in-gl').value.trim(); s.goles_visita = ctl.querySelector('.ce-in-gv').value.trim();
       card.querySelector('.ce-titulo').textContent = s.titulo; card.querySelector('.ce-dato').textContent = s.dato;
       card.querySelector('.ce-gol-local').textContent = s.goles_local || '-'; card.querySelector('.ce-gol-visita').textContent = s.goles_visita || '-';
+      s.autores_local = ctl.querySelector('.ce-in-al').value; s.autores_visita = ctl.querySelector('.ce-in-av').value;
+      card.querySelector('.ce-goles-local').textContent = s.autores_local; card.querySelector('.ce-goles-visita').textContent = s.autores_visita;
       ceAjustarTexto(card); guardar();
     });
     // Invertir: quién va a la izquierda (el local de AQUEL partido) con su resultado.
     ctl.querySelector('.ce-invertir').addEventListener('click', () => {
-      [s.local_id, s.visita_id] = [s.visita_id, s.local_id]; [s.goles_local, s.goles_visita] = [s.goles_visita, s.goles_local];
+      [s.local_id, s.visita_id] = [s.visita_id, s.local_id]; [s.goles_local, s.goles_visita] = [s.goles_visita, s.goles_local]; [s.autores_local, s.autores_visita] = [s.autores_visita, s.autores_local];
       const foto = card.querySelector('.rn-foto').style.cssText, conFoto = card.classList.contains('ce-con-foto');
       card.innerHTML = buildClasicoSlide(s).innerHTML; card.querySelector('.rn-foto').style.cssText = foto; card.classList.toggle('ce-con-foto', conFoto);
       ctl.querySelector('.ce-in-gl').value = s.goles_local ?? ''; ctl.querySelector('.ce-in-gv').value = s.goles_visita ?? '';
+      ctl.querySelector('.ce-in-al').value = s.autores_local || ''; ctl.querySelector('.ce-in-av').value = s.autores_visita || '';
       pintarEquipos(); ceAjustarTexto(card); guardar();
     });
     ctl.querySelector('.ce-quitar-slide').addEventListener('click', () => {

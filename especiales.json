@@ -6,15 +6,217 @@
       "v": 4,
       "home_id": 2549,
       "away_id": 540,
-      "portada": { "linea": "", "titulo1": "¿CUÁL ES EL MEJOR", "titulo2": "SAN LORENZO–BOCA DE LA HISTORIA?",
-                   "palabra_local": "SAN LORENZO", "palabra_visita": "BOCA", "color_local": "#e2201d", "color_visita": "#4972c6" },
+      "portada": {
+        "linea": "",
+        "titulo1": "¿CUÁL ES EL MEJOR",
+        "titulo2": "SAN LORENZO–BOCA DE LA HISTORIA?",
+        "palabra_local": "SAN LORENZO",
+        "palabra_visita": "BOCA",
+        "color_local": "#e2201d",
+        "color_visita": "#4972c6"
+      },
       "slides": [
-        { "titulo": "EL DE LOS SIETE", "dato": "Apertura 2006 | agosto de 2006 · Estadio Pedro Bidegain (Nuevo Gasómetro)",
-          "local_id": 2549, "visita_id": 540, "goles_local": 1, "goles_visita": 7 },
-        { "titulo": "EL DE SALTA", "dato": "Copa Sudamericana 2004, octavos de final | septiembre de 2004 · Estadio Padre Ernesto Martearena, Salta",
-          "local_id": 540, "visita_id": 2549, "goles_local": 2, "goles_visita": 1 },
-        { "titulo": "EL DE LA SUPERCOPA", "dato": "Supercopa Argentina 2015 (final) | febrero de 2016 · Estadio Mario Alberto Kempes, Córdoba",
-          "local_id": 540, "visita_id": 2549, "goles_local": 0, "goles_visita": 4 }
+        {
+          "titulo": "EL DE LOS SIETE",
+          "dato": "Apertura 2006 | agosto de 2006 · Estadio Pedro Bidegain (Nuevo Gasómetro)",
+          "local_id": 2549,
+          "visita_id": 540,
+          "goles_local": 1,
+          "goles_visita": 7
+        },
+        {
+          "titulo": "EL DE SALTA",
+          "dato": "Copa Sudamericana 2004, octavos de final | septiembre de 2004 · Estadio Padre Ernesto Martearena, Salta",
+          "local_id": 540,
+          "visita_id": 2549,
+          "goles_local": 2,
+          "goles_visita": 1
+        },
+        {
+          "titulo": "EL DE LA SUPERCOPA",
+          "dato": "Supercopa Argentina 2015 (final) | febrero de 2016 · Estadio Mario Alberto Kempes, Córdoba",
+          "local_id": 540,
+          "visita_id": 2549,
+          "goles_local": 0,
+          "goles_visita": 4
+        }
+      ]
+    }
+  ],
+  "724-2026-11": [
+    {
+      "tipo": "mejor-clasico",
+      "v": 2,
+      "rotulo": "ESPECIAL",
+      "nombre": "De 0-2 a 3-2: las remontadas de Boca",
+      "home_id": 540,
+      "away_id": null,
+      "nota": "Sólo los partidos en que Boca perdía 0-2 y ganó 3-2. Fuente: historiadeboca.com.ar. Más nuevo primero. Goles: página de cada partido en historiadeboca.com.ar.",
+      "portada": {
+        "linea": "14 veces en la historia · la última, el domingo ante Racing",
+        "titulo1": "TODAS LAS VECES QUE BOCA",
+        "titulo2": "PERDÍA 0-2 Y GANÓ 3 A 2",
+        "palabra_local": "BOCA",
+        "palabra_visita": "3 A 2",
+        "color_local": "#4972c6",
+        "color_visita": "#f3c622",
+        "foto_local": "especiales/remontadas-3-2/fotos-hd/69.jpg",
+        "foto_visita": "especiales/remontadas-3-2/fotos-hd/63.jpg"
+      },
+      "slides": [
+        {
+          "titulo": "LOS TRES\nDE VALENCIA",
+          "dato": "Copa Argentina 2026, cuartos | septiembre de 2026 · Gigante de Arroyito, Rosario",
+          "local_id": 540,
+          "visita_id": 986,
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos-hd/69.jpg",
+          "autores_local": "Valencia 72', 80', 89'",
+          "autores_visita": "Lodico 19'\nA. Martínez 47'"
+        },
+        {
+          "titulo": "LA VUELTA\nDE BIANCHI",
+          "dato": "Torneo Final 2013, fecha 1 | febrero de 2013 · La Bombonera",
+          "local_id": 540,
+          "visita_id": "hist-quilmes",
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos-hd/63.jpg",
+          "autores_local": "Erviti 37'\nBurdisso 67', 81'",
+          "autores_visita": "Olivera 5'\nMenéndez 8'"
+        },
+        {
+          "titulo": "CON UNO\nMENOS",
+          "dato": "Apertura 2006, fecha 9 | octubre de 2006 · La Bombonera",
+          "local_id": 540,
+          "visita_id": 570,
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos/59.jpg",
+          "autores_local": "Gago 69'\nPalacio 75', 88'",
+          "autores_visita": "Pellegrino 27'\nZárate 34'"
+        },
+        {
+          "titulo": "EL TRIPLETE\nDE CABAÑAS",
+          "dato": "Apertura 1991, fecha 1 | septiembre de 1991 · La Bombonera",
+          "local_id": 540,
+          "visita_id": 570,
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos/51.jpg",
+          "autores_local": "Cabañas 26', 60', 78'",
+          "autores_visita": "Ruggeri 8'\nGareca 15'"
+        },
+        {
+          "titulo": "TRES GOLES\nEN 13 MINUTOS",
+          "dato": "Metropolitano 1972, fecha 6 | marzo de 1972 · cancha de Boca",
+          "local_id": 540,
+          "visita_id": 2473,
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos/38.jpg",
+          "autores_local": "Nicolau 73' (p)\nCurioni 84'\nRogel 86'",
+          "autores_visita": "Barú 19'\nMarzolini 51' (e/c)"
+        },
+        {
+          "titulo": "EL OLÍMPICO\nDE COCH",
+          "dato": "Nacional 1970, fecha 8 | octubre de 1970 · cancha de Boca",
+          "local_id": 540,
+          "visita_id": 745,
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos/35.jpg",
+          "autores_local": "Rojas 47', 57'\nCoch 76'",
+          "autores_visita": "Gómez 5'\nGramajo 42'"
+        },
+        {
+          "titulo": "EN LA PAZ",
+          "dato": "Copa Libertadores 1965, primera fase | febrero de 1965 · Estadio Hernando Siles, La Paz",
+          "local_id": "hist-the-strongest",
+          "visita_id": 540,
+          "goles_local": 2,
+          "goles_visita": 3,
+          "foto": "especiales/remontadas-3-2/fotos/29.jpg",
+          "autores_local": "Morales 7'\nQuevedo 49'",
+          "autores_visita": "Menéndez 55' (p), 74'\nSilveira 69'"
+        },
+        {
+          "titulo": "EN EL\nMONUMENTAL",
+          "dato": "Campeonato 1959, fecha 18 | septiembre de 1959 · Estadio Monumental",
+          "local_id": 608,
+          "visita_id": 540,
+          "goles_local": 2,
+          "goles_visita": 3,
+          "foto": "especiales/remontadas-3-2/fotos/27.jpg",
+          "autores_local": "Melón 20'\nNuin 28' (p)",
+          "autores_visita": "Yudica 41'\nRodríguez 57'\nNardiello 65'"
+        },
+        {
+          "titulo": "MARCARIÁN\nAL 89",
+          "dato": "Campeonato 1956, fecha 24 | octubre de 1956 · cancha de Chacarita",
+          "local_id": "hist-chacarita",
+          "visita_id": 540,
+          "goles_local": 2,
+          "goles_visita": 3,
+          "foto": "especiales/remontadas-3-2/fotos/25.jpg",
+          "autores_local": "Pegnotti 5'\nBarreiro 10'",
+          "autores_visita": "Rodríguez 30'\nAngelillo 65'\nMarcarián 89'"
+        },
+        {
+          "titulo": "TRES GOLES\nEN 14 MINUTOS",
+          "dato": "Campeonato 1941, fecha 21 | agosto de 1941 · cancha de Huracán",
+          "local_id": 2578,
+          "visita_id": 540,
+          "goles_local": 2,
+          "goles_visita": 3,
+          "foto": "especiales/remontadas-3-2/fotos/15.jpg",
+          "autores_local": "Méndez 15'\nGuerra 54'",
+          "autores_visita": "Lazzatti 63'\nMonestés 75'\nRosell 77'"
+        },
+        {
+          "titulo": "DOBLETE\nDE VARALLO",
+          "dato": "Campeonato 1937, fecha 30 | noviembre de 1937 · cancha de Boca",
+          "local_id": 540,
+          "visita_id": "hist-ferro",
+          "goles_local": 3,
+          "goles_visita": 2,
+          "autores_local": "Cherro 27'\nVarallo 37' (p), 53'",
+          "autores_visita": "Gandulla 4'\nBorgnia 13'"
+        },
+        {
+          "titulo": "A LA PUNTA\nCON GIMNASIA",
+          "dato": "Campeonato 1933, fecha 26 | septiembre de 1933 · cancha de Boca",
+          "local_id": 540,
+          "visita_id": 1392,
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos/08.jpg",
+          "autores_local": "Benítez Cáceres 25'\nVarallo 58' (p)\nNardini 65'",
+          "autores_visita": "Morgada 13'\nEchevarrieta 23'"
+        },
+        {
+          "titulo": "EL TRIPLETE\nDE VARALLO",
+          "dato": "Campeonato 1933, fecha 12 | mayo de 1933 · cancha de River",
+          "local_id": 540,
+          "visita_id": "hist-talleres-re",
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos/06.jpg",
+          "autores_local": "Varallo 41', 50', 85'",
+          "autores_visita": "Troncoso 10'\nRojas 14'"
+        },
+        {
+          "titulo": "LA FINAL DEL\nALARGUE",
+          "dato": "Copa Ibarguren 1924, final | mayo de 1926 · cancha de Boca",
+          "local_id": 540,
+          "visita_id": "hist-belgrano-rosario",
+          "goles_local": 3,
+          "goles_visita": 2,
+          "foto": "especiales/remontadas-3-2/fotos/03.jpg",
+          "autores_local": "Tazza 52', 91'\nCherro 58'",
+          "autores_visita": "Bearzotti 16', 30'"
+        }
       ]
     }
   ]
