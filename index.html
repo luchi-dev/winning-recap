@@ -2457,7 +2457,19 @@ document.addEventListener('DOMContentLoaded', () => {
 /* Al abrir o recargar la página se entra directo a la fecha vigente: la del
    último partido que ya empezó (torneo incluido). Entre fecha y fecha queda la
    que terminó, hasta que arranca la siguiente. "Volver" lleva al selector. */
+const FECHA_VISTA_KEY = 'winning.recap.fechaVista';
 async function irAFechaVigente() {
+  // Si se estuvo mirando una fecha en las últimas 12 horas, recargar vuelve a ésa
+  // (p. ej. la previa de la fecha que todavía no empezó). No aplica a Chrome sin cabeza.
+  try {
+    const v = JSON.parse(localStorage.getItem(FECHA_VISTA_KEY) || 'null');
+    if (v && !navigator.webdriver && Date.now() - v.t < 12 * 3600e3 && v.fecha >= 1 && v.fecha <= 16) {
+      const bt = document.querySelector('.comp-btn[data-comp="' + v.comp + '"]');
+      if (bt) bt.click();
+      loadFecha(v.fecha);
+      return;
+    }
+  } catch (e) {}
   try {
     const { data } = await db.from('v_fixtures').select('competition_id, matchday, kickoff_ts')
       .eq('season_id', currentSeason).in('competition_id', [384, 724]).gte('matchday', 1).lte('matchday', 16)
@@ -4328,6 +4340,7 @@ async function pintarPartidos() {
 
 async function loadFecha(matchday) {
   fechaActual = matchday;
+  try { localStorage.setItem(FECHA_VISTA_KEY, JSON.stringify({ comp: currentComp, fecha: matchday, t: Date.now() })); } catch (e) {}
   pintarNavFecha();
   document.getElementById('selectorView').style.display = 'none';
   document.getElementById('cardsView').style.display = 'block';
@@ -7449,21 +7462,27 @@ async function renderFixturesCard(matchday, data) {
     console.warn('Stadium lookup failed; rendering without venues.', err);
   }
 
+  // Todas las placas en una sola fila, una al lado de la otra.
+  const section = document.createElement('div');
+  section.className = 'match-section';
+  section.innerHTML = `<h3>FIXTURE DE LA FECHA — ${dias.length} día(s), ${all.length} partido(s)</h3>`;
+  const row = document.createElement('div');
+  row.className = 'cards-row';
+  section.appendChild(row);
+  container.appendChild(section);
+  const fxDiaSemana = new Intl.DateTimeFormat('es-AR', { weekday: 'long', timeZone: 'America/Argentina/Buenos_Aires' });
+
   dias.forEach((dia, n) => {
   const dayMatches = byDay[dia].sort(
     (a, b) => new Date(a.kickoff_local) - new Date(b.kickoff_local));
-  // Primer día "COMIENZA LA", último "TERMINA LA", los del medio "CONTINÚA LA" (editable abajo).
-  const titulo = n === 0 ? 'COMIENZA LA' : (n === dias.length - 1 ? 'TERMINA LA' : 'CONTINÚA LA');
-  const section = document.createElement('div');
-  section.className = 'match-section';
-  section.innerHTML = `<h3>${titulo} FECHA — ${dayMatches.length} partido(s) del ${dia}</h3>`;
-  const row = document.createElement('div');
-  row.className = 'cards-row';
+  // Primer día "COMIENZA LA"; los demás, el día: "SÁBADO DE". Las dos líneas se editan abajo.
+  const titulo = n === 0 ? 'COMIENZA LA' : fxDiaSemana.format(new Date(dayMatches[0].kickoff_local)).toUpperCase() + ' DE';
   const card = buildFixturesCard(matchday, dayMatches, stadiums, titulo, n === 0 ? null : 'fecha' + matchday + '_dia' + (n + 1));
   const w = createCardWrapper(card, card.dataset.filename);
   // Fondo propio: sin foto se descarga transparente (como siempre); con foto, sale con la foto.
   const ctl = document.createElement('div'); ctl.className = 'pv-ctl';
-  ctl.innerHTML = '<label>título <input class="fx-in-titulo" size="14" value="' + titulo + '"></label>' +
+  ctl.innerHTML = '<label>título 1 <input class="fx-in-titulo" size="14" value="' + titulo + '"></label>' +
+    '<label>título 2 <input class="fx-in-titulo2" size="14" value="FECHA ' + matchday + '"></label>' +
     '<label>foto de fondo <input type="file" class="fx-in-foto" accept="image/*"></label>' +
     '<label>zoom <input type="range" class="fx-in-zoom" min="100" max="400" value="100"></label>' +
     '<label>oscurecer <input type="range" class="fx-in-osc" min="0" max="80" value="30"></label>' +
@@ -7509,11 +7528,10 @@ async function renderFixturesCard(matchday, data) {
   card.addEventListener('pointerup', soltar); card.addEventListener('pointercancel', soltar);
   ctl.querySelector('.fx-in-quitar').addEventListener('click', () => { foto = null; ctl.querySelector('.fx-in-foto').value = ''; pintar(); });
   ctl.querySelector('.fx-in-titulo').addEventListener('input', ev => { card.querySelector('.fx-title-1').textContent = ev.target.value; });
+  ctl.querySelector('.fx-in-titulo2').addEventListener('input', ev => { card.querySelector('.fx-title-2').textContent = ev.target.value; });
   pintar();
   w.appendChild(ctl); w.appendChild(nota);
   row.appendChild(w);
-  section.appendChild(row);
-  container.appendChild(section);
   });
 }
 
