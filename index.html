@@ -1784,10 +1784,18 @@ body {
 .card-ce-slide .ce-gol-local  { left: 345px; }
 .card-ce-slide .ce-gol-visita { left: 543px; }
 .card-ce-slide .ce-barra { position: absolute; left: 538px; top: 971px; width: 3px; height: 91px; background: #fff; border-radius: 20px; }
-/* Autores de los goles: dos columnas que se encuentran en el eje de la placa, debajo del resultado. */
-.card-ce-slide .ce-goles { position: absolute; top: 1150px; width: 450px; font-family: 'CanaroBook', 'Canaro', sans-serif; font-weight: 500; font-size: 28px; line-height: 35px; color: #fff; white-space: pre-line; text-shadow: 0 2px 0 #000; }
-.card-ce-slide .ce-goles-local  { left: 70px; text-align: right; }
-.card-ce-slide .ce-goles-visita { left: 560px; text-align: left; }
+/* Autores de los goles: igual que los eventos de la placa resultado (pelota + Canaro Bold 23,36),
+   dos columnas de 390 con la pelota por fuera en x=105 y x=938. */
+.card-ce-slide .ce-goles { position: absolute; top: 1150px; min-height: 33px; }
+.card-ce-slide .ce-goles-local  { left: 105px; width: 477px; }
+.card-ce-slide .ce-goles-visita { left: 538px; width: 435px; }
+.card-ce-slide .ce-goles .rn-ico { position: absolute; top: 0; }
+.card-ce-slide .ce-goles-local  .rn-ico { left: 0; }
+.card-ce-slide .ce-goles-visita .rn-ico { left: 400px; }
+.card-ce-slide .ce-goles .rn-ico img { display: block; width: 32px; height: 33px; }
+.card-ce-slide .ce-goles .rn-txt { width: 390px; padding-top: 7px; font-family: 'Canaro', sans-serif; font-weight: 700; font-size: 23.36px; line-height: 24px; color: #fff; text-transform: uppercase; }
+.card-ce-slide .ce-goles-local  .rn-txt { margin-left: 42px; }
+.card-ce-slide .ce-goles-visita .rn-txt { text-align: right; }
 .card-ce-slide .ce-escudo { position: absolute; top: 915px; width: 150px; height: 180px; }
 .card-ce-slide .ce-escudo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .card-ce-slide .ce-escudo-local  { left: 155px; }
@@ -3694,6 +3702,12 @@ function buildClasicoPortada(e, ctx) {
     `<div class="rn-wordmark">${WINNING_LOGO_HTML}</div>`;
   return el;
 }
+/* Los goles de un equipo como en la placa resultado: la pelota y los autores seguidos, separados por coma.
+   En el campo se escribe un jugador por renglón. Sin texto no se dibuja nada. */
+function ceGolesHtml(txt) {
+  const t = String(txt || '').split(String.fromCharCode(10)).map(x => x.trim()).filter(Boolean).join(', ');
+  return t ? '<span class="rn-ico"><img src="icons/goal.png" alt=""></span><div class="rn-txt">' + gnEscape(t) + '</div>' : '';
+}
 function buildClasicoSlide(s) {
   const el = document.createElement('div');
   el.className = 'card card-ce card-ce-slide';
@@ -3707,7 +3721,7 @@ function buildClasicoSlide(s) {
     `<div class="ce-gol ce-gol-local">${gnEscape(s.goles_local ?? '-')}</div><span class="ce-barra"></span><div class="ce-gol ce-gol-visita">${gnEscape(s.goles_visita ?? '-')}</div>` +
     ceEscudo('visita', s.visita_id) +
     // Quién hizo los goles de cada equipo, un renglón por jugador, debajo del resultado.
-    `<div class="ce-goles ce-goles-local">${gnEscape(s.autores_local || '')}</div><div class="ce-goles ce-goles-visita">${gnEscape(s.autores_visita || '')}</div>`;
+    `<div class="ce-goles ce-goles-local">${ceGolesHtml(s.autores_local)}</div><div class="ce-goles ce-goles-visita">${ceGolesHtml(s.autores_visita)}</div>`;
   return el;
 }
 /* Achica lo que no entra: renglones de la portada, el título del slide (hasta dos
@@ -3746,13 +3760,6 @@ function ceAjustarTexto(card) {
     const corte = entero.indexOf(' | ');
     if (corte < 0) probar(entero, 24, 14, 28 / 24);
     else if (!probar(entero, 24, 21, 28 / 24)) probar(entero.slice(0, corte) + SALTO + entero.slice(corte + 3), 23, 14, 1.15);
-  }
-  // Autores de los goles: hasta 4 renglones al tamaño base; con más, se achican para entrar.
-  const autores = Array.from(card.querySelectorAll('.ce-goles'));
-  if (autores.length) {
-    const renglones = Math.max(...autores.map(a => a.textContent.split(String.fromCharCode(10)).length));
-    const tam = renglones > 4 ? 28 * 4 / renglones : 28;
-    autores.forEach(a => { a.style.fontSize = tam + 'px'; a.style.lineHeight = (tam * 1.25) + 'px'; });
   }
   card.querySelectorAll('.ce-gol').forEach(g => { g.style.fontSize = (g.textContent.trim().length > 1 ? 150 : 244) + 'px'; });
 }
@@ -3904,7 +3911,7 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
       card.querySelector('.ce-titulo').textContent = s.titulo; card.querySelector('.ce-dato').textContent = s.dato;
       card.querySelector('.ce-gol-local').textContent = s.goles_local || '-'; card.querySelector('.ce-gol-visita').textContent = s.goles_visita || '-';
       s.autores_local = ctl.querySelector('.ce-in-al').value; s.autores_visita = ctl.querySelector('.ce-in-av').value;
-      card.querySelector('.ce-goles-local').textContent = s.autores_local; card.querySelector('.ce-goles-visita').textContent = s.autores_visita;
+      card.querySelector('.ce-goles-local').innerHTML = ceGolesHtml(s.autores_local); card.querySelector('.ce-goles-visita').innerHTML = ceGolesHtml(s.autores_visita);
       ceAjustarTexto(card); guardar();
     });
     // Invertir: quién va a la izquierda (el local de AQUEL partido) con su resultado.
