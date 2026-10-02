@@ -1700,6 +1700,10 @@ body {
 .card-hs .hs-sep { position: absolute; left: 534px; top: 0; width: 12px; height: 1350px; background: #fff; }
 .card-hs .hs-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 48.08%, rgba(0,0,0,1) 100%); }
 .card-hs.hs-sin-marco .hs-sep, .card-hs.hs-sin-marco .hs-scrim { display: none; }
+/* Una sola foto: la de la izquierda ocupa toda la placa, sin la otra mitad ni el separador. */
+.card-hs.hs-una-foto .hs-foto-local { width: 1080px; }
+.card-hs.hs-una-foto .hs-foto-visita, .card-hs.hs-una-foto .hs-sep { display: none; }
+.card-hs.hs-una-foto .hs-foto-local:not([style*="background-image"])::after { content: 'FOTO'; }
 .card-hs.moviendo { cursor: grab; }
 .card-hs.moviendo:active { cursor: grabbing; }
 .hs-foto-ctl { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #9a9aa8; margin-top: 6px; width: 324px; }
@@ -3525,8 +3529,9 @@ async function hsAgregar(row, fx, match, matchday) {
 
 /* Fotos de la placa historial: una por mitad (541x1350). Se suben a mano y
    viven sólo en la página abierta (una data URL no entra en localStorage). */
-function hsFotoControles(wrapper, card, nomLocal, nomVisita, iniciales) {
-  const W = 541, H = 1350;
+function hsFotoControles(wrapper, card, nomLocal, nomVisita, iniciales, unaSola) {
+  // Con "una sola foto" la de la izquierda ocupa toda la placa (1080) y no hay mitades.
+  const H = 1350, una = () => card.classList.contains('hs-una-foto'), ancho = lado => una() && lado === 'local' ? 1080 : 541;
   const est = { local: { src: null, nat: null, x: 50, y: 50, zoom: 1 }, visita: { src: null, nat: null, x: 50, y: 50, zoom: 1 } };
   const ctl = document.createElement('div'); ctl.className = 'hs-foto-ctl';
   const fila = (lado, nom) => `<div class="hs-fila" data-lado="${lado}"><b>foto ${gnEscape(nom)}</b><label class="hs-subir">subir archivo<input type="file" accept="image/*"></label>` +
@@ -3534,7 +3539,8 @@ function hsFotoControles(wrapper, card, nomLocal, nomVisita, iniciales) {
     '<label>zoom <input type="range" class="hs-zoom" min="1" max="3" step="0.01" value="1"></label></div>';
   ctl.innerHTML = fila('local', nomLocal) + fila('visita', nomVisita) +
     '<div class="hs-fila"><label><input type="checkbox" class="hs-mover"> mover foto / rueda = zoom</label>' +
-    '<label><input type="checkbox" class="hs-marco" checked> separador + degradé</label></div>' +
+    '<label><input type="checkbox" class="hs-marco" checked> separador + degradé</label>' +
+    '<label><input type="checkbox" class="hs-una"> una sola foto (sin dividir)</label></div>' +
     '<div class="hs-fila hs-estado"></div>';
   wrapper.appendChild(ctl);
   const estado = ctl.querySelector('.hs-estado');
@@ -3544,10 +3550,10 @@ function hsFotoControles(wrapper, card, nomLocal, nomVisita, iniciales) {
     else {
       el.style.backgroundImage = `url('${e.src}')`;
       el.style.backgroundPosition = e.x + '% ' + e.y + '%';
-      if (e.nat && e.zoom > 1.001) { const esc = Math.max(W / e.nat.w, H / e.nat.h) * e.zoom; el.style.backgroundSize = Math.round(e.nat.w * esc) + 'px ' + Math.round(e.nat.h * esc) + 'px'; }
+      if (e.nat && e.zoom > 1.001) { const esc = Math.max(ancho(lado) / e.nat.w, H / e.nat.h) * e.zoom; el.style.backgroundSize = Math.round(e.nat.w * esc) + 'px ' + Math.round(e.nat.h * esc) + 'px'; }
       else el.style.backgroundSize = 'cover';
     }
-    const hay = !!(est.local.src || est.visita.src);
+    const hay = !!(est.local.src || (!una() && est.visita.src));
     card.classList.toggle('hs-con-foto', hay);
     estado.textContent = hay ? 'se descarga completa, con las fotos'
       : (card.classList.contains('hs-sin-marco') ? 'se descarga sin fondo' : 'se descarga sin fondo, con separador y degradé (las fotos van atrás en Figma)');
@@ -3574,12 +3580,12 @@ function hsFotoControles(wrapper, card, nomLocal, nomVisita, iniciales) {
   chk.addEventListener('change', () => card.classList.toggle('moviendo', chk.checked));
   ctl.querySelector('.hs-marco').addEventListener('change', e => { card.classList.toggle('hs-sin-marco', !e.target.checked); aplicar('local'); });
   // La mitad se decide por dónde cae el cursor dentro de la placa.
-  const ladoDe = e => { const r = card.getBoundingClientRect(); return (e.clientX - r.left) < r.width / 2 ? 'local' : 'visita'; };
+  const ladoDe = e => { const r = card.getBoundingClientRect(); return una() || (e.clientX - r.left) < r.width / 2 ? 'local' : 'visita'; };
   let arr = null;
   card.addEventListener('mousedown', e => {
     if (!chk.checked) return;
     const lado = ladoDe(e), s = est[lado]; if (!s.src || !s.nat) return;
-    const esc = Math.max(W / s.nat.w, H / s.nat.h) * s.zoom;
+    const W = ancho(lado), esc = Math.max(W / s.nat.w, H / s.nat.h) * s.zoom;
     arr = { lado, x0: e.clientX, y0: e.clientY, x: s.x, y: s.y, sobraX: s.nat.w * esc - W, sobraY: s.nat.h * esc - H, vista: card.getBoundingClientRect().width / 1080 };
     e.preventDefault();
   });
@@ -3599,7 +3605,16 @@ function hsFotoControles(wrapper, card, nomLocal, nomVisita, iniciales) {
     ctl.querySelector(`[data-lado="${lado}"] .hs-zoom`).value = s.zoom;
     aplicar(lado);
   }, { passive: false });
-  aplicar('local');
+  // Una sola foto: se esconden la fila de la segunda foto, la otra mitad y el separador.
+  const chkUna = ctl.querySelector('.hs-una');
+  const ponerUna = si => {
+    chkUna.checked = si; card.classList.toggle('hs-una-foto', si);
+    ctl.querySelector('[data-lado="visita"]').style.display = si ? 'none' : '';
+    ctl.querySelector('[data-lado="local"] b').textContent = si ? 'foto' : 'foto ' + nomLocal;
+    aplicar('local');
+  };
+  chkUna.addEventListener('change', () => ponerUna(chkUna.checked));
+  ponerUna(!!unaSola);
   // Fotos que ya vienen cargadas (p. ej. las de un especial, desde especiales.json).
   if (iniciales) ['local', 'visita'].forEach(lado => { if (iniciales[lado]) poner(lado, iniciales[lado]); });
 }
@@ -3813,7 +3828,7 @@ async function ceArmarMejorClasico(row, e, clave, matchday) {
   });
   wp.appendChild(cp);
   hsFotoControles(wp, portada, e.away_id == null ? 'izquierda' : corto(e.home_id), e.away_id == null ? 'derecha' : corto(e.away_id),
-    { local: e.portada.foto_local, visita: e.portada.foto_visita });
+    { local: e.portada.foto_local, visita: e.portada.foto_visita }, e.portada.una_foto ?? (e.away_id == null));
   row.appendChild(wp);
 
   // ── Slides ──
