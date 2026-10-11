@@ -389,7 +389,7 @@ const claveFoto = u => sinAcentos(u.split('?')[0].replace(/^https?:\/\/(www\.)?/
       const como = c.origen === 'galería' ? 'camino D: galería de fotos linkeada desde una nota encontrada por ' + c.via
         : c.origen === 'nota' ? 'camino D: foto principal de la nota, encontrada por ' + c.via + ' buscando «' + c.consulta + '»'
         : 'camino D: Bing Imágenes (última semana) buscando «' + c.consulta + '»';
-      opciones.push({ archivo: 'fotos-partido/' + nombre, medio: c.host, tam: c.w + 'x' + c.h, escala: c.escala, url: c.u, nota: c.nota, fuente: c.notaUrl || null,
+      opciones.push({ archivo: 'fotos-partido/' + nombre, medio: c.host, tam: c.w + 'x' + c.h, escala: c.escala, url: c.u, nota: c.nota, goleador: !!c.goleador, fuente: c.notaUrl || null,
         que: (c.titulo || '').slice(0, 120), porque: porque.join(' · '), como, pos: await encuadre(full) });
       console.log('   ' + k + '. ' + (c.w + 'x' + c.h).padEnd(11) + c.host.padEnd(28) + 'nota ' + String(c.nota).padEnd(5) + c.origen.padEnd(8) + (c.goleador ? 'GOLEADOR ' : '') + (c.h >= c.w ? 'vertical ' : '') + (c.escala <= 1.001 ? 'sin estirar' : 'estira ' + c.escala + 'x') + ' · ' + (c.titulo || '').slice(0, 50));
     }

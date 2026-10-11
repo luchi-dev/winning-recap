@@ -14,14 +14,20 @@
  * vez de 131 y se perdió Lanús-Estudiantes y el cierre de la fecha 10.
  * Sólo se trabaja en los momentos que definió Luchi según cuándo postea:
  *
- *   MINUTO ~75 DEL PARTIDO  pre-búsqueda: foto del partido (los goles y festejos
- *                           ya están publicados) y caras del Top 5, para que al
- *                           pitazo la placa ya esté lista.
+ *   10 MIN DESPUÉS DE UN GOL  busca la foto del partido con ese goleador, para
+ *                           llegar al pitazo con el festejo ya elegido. Si hay
+ *                           otro gol, vuelve a buscar a los 10 min de ese.
+ *   MINUTO ~75 DEL PARTIDO  caras del Top 5, y la foto del partido si todavía no
+ *                           se buscó (0-0) o la que hay no es de un goleador.
  *   PITAZO FINAL            se queda despierto mirando el partido cada 30 s. Si
  *                           un gol sobre la hora cambió goleadores o resultado,
  *                           rehace la búsqueda. Completa las caras del Top 5.
  *   30 MIN DESPUÉS          UN reintento, sólo si la foto quedó floja (chica o
- *                           muy estirada) o no hubo. Después no insiste más.
+ *                           muy estirada), no hubo, o hubo goles y la elegida no
+ *                           es de un goleador (el festejo suele llegar con la
+ *                           crónica). Después no insiste más.
+ *
+ * Una foto puesta a mano no se pisa nunca.
  *   FIN DEL DÍA             caras de los MVPs del día.
  *   CIERRE DE PUNTAJES      caras de Equipo Ideal, Ganador de la fecha, MVPs y
  *                           Super Suplentes, apenas existe el equipo ideal.
@@ -50,6 +56,7 @@ const DIR_REVISAR = path.join(DIR_FOTOS, '_revisar');
 
 const MIN = 60e3, HORA = 3600e3, DIA = 24 * HORA;
 const PRE_DESDE = 30 * MIN;        // minutos de segundo tiempo para arrancar la pre-búsqueda (~min 75)
+const TRAS_GOL = 10 * MIN;         // cuánto después de un gol se busca la foto (antes los medios no la tienen)
 const ESPERA_MAX = 80 * MIN;       // si a los 80' de segundo tiempo no figura terminado, no se lo espera más
 const REINTENTO = 30 * MIN;        // el único reintento de una foto floja
 const DIAS_PARTIDO = 3;            // pasado esto, un partido ya no se toca
@@ -193,6 +200,9 @@ async function pasada(estado) {
   const registro = leer(REGISTRO, {});
   const P = g => (estado.partidos[g] = estado.partidos[g] || {});
   const floja = g => { const o = ((registro[g] || {}).opciones || [])[0]; return !o || o.escala > 1.5 || parseInt(o.tam, 10) < 1000; };
+  const aMano = g => /^a mano/.test((registro[g] || {}).como || '');
+  const sinGoleador = g => { const o = ((registro[g] || {}).opciones || [])[0]; return !o || !('goleador' in o ? o.goleador : /^nombra a /.test(o.porque || '')); };
+  const hayGoles = j => (j.home_score || 0) + (j.away_score || 0) > 0;
   const reciente = j => ahora - new Date(j.kickoff_ts) < DIAS_PARTIDO * DIA;
   const min2T = j => j.second_half_start ? ahora - new Date(j.second_half_start) : -1;
 
@@ -218,21 +228,34 @@ async function pasada(estado) {
     const p = P(j.game_id), t = nombre(j);
     if (p.cerrado) continue;
     if (!terminado(j)) {
-      // MINUTO ~75: pre-búsqueda
-      if (!p.pre && min2T(j) >= PRE_DESDE && min2T(j) < ESPERA_MAX) {
-        fotos.push({ j, motivo: 'segundo tiempo avanzado de ' + t + ' → pre-búsqueda para tenerla al pitazo', paso: 'pre' });
+      const jugado = ahora - new Date(j.kickoff_ts);
+      if (jugado < 0 || jugado > 3 * HORA) continue;
+      // Se anota cuándo cambió el resultado o los goleadores: de ahí se cuentan los 10 min.
+      const f = await firma(j);
+      if (p.visto !== f) { p.visto = f; p.vistoT = ahora; }
+      const golPendiente = hayGoles(j) && p.firma !== f && !aMano(j.game_id);
+      // 10 MIN DESPUÉS DE UN GOL
+      if (golPendiente && ahora - p.vistoT >= TRAS_GOL)
+        fotos.push({ j, motivo: 'gol en ' + t + ' hace 10 min (' + (j.home_score ?? 0) + '-' + (j.away_score ?? 0) + ') → busco la foto', paso: 'gol', forzar: true, firma: f });
+      // MINUTO ~75: caras, y la foto si no hay o no es de un goleador (salvo que se esté esperando la de un gol)
+      else if (!p.min75 && min2T(j) >= PRE_DESDE && min2T(j) < ESPERA_MAX) {
+        if (aMano(j.game_id) || golPendiente || (p.pre && !(hayGoles(j) && sinGoleador(j.game_id)))) fotos.push({ j, motivo: 'segundo tiempo avanzado de ' + t + ': la foto ya está buscada o viene con el gol', paso: 'pre', nada: true });
+        else fotos.push({ j, motivo: 'segundo tiempo avanzado de ' + t + ' → pre-búsqueda para tenerla al pitazo', paso: 'pre', forzar: !!p.pre, firma: f });
         await carasDelPartido(j, 8, 'Top 5 de ' + t);
       }
     } else if (!p.final) {
       // PITAZO FINAL
       const f = await firma(j);
-      if (!p.pre) fotos.push({ j, motivo: 'terminó ' + t + ' (sin pre-búsqueda) → foto', paso: 'final', firma: f });
+      if (aMano(j.game_id)) fotos.push({ j, motivo: 'terminó ' + t + ', la foto está puesta a mano: no la toco', paso: 'final', nada: true, firma: f });
+      else if (!p.pre) fotos.push({ j, motivo: 'terminó ' + t + ' (sin pre-búsqueda) → foto', paso: 'final', firma: f });
       else if (p.firma !== f) fotos.push({ j, motivo: 'terminó ' + t + ' y cambió el resultado o los goleadores desde la pre-búsqueda → rehago la foto', paso: 'final', forzar: true, firma: f });
       else fotos.push({ j, motivo: 'terminó ' + t + ', la foto de la pre-búsqueda sigue valiendo', paso: 'final', nada: true, firma: f });
       await carasDelPartido(j, 5, 'Top 5 de ' + t);
     } else if (ahora - p.final >= REINTENTO) {
       // 30 MIN DESPUÉS
-      if (floja(j.game_id)) fotos.push({ j, motivo: '30 min después de ' + t + ': la foto quedó floja → único reintento', paso: 'reintento', forzar: true });
+      if (aMano(j.game_id)) fotos.push({ j, motivo: '30 min después de ' + t + ': la foto está puesta a mano, cierro el partido', paso: 'reintento', nada: true });
+      else if (hayGoles(j) && sinGoleador(j.game_id)) fotos.push({ j, motivo: '30 min después de ' + t + ': la foto no es de un goleador → único reintento, ya con las crónicas', paso: 'reintento', forzar: true });
+      else if (floja(j.game_id)) fotos.push({ j, motivo: '30 min después de ' + t + ': la foto quedó floja → único reintento', paso: 'reintento', forzar: true });
       else fotos.push({ j, motivo: '30 min después de ' + t + ': la foto está bien, cierro el partido', paso: 'reintento', nada: true });
       await carasDelPartido(j, 5, 'Top 5 de ' + t);
     }
@@ -313,7 +336,8 @@ async function pasada(estado) {
   for (const f of fotos) {
     const p = P(f.j.game_id);
     if (!f.nada) correr('foto-fuentes.js', [f.j.matchday, '--comp', COMPETITION, '--game', f.j.game_id, ...(f.forzar ? ['--forzar'] : [])]);
-    if (f.paso === 'pre') { p.pre = Date.now(); p.firma = await firma(f.j); }
+    if (f.paso === 'pre') p.min75 = Date.now();
+    if ((f.paso === 'pre' || f.paso === 'gol') && !f.nada) { p.pre = Date.now(); p.firma = f.firma; }
     if (f.paso === 'final') { p.final = Date.now(); p.firma = f.firma; }
     if (f.paso === 'reintento') p.cerrado = true;
     guardar();
@@ -360,7 +384,7 @@ async function pasada(estado) {
 
   // Limpieza: lo de hace más de un mes ya no sirve.
   const viejo = Date.now() - 30 * DIA;
-  Object.keys(estado.partidos).forEach(k => { const e = estado.partidos[k]; if ((e.final || e.pre || 0) < viejo) delete estado.partidos[k]; });
+  Object.keys(estado.partidos).forEach(k => { const e = estado.partidos[k]; if ((e.final || e.pre || e.vistoT || 0) < viejo) delete estado.partidos[k]; });
   Object.keys(estado.caras).forEach(k => { if (estado.caras[k].t < viejo) delete estado.caras[k]; });
   guardar();
   return { hayTrabajo, esperando, vigilar };
@@ -372,6 +396,8 @@ async function pasada(estado) {
   estado.partidos = estado.partidos || {}; estado.caras = estado.caras || {}; estado.captions = estado.captions || {}; estado.publicado = estado.publicado || {};
   // El estado viejo contaba intentos ({n,t}); ya no se usa.
   Object.keys(estado.partidos).forEach(k => { if ('n' in estado.partidos[k]) delete estado.partidos[k]; });
+  // Partidos que ya tenían la pre-búsqueda del minuto 75 antes de que existiera la del gol.
+  Object.values(estado.partidos).forEach(e => { if (e.pre && !e.min75 && !e.vistoT) e.min75 = e.pre; });
 
   let hubo = false, vueltas = 0, ultimoAviso = '';
   for (;;) {
