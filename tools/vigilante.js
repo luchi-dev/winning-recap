@@ -129,6 +129,13 @@ function publicar() {
   log(ok ? 'publicado en el sitio' : 'OJO: falló la publicación');
 }
 
+/* Trae del sitio el registro de fotos antes de decidir: si alguien puso una foto a mano
+   mientras la guardia estaba despierta, hay que verla (y no pisarla al publicar). */
+function traerRegistro() {
+  if (!process.env.BUCKET || MIRAR) return;
+  spawnSync('aws', ['s3', 'cp', process.env.BUCKET + '/fotos-partido/elegidas.json', REGISTRO, '--only-show-errors'], { cwd: RAIZ, stdio: 'inherit' });
+}
+
 /* Lanza la próxima corrida (sólo en GitHub: hace falta GH_TOKEN y el repo). La
    nueva queda en cola por el grupo de concurrencia y arranca cuando ésta termina. */
 function relevo() {
@@ -197,6 +204,7 @@ async function pasada(estado) {
   const ahora = Date.now();
   for (const c of [puntosCache, torneoCache]) Object.keys(c).forEach(k => delete c[k]);   // los puntos cambian mientras se espera el pitazo
   const fx = await fixtures();
+  traerRegistro();
   const registro = leer(REGISTRO, {});
   const P = g => (estado.partidos[g] = estado.partidos[g] || {});
   const floja = g => { const o = ((registro[g] || {}).opciones || [])[0]; return !o || o.escala > 1.5 || parseInt(o.tam, 10) < 1000; };
