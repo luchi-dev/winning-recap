@@ -44,9 +44,14 @@ async function publicarEnX(carpeta, base, placas, probar) {
     jpgs.push(Buffer.from(await r.arrayBuffer()));
     log(`imagen ${u} (${Math.round(jpgs[jpgs.length - 1].length / 1024)} KB)`);
   }
+  // responde.txt (opcional): id del tweet al que se contesta, para armar un hilo.
+  let responde = null;
+  try { responde = aws(['s3', 'cp', base + 'responde.txt', '-']).trim() || null; } catch (e) { /* sin responde.txt es un posteo suelto */ }
+  if (responde && !/^\d+$/.test(responde)) throw new Error('responde.txt tiene que ser solo el número del tweet');
   log(`texto (${texto.length} caracteres):\n${texto}\n`);
+  if (responde) log('en respuesta a https://x.com/i/status/' + responde);
   if (probar) { log('modo prueba: no se publica'); return; }
-  log('publicado en X: ' + await redes.publicarX(texto, jpgs));
+  log('publicado en X: ' + await redes.publicarX(texto, jpgs, responde));
 }
 
 (async () => {
