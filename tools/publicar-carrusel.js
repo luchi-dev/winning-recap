@@ -12,7 +12,8 @@
  *   --probar    revisa placas y caption y los muestra, pero no publica
  *   --facebook  publica también en la página de Facebook (si están las claves)
  *   --x         publica en X en vez de Instagram: hasta 4 JPG y el texto de
- *               tweet.txt (280 caracteres como máximo)
+ *               tweet.txt (la cuenta tiene X Premium: admite textos largos;
+ *               pasados los 280 caracteres X muestra "Mostrar más")
  *
  * Claves en el ambiente: IG_USER_ID, IG_ACCESS_TOKEN y, opcionales, FB_PAGE_ID
  * y FB_PAGE_TOKEN; para X, las cuatro X_*. Lo compartido está en redes.js.
@@ -36,7 +37,8 @@ async function publicarEnX(carpeta, base, placas, probar) {
   if (placas.length > 4) throw new Error(`hay ${placas.length} imágenes y X acepta hasta 4 por posteo`);
   const texto = aws(['s3', 'cp', base + 'tweet.txt', '-']).replace(/\r/g, '').trim();
   if (!texto) throw new Error('tweet.txt está vacío');
-  if (texto.length > 280) throw new Error(`el texto tiene ${texto.length} caracteres y X permite 280`);
+  if (texto.length > 4000) throw new Error(`el texto tiene ${texto.length} caracteres: demasiado largo para un posteo`);
+  if (texto.length > 280) log('aviso: pasa los 280 caracteres; en X se ve cortado con "Mostrar más"');
   const jpgs = [];
   for (const n of placas) {
     const u = `${redes.SITIO}/carruseles/${carpeta}/${n}`;
