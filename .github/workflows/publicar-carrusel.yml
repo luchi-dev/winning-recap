@@ -57,6 +57,7 @@ jobs:
       - name: Dependencias
         if: ${{ inputs.x }}
         run: npm ci --no-audit --no-fund
+        working-directory: tools
 
       # La carpeta va por variable de ambiente, no pegada en el comando.
       - name: Publicar
