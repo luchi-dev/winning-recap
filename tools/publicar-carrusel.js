@@ -7,7 +7,8 @@
  *
  *   carpeta     nombre dentro de carruseles/ en el S3 del sitio. Adentro van
  *               las placas en JPG (hasta 10, se publican en orden alfabético:
- *               01-portada.jpg, 02-...) y caption.txt con el texto.
+ *               01-portada.jpg, 02-...) y caption.txt con el texto. Una placa
+ *               puede ser un video .mp4 (H.264 + AAC, hasta 60 s; solo Instagram).
  *   --probar    revisa placas y caption y los muestra, pero no publica
  *   --facebook  publica también en la página de Facebook (si están las claves)
  *   --x         publica en X en vez de Instagram: hasta 4 JPG y el texto de
@@ -64,8 +65,9 @@ async function publicarEnX(carpeta, base, placas, probar) {
   }
   try {
     const base = `${BUCKET}/carruseles/${carpeta}/`;
-    const placas = aws(['s3', 'ls', base]).split('\n').map(l => l.trim().split(/\s+/).pop()).filter(n => /\.jpe?g$/i.test(n || '')).sort();
-    if (enX) return await publicarEnX(carpeta, base, placas, probar);
+    const placas = aws(['s3', 'ls', base]).split('\n').map(l => l.trim().split(/\s+/).pop()).filter(n => /\.(jpe?g|mp4)$/i.test(n || '')).sort();
+    if (enX) return await publicarEnX(carpeta, base, placas.filter(n => !/\.mp4$/i.test(n)), probar);
+    if (facebook && placas.some(n => /\.mp4$/i.test(n))) throw new Error('el carrusel tiene un video: a Facebook no se puede mandar así, publicar sin --facebook');
     if (placas.length < 2) throw new Error(`en carruseles/${carpeta}/ hay ${placas.length} JPG y un carrusel necesita al menos 2`);
     if (placas.length > 10) throw new Error(`hay ${placas.length} placas e Instagram acepta hasta 10 por carrusel`);
     const caption = aws(['s3', 'cp', base + 'caption.txt', '-']).replace(/\r/g, '').trim();
@@ -75,7 +77,8 @@ async function publicarEnX(carpeta, base, placas, probar) {
     const urls = placas.map(n => `${redes.SITIO}/carruseles/${carpeta}/${n}`);
     for (const u of urls) {
       const r = await fetch(u, { method: 'HEAD' });
-      if (!r.ok || !/image\/jpeg/.test(r.headers.get('content-type') || '')) throw new Error('no es un JPG público: ' + u);
+      const tipo = /\.mp4$/i.test(u) ? /video\/mp4/ : /image\/jpeg/;
+      if (!r.ok || !tipo.test(r.headers.get('content-type') || '')) throw new Error('no es un JPG o MP4 público: ' + u);
     }
     log(`${placas.length} placas:\n${urls.join('\n')}\n`);
     log(`caption (${caption.length} caracteres):\n${caption}\n`);

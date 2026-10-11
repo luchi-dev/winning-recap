@@ -111,14 +111,15 @@ async function graphIG(ruta, params, metodo = 'GET') {
   return d;
 }
 async function esperarContenedor(id) {
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 90; i++) {   // un video tarda bastante más que una foto
     const s = await graphIG(`/${id}`, { fields: 'status_code,status' }).catch(e => ({ status_code: 'SIN_ESTADO', status: e.message }));
     if (s.status_code === 'FINISHED') return;
-    if (s.status_code === 'ERROR' || s.status_code === 'EXPIRED') throw new Error('Instagram no pudo procesar la imagen: ' + (s.status || s.status_code));
+    if (s.status_code === 'ERROR' || s.status_code === 'EXPIRED') throw new Error('Instagram no pudo procesar la placa: ' + (s.status || s.status_code));
     await dormir(4000);
   }
 }
-/* urls: direcciones públicas de los JPG. Una sola → foto; varias → carrusel (hasta 10). */
+/* urls: direcciones públicas de los JPG. Una sola → foto; varias → carrusel (hasta 10).
+   En un carrusel también puede ir un .mp4 (H.264 + AAC, hasta 60 s): entra como una placa más. */
 async function publicarInstagram(caption, urls) {
   const { IG_USER_ID, IG_ACCESS_TOKEN } = process.env;
   if (!IG_USER_ID || !IG_ACCESS_TOKEN) throw new Error('faltan las claves de Instagram en el ambiente (IG_USER_ID, IG_ACCESS_TOKEN)');
@@ -130,7 +131,7 @@ async function publicarInstagram(caption, urls) {
   } else {
     const hijos = [];
     for (const u of urls.slice(0, 10)) {
-      const h = (await graphIG(`/${IG_USER_ID}/media`, { image_url: u, is_carousel_item: 'true' }, 'POST')).id;
+      const h = (await graphIG(`/${IG_USER_ID}/media`, /.mp4$/i.test(u) ? { media_type: 'VIDEO', video_url: u, is_carousel_item: 'true' } : { image_url: u, is_carousel_item: 'true' }, 'POST')).id;
       await esperarContenedor(h);
       hijos.push(h);
     }
