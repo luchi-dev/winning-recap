@@ -1,0 +1,51 @@
+# Publica en Instagram un carrusel ya armado (placas que no salen del Recap):
+# Actions → "Publicar carrusel" → Run workflow → carpeta.
+# Las placas (JPG, hasta 10) y caption.txt se suben antes al S3 del sitio, en
+# carruseles/<carpeta>/, y se publican en orden alfabético.
+name: Publicar carrusel
+
+on:
+  workflow_dispatch:
+    inputs:
+      carpeta:
+        description: 'Carpeta dentro de carruseles/ en el sitio (ej: clasico-mas-grande)'
+        required: true
+      probar:
+        description: 'Solo probar: revisa placas y caption, no publica'
+        required: false
+        type: boolean
+        default: true
+      facebook:
+        description: 'Publicar también en la página de Facebook (si están las claves)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  IG_USER_ID: ${{ secrets.IG_USER_ID }}
+  IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+  FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+  FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  BUCKET: s3://winning-com-ar/iloveneuquen
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # La carpeta va por variable de ambiente, no pegada en el comando.
+      - name: Publicar
+        run: node tools/publicar-carrusel.js "$CARPETA" ${{ inputs.probar && '--probar' || '' }} ${{ inputs.facebook && '--facebook' || '' }}
+        env:
+          CARPETA: ${{ inputs.carpeta }}
