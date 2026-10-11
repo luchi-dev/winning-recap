@@ -10,9 +10,11 @@
  *               01-portada.jpg, 02-...) y caption.txt con el texto.
  *   --probar    revisa placas y caption y los muestra, pero no publica
  *   --facebook  publica también en la página de Facebook (si están las claves)
+ *   --x         publica en X en vez de Instagram: hasta 4 JPG y el texto de
+ *               tweet.txt (280 caracteres como máximo)
  *
  * Claves en el ambiente: IG_USER_ID, IG_ACCESS_TOKEN y, opcionales, FB_PAGE_ID
- * y FB_PAGE_TOKEN. Lo compartido está en redes.js.
+ * y FB_PAGE_TOKEN; para X, las cuatro X_*. Lo compartido está en redes.js.
  */
 
 const { spawnSync } = require('child_process');
@@ -27,10 +29,30 @@ function aws(args) {
   return r.stdout;
 }
 
+/* X: una a cuatro imágenes y el texto de tweet.txt. Las imágenes se bajan del sitio. */
+async function publicarEnX(carpeta, base, placas, probar) {
+  if (!placas.length) throw new Error(`en carruseles/${carpeta}/ no hay ningún JPG`);
+  if (placas.length > 4) throw new Error(`hay ${placas.length} imágenes y X acepta hasta 4 por posteo`);
+  const texto = aws(['s3', 'cp', base + 'tweet.txt', '-']).replace(/\r/g, '').trim();
+  if (!texto) throw new Error('tweet.txt está vacío');
+  if (texto.length > 280) throw new Error(`el texto tiene ${texto.length} caracteres y X permite 280`);
+  const jpgs = [];
+  for (const n of placas) {
+    const u = `${redes.SITIO}/carruseles/${carpeta}/${n}`;
+    const r = await fetch(u + '?v=' + Date.now());
+    if (!r.ok || !/image\/jpeg/.test(r.headers.get('content-type') || '')) throw new Error('no es un JPG público: ' + u);
+    jpgs.push(Buffer.from(await r.arrayBuffer()));
+    log(`imagen ${u} (${Math.round(jpgs[jpgs.length - 1].length / 1024)} KB)`);
+  }
+  log(`texto (${texto.length} caracteres):\n${texto}\n`);
+  if (probar) { log('modo prueba: no se publica'); return; }
+  log('publicado en X: ' + await redes.publicarX(texto, jpgs));
+}
+
 (async () => {
   const a = process.argv.slice(2);
   const carpeta = a[0] && !a[0].startsWith('--') ? a[0] : null;
-  const probar = a.includes('--probar'), facebook = a.includes('--facebook');
+  const probar = a.includes('--probar'), facebook = a.includes('--facebook'), enX = a.includes('--x');
   if (!carpeta || !/^[a-z0-9-]+$/.test(carpeta)) {
     console.error('uso: node publicar-carrusel.js <carpeta> [--probar] [--facebook]   (carpeta: minúsculas, números y guiones)');
     process.exit(2);
@@ -38,6 +60,7 @@ function aws(args) {
   try {
     const base = `${BUCKET}/carruseles/${carpeta}/`;
     const placas = aws(['s3', 'ls', base]).split('\n').map(l => l.trim().split(/\s+/).pop()).filter(n => /\.jpe?g$/i.test(n || '')).sort();
+    if (enX) return await publicarEnX(carpeta, base, placas, probar);
     if (placas.length < 2) throw new Error(`en carruseles/${carpeta}/ hay ${placas.length} JPG y un carrusel necesita al menos 2`);
     if (placas.length > 10) throw new Error(`hay ${placas.length} placas e Instagram acepta hasta 10 por carrusel`);
     const caption = aws(['s3', 'cp', base + 'caption.txt', '-']).replace(/\r/g, '').trim();

@@ -20,6 +20,11 @@ on:
         required: false
         type: boolean
         default: false
+      x:
+        description: 'Publicar en X en vez de Instagram (hasta 4 JPG + tweet.txt)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,6 +34,10 @@ env:
   IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
   FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
   FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+  X_API_KEY: ${{ secrets.X_API_KEY }}
+  X_API_SECRET: ${{ secrets.X_API_SECRET }}
+  X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+  X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: sa-east-1
@@ -44,8 +53,13 @@ jobs:
         with:
           node-version: 22
 
+      # Solo X necesita paquetes (twitter-api-v2); Instagram y Facebook van con fetch.
+      - name: Dependencias
+        if: ${{ inputs.x }}
+        run: npm ci --no-audit --no-fund
+
       # La carpeta va por variable de ambiente, no pegada en el comando.
       - name: Publicar
-        run: node tools/publicar-carrusel.js "$CARPETA" ${{ inputs.probar && '--probar' || '' }} ${{ inputs.facebook && '--facebook' || '' }}
+        run: node tools/publicar-carrusel.js "$CARPETA" ${{ inputs.probar && '--probar' || '' }} ${{ inputs.facebook && '--facebook' || '' }} ${{ inputs.x && '--x' || '' }}
         env:
           CARPETA: ${{ inputs.carpeta }}
