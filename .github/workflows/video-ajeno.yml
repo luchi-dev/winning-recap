@@ -1,0 +1,78 @@
+# Tuit con el video de otra cuenta puesto adentro (tools/video-ajeno.js): el texto es
+# nuestro y el video sigue siendo del tuit original, con su crédito. No es cita ni resubida.
+#   leer     → lista los tuits con video de las cuentas desde una hora (consume crédito de la API de X)
+#   publicar → publica el texto + el video del tuit del link
+#   borrar   → borra un tuit nuestro (por id)
+name: Video ajeno en X
+
+on:
+  workflow_dispatch:
+    inputs:
+      accion:
+        description: 'Qué hacer'
+        required: true
+        type: choice
+        options: [leer, publicar, borrar]
+        default: leer
+      cuentas:
+        description: 'leer: cuentas separadas por coma'
+        required: false
+        default: 'SC_ESPN'
+      desde:
+        description: 'leer: desde qué hora, en UTC (ej. 2026-10-11T19:30:00Z)'
+        required: false
+      link:
+        description: 'publicar: link del tuit original con el video'
+        required: false
+      texto:
+        description: 'publicar: el texto del tuit'
+        required: false
+      id:
+        description: 'borrar: id del tuit nuestro'
+        required: false
+      probar:
+        description: 'publicar: solo mostrar cómo quedaría, sin publicar'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  X_API_KEY: ${{ secrets.X_API_KEY }}
+  X_API_SECRET: ${{ secrets.X_API_SECRET }}
+  X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+  X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+
+jobs:
+  video-ajeno:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Solo la librería de X, aparte: instalar todo tools/ tarda un minuto de más
+      - name: Instalar la librería de X
+        run: |
+          mkdir -p "$RUNNER_TEMP/x" && cd "$RUNNER_TEMP/x" && npm init -y >/dev/null && npm install --no-audit --no-fund twitter-api-v2@1.29.1
+          echo "NODE_PATH=$RUNNER_TEMP/x/node_modules" >> "$GITHUB_ENV"
+
+      # Los textos van por variable de ambiente: pueden tener comillas, emojis y saltos de línea.
+      - name: Hacerlo
+        run: |
+          case "$ACCION" in
+            leer)     node tools/video-ajeno.js leer --cuentas "$CUENTAS" ${DESDE:+--desde "$DESDE"} ;;
+            publicar) node tools/video-ajeno.js publicar "$LINK" ${{ inputs.probar && '--probar' || '' }} ;;
+            borrar)   node tools/video-ajeno.js borrar "$ID" ;;
+          esac
+        env:
+          ACCION: ${{ inputs.accion }}
+          CUENTAS: ${{ inputs.cuentas }}
+          DESDE: ${{ inputs.desde }}
+          LINK: ${{ inputs.link }}
+          ID: ${{ inputs.id }}
+          X_TEXTO: ${{ inputs.texto }}
