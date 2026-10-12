@@ -1,0 +1,22 @@
+{
+  "activa": true,
+  "minutos": 25,
+  "tipo": "manual",
+  "carpetas": [
+    "censo-07-tucuman",
+    "censo-08-corrientes",
+    "censo-02-tierra-del-fuego",
+    "censo-06-santa-fe",
+    "censo-05-cordoba",
+    "censo-03b-buenos-aires-jugatela",
+    "censo-04-caba",
+    "censo-13-censo-2036",
+    "censo-09-boca-gana-todas",
+    "censo-11-millones",
+    "censo-15-general",
+    "censo-14-propuesta",
+    "censo-10-veredicto",
+    "censo-12-reparto",
+    "censo-03-buenos-aires"
+  ]
+}

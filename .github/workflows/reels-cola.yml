@@ -1,0 +1,42 @@
+# Sube como reel de prueba el próximo video de la cola (tools/reels-cola.json), uno cada media hora.
+# Los videos y captions se suben antes al S3 del sitio, en reels/<carpeta>/.
+# Para frenarla: poner "activa": false en tools/reels-cola.json (o deshabilitar este workflow en Actions).
+name: Reels en cola
+
+on:
+  schedule:
+    - cron: '5,35 * * * *'
+  workflow_dispatch:
+    inputs:
+      probar:
+        description: 'Solo decir cuál sigue, sin publicar'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reels-cola
+  cancel-in-progress: false
+
+env:
+  IG_USER_ID: ${{ secrets.IG_USER_ID }}
+  IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  BUCKET: s3://winning-com-ar/iloveneuquen
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Publicar el que sigue
+        run: node tools/publicar-reel-cola.js ${{ inputs.probar && '--probar' || '' }}
