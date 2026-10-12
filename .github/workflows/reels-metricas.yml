@@ -1,0 +1,32 @@
+# Muestra las métricas de los últimos reels de la cuenta (vistas, alcance, me gusta, tiempo de reproducción).
+# Actions → "Reels: métricas" → Run workflow. Solo lee, no publica nada.
+name: 'Reels: métricas'
+
+on:
+  workflow_dispatch:
+    inputs:
+      cantidad:
+        description: 'Cuántas publicaciones recientes mirar'
+        required: false
+        default: '30'
+
+permissions:
+  contents: read
+
+env:
+  IG_USER_ID: ${{ secrets.IG_USER_ID }}
+  IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+
+jobs:
+  metricas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Métricas
+        run: node tools/reels-metricas.js "$CANTIDAD"
+        env:
+          CANTIDAD: ${{ inputs.cantidad }}
