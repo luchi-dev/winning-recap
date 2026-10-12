@@ -8,6 +8,7 @@
  *   subirS3(jpg, nombre)              sube un JPG al S3 del sitio y devuelve su URL
  *   publicarX(texto, jpgs)            un posteo en X con hasta 4 imágenes
  *   publicarInstagram(caption, urls)  una foto o un carrusel (hasta 10) en Instagram
+ *   publicarReel(caption, url, prueba) un reel en Instagram; prueba = reel de prueba (solo no seguidores)
  *   publicarFacebook(caption, urls)   una o varias fotos en la página de Facebook
  *
  * Claves, siempre en el ambiente: X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN,
@@ -25,6 +26,7 @@ const SITIO = 'https://winning.com.ar/iloveneuquen';
 const BUCKET = process.env.BUCKET || 's3://winning-com-ar/iloveneuquen';
 const GRAPH_IG = 'https://graph.instagram.com/v21.0';
 const GRAPH_FB = 'https://graph.facebook.com/v21.0';
+const GRAPH_IG_REEL = 'https://graph.instagram.com/v23.0';   // los reels de prueba (trial_params) necesitan una versión más nueva
 
 const log = m => console.log('[redes] ' + m);
 const dormir = ms => new Promise(r => setTimeout(r, ms));
@@ -102,8 +104,8 @@ async function publicarX(texto, jpgs, enRespuestaA) {
 }
 
 // ── Instagram ─────────────────────────────────────────────────────────
-async function graphIG(ruta, params, metodo = 'GET') {
-  const url = new URL(GRAPH_IG + ruta);
+async function graphIG(ruta, params, metodo = 'GET', base = GRAPH_IG) {
+  const url = new URL(base + ruta);
   Object.entries({ ...params, access_token: process.env.IG_ACCESS_TOKEN }).forEach(([k, v]) => url.searchParams.set(k, v));
   const r = await fetch(url, { method: metodo });
   const d = await r.json().catch(() => ({}));
@@ -148,6 +150,26 @@ async function publicarInstagram(caption, urls) {
   return info.permalink || ('id ' + p.id);
 }
 
+/* url: dirección pública de un .mp4 vertical (H.264 + AAC). prueba: 'MANUAL' o 'SS_PERFORMANCE' lo publica como
+   reel de prueba (se muestra solo a no seguidores): con MANUAL se pasa a los seguidores a mano desde la app,
+   con SS_PERFORMANCE lo pasa Instagram solo si rinde bien. Sin prueba es un reel común. */
+async function publicarReel(caption, url, prueba) {
+  const { IG_USER_ID, IG_ACCESS_TOKEN } = process.env;
+  if (!IG_USER_ID || !IG_ACCESS_TOKEN) throw new Error('faltan las claves de Instagram en el ambiente (IG_USER_ID, IG_ACCESS_TOKEN)');
+  if (caption.length > 2200) throw new Error(`el caption tiene ${caption.length} caracteres e Instagram permite 2200`);
+  const params = { media_type: 'REELS', video_url: url, caption };
+  if (prueba) params.trial_params = JSON.stringify({ graduation_strategy: prueba });
+  const id = (await graphIG(`/${IG_USER_ID}/media`, params, 'POST', GRAPH_IG_REEL)).id;
+  await esperarContenedor(id);
+  let p = null;
+  for (let i = 0; i < 12 && !p; i++) {
+    try { p = await graphIG(`/${IG_USER_ID}/media_publish`, { creation_id: id }, 'POST', GRAPH_IG_REEL); }
+    catch (e) { if (!/9007|2207027|not ready|not available/i.test(e.message) || i === 11) throw e; log('Instagram: todavía no está listo, espero 10 s (' + (i + 1) + '/12)'); await dormir(10000); }
+  }
+  const info = await graphIG(`/${p.id}`, { fields: 'permalink' }).catch(() => ({}));
+  return info.permalink || ('id ' + p.id);
+}
+
 // ── Facebook (página) ─────────────────────────────────────────────────
 async function graphFB(ruta, params) {
   const r = await fetch(GRAPH_FB + ruta, { method: 'POST', body: new URLSearchParams({ ...params, access_token: process.env.FB_PAGE_TOKEN }) });
@@ -171,4 +193,4 @@ async function publicarFacebook(caption, urls) {
   return 'https://www.facebook.com/' + d.id;
 }
 
-module.exports = { imagenes, subirS3, publicarX, publicarInstagram, publicarFacebook, COMPETITION, SEASON, RAIZ, SITIO };
+module.exports = { imagenes, subirS3, publicarX, publicarInstagram, publicarReel, publicarFacebook, COMPETITION, SEASON, RAIZ, SITIO };

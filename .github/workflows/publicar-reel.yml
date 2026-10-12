@@ -1,0 +1,50 @@
+# Publica en Instagram un reel ya armado (un video que no sale del Recap), común o de prueba:
+# Actions → "Publicar reel" → Run workflow → carpeta.
+# El video (un solo .mp4 vertical) y caption.txt se suben antes al S3 del sitio, en reels/<carpeta>/.
+# Reel de prueba: lo ven solo no seguidores; con "manual" se pasa a los seguidores desde la app.
+name: Publicar reel
+
+on:
+  workflow_dispatch:
+    inputs:
+      carpeta:
+        description: 'Carpeta dentro de reels/ en el sitio (ej: censo-01-santiago)'
+        required: true
+      tipo:
+        description: 'prueba-manual: reel de prueba, lo pasás vos a los seguidores · prueba-auto: lo pasa Instagram si rinde · comun: a todos'
+        required: true
+        type: choice
+        options: [prueba-manual, prueba-auto, comun]
+        default: prueba-manual
+      probar:
+        description: 'Solo probar: revisa video y caption, no publica'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  IG_USER_ID: ${{ secrets.IG_USER_ID }}
+  IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  BUCKET: s3://winning-com-ar/iloveneuquen
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # La carpeta va por variable de ambiente, no pegada en el comando.
+      - name: Publicar
+        run: node tools/publicar-reel.js "$CARPETA" ${{ inputs.probar && '--probar' || '' }} ${{ inputs.tipo == 'prueba-manual' && '--prueba manual' || '' }} ${{ inputs.tipo == 'prueba-auto' && '--prueba auto' || '' }}
+        env:
+          CARPETA: ${{ inputs.carpeta }}
