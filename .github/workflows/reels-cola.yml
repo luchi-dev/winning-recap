@@ -1,11 +1,12 @@
-# Sube como reel de prueba el próximo video de la cola (tools/reels-cola.json), uno cada media hora.
+# Sube como reels de prueba los videos de la cola (tools/reels-cola.json), uno cada media hora.
 # Los videos y captions se suben antes al S3 del sitio, en reels/<carpeta>/.
-# Para frenarla: poner "activa": false en tools/reels-cola.json (o deshabilitar este workflow en Actions).
+# El cron de GitHub no es confiable en este repo, así que no hay horario: se larga a mano (Actions →
+# "Reels en cola" → Run workflow) y el trabajo se queda de guardia, publicando uno cada 30 minutos
+# hasta vaciar la cola (un trabajo dura como mucho 6 horas: alcanza para 11 reels).
+# Para frenarla: cancelar la corrida en Actions, o poner "activa": false en tools/reels-cola.json.
 name: Reels en cola
 
 on:
-  schedule:
-    - cron: '5,35 * * * *'
   workflow_dispatch:
     inputs:
       probar:
@@ -13,6 +14,11 @@ on:
         required: false
         type: boolean
         default: false
+      guardia:
+        description: 'Quedarse publicando uno cada 30 minutos hasta vaciar la cola'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -32,11 +38,21 @@ env:
 jobs:
   publicar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Publicar el que sigue
+        if: ${{ inputs.probar || !inputs.guardia }}
         run: node tools/publicar-reel-cola.js ${{ inputs.probar && '--probar' || '' }}
+      # Guardia: una pasada cada 30 minutos; un reel que falla no corta la tanda. Termina cuando no queda nada.
+      - name: Guardia
+        if: ${{ !inputs.probar && inputs.guardia }}
+        run: |
+          for n in $(seq 1 11); do
+            node tools/publicar-reel-cola.js | tee pasada.log || true
+            if grep -q "no queda nada en la cola\|la cola está apagada" pasada.log; then break; fi
+            sleep 1800
+          done

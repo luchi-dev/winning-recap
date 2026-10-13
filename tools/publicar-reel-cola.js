@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * publicar-reel-cola.js — publica como reel de prueba el próximo video de la cola
- * (tools/reels-cola.json), uno por pasada. Lo corre el workflow "Reels en cola" cada media hora.
+ * (tools/reels-cola.json), uno por pasada. Lo corre el workflow "Reels en cola", que se queda de guardia y hace una pasada cada media hora.
  *
  *   node publicar-reel-cola.js [--probar]
  *
