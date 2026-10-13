@@ -13,7 +13,9 @@
  *   --facebook  publica también en la página de Facebook (si están las claves)
  *   --x         publica en X en vez de Instagram: hasta 4 JPG y el texto de
  *               tweet.txt (la cuenta tiene X Premium: admite textos largos;
- *               pasados los 280 caracteres X muestra "Mostrar más")
+ *               pasados los 280 caracteres X muestra "Mostrar más"). Con
+ *               responde.txt (el número de un tweet) sale como respuesta, y
+ *               ahí puede ir sin imágenes: solo el texto
  *
  * Claves en el ambiente: IG_USER_ID, IG_ACCESS_TOKEN y, opcionales, FB_PAGE_ID
  * y FB_PAGE_TOKEN; para X, las cuatro X_*. Lo compartido está en redes.js.
@@ -49,7 +51,6 @@ async function publicarVideoEnX(carpeta, base, placas, probar) {
 /* X: una a cuatro imágenes y el texto de tweet.txt. Las imágenes se bajan del sitio. */
 async function publicarEnX(carpeta, base, placas, probar) {
   if (placas.some(n => /\.mp4$/i.test(n))) return await publicarVideoEnX(carpeta, base, placas, probar);
-  if (!placas.length) throw new Error(`en carruseles/${carpeta}/ no hay ningún JPG`);
   if (placas.length > 4) throw new Error(`hay ${placas.length} imágenes y X acepta hasta 4 por posteo`);
   const texto = aws(['s3', 'cp', base + 'tweet.txt', '-']).replace(/\r/g, '').trim();
   if (!texto) throw new Error('tweet.txt está vacío');
@@ -67,6 +68,8 @@ async function publicarEnX(carpeta, base, placas, probar) {
   let responde = null;
   try { responde = aws(['s3', 'cp', base + 'responde.txt', '-']).trim() || null; } catch (e) { /* sin responde.txt es un posteo suelto */ }
   if (responde && !/^\d+$/.test(responde)) throw new Error('responde.txt tiene que ser solo el número del tweet');
+  // sin imágenes solo vale como respuesta: un texto suelto debajo de un tweet nuestro
+  if (!placas.length && !responde) throw new Error(`en carruseles/${carpeta}/ no hay ningún JPG`);
   log(`texto (${texto.length} caracteres):\n${texto}\n`);
   if (responde) log('en respuesta a https://x.com/i/status/' + responde);
   if (probar) { log('modo prueba: no se publica'); return; }
