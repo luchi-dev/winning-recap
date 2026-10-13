@@ -154,12 +154,14 @@ async function publicarInstagram(caption, urls) {
 
 /* url: dirección pública de un .mp4 vertical (H.264 + AAC). prueba: 'MANUAL' o 'SS_PERFORMANCE' lo publica como
    reel de prueba (se muestra solo a no seguidores): con MANUAL se pasa a los seguidores a mano desde la app,
-   con SS_PERFORMANCE lo pasa Instagram solo si rinde bien. Sin prueba es un reel común. */
-async function publicarReel(caption, url, prueba) {
+   con SS_PERFORMANCE lo pasa Instagram solo si rinde bien. Sin prueba es un reel común.
+   portada: dirección pública de un JPG para la tapa (opcional). */
+async function publicarReel(caption, url, prueba, portada) {
   const { IG_USER_ID, IG_ACCESS_TOKEN } = process.env;
   if (!IG_USER_ID || !IG_ACCESS_TOKEN) throw new Error('faltan las claves de Instagram en el ambiente (IG_USER_ID, IG_ACCESS_TOKEN)');
   if (caption.length > 2200) throw new Error(`el caption tiene ${caption.length} caracteres e Instagram permite 2200`);
-  const params = { media_type: 'REELS', video_url: url, caption };
+  // portada: el primer cuadro entra desde negro, así que se toma el del segundo 1,5 (o una imagen propia con portada)
+  const params = { media_type: 'REELS', video_url: url, caption, ...(portada ? { cover_url: portada } : { thumb_offset: '1500' }) };
   if (prueba) params.trial_params = JSON.stringify({ graduation_strategy: prueba });
   const id = (await graphIG(`/${IG_USER_ID}/media`, params, 'POST', GRAPH_IG_REEL)).id;
   await esperarContenedor(id);
