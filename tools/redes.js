@@ -91,14 +91,16 @@ function subirS3(jpg, nombre) {
 }
 
 // ── X ─────────────────────────────────────────────────────────────────
-async function publicarX(texto, jpgs, enRespuestaA) {
+/* jpgs: hasta cuatro imágenes. video (opcional): un MP4 en vez de las imágenes. */
+async function publicarX(texto, jpgs, enRespuestaA, video) {
   const { TwitterApi } = require('twitter-api-v2');
   const { X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET } = process.env;
   if (!X_API_KEY || !X_API_SECRET || !X_ACCESS_TOKEN || !X_ACCESS_SECRET) throw new Error('faltan las claves de X en el ambiente (X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET)');
   if (texto.length > 280) throw new Error(`el texto tiene ${texto.length} caracteres y X permite 280`);
   const client = new TwitterApi({ appKey: X_API_KEY, appSecret: X_API_SECRET, accessToken: X_ACCESS_TOKEN, accessSecret: X_ACCESS_SECRET });
   const ids = [];
-  for (const jpg of jpgs.slice(0, 4)) ids.push(await client.v1.uploadMedia(jpg, { mimeType: 'image/jpeg' }));
+  if (video) ids.push(await client.v1.uploadMedia(video, { mimeType: 'video/mp4', target: 'tweet' }));   // sube por partes y espera a que X lo procese
+  else for (const jpg of jpgs.slice(0, 4)) ids.push(await client.v1.uploadMedia(jpg, { mimeType: 'image/jpeg' }));
   const r = await client.v2.tweet({ text: texto, media: { media_ids: ids }, ...(enRespuestaA ? { reply: { in_reply_to_tweet_id: String(enRespuestaA) } } : {}) });
   return 'https://x.com/i/status/' + (r.data && r.data.id);
 }

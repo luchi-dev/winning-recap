@@ -31,8 +31,24 @@ function aws(args) {
   return r.stdout;
 }
 
+/* X con video: un solo MP4 (H.264 + AAC), sin imágenes, y el texto de tweet.txt. */
+async function publicarVideoEnX(carpeta, base, placas, probar) {
+  if (placas.length !== 1) throw new Error('para X con video la carpeta lleva un solo .mp4, sin imágenes');
+  const texto = aws(['s3', 'cp', base + 'tweet.txt', '-']).replace(/\r/g, '').trim();
+  if (!texto) throw new Error('tweet.txt está vacío');
+  const u = `${redes.SITIO}/carruseles/${carpeta}/${placas[0]}`;
+  const r = await fetch(u + '?v=' + Date.now());
+  if (!r.ok || !/video\/mp4/.test(r.headers.get('content-type') || '')) throw new Error('no es un MP4 público: ' + u);
+  const mp4 = Buffer.from(await r.arrayBuffer());
+  log(`video ${u} (${(mp4.length / 1048576).toFixed(1)} MB)`);
+  log(`texto (${texto.length} caracteres):\n${texto}\n`);
+  if (probar) { log('modo prueba: no se publica'); return; }
+  log('publicado en X: ' + await redes.publicarX(texto, [], null, mp4));
+}
+
 /* X: una a cuatro imágenes y el texto de tweet.txt. Las imágenes se bajan del sitio. */
 async function publicarEnX(carpeta, base, placas, probar) {
+  if (placas.some(n => /\.mp4$/i.test(n))) return await publicarVideoEnX(carpeta, base, placas, probar);
   if (!placas.length) throw new Error(`en carruseles/${carpeta}/ no hay ningún JPG`);
   if (placas.length > 4) throw new Error(`hay ${placas.length} imágenes y X acepta hasta 4 por posteo`);
   const texto = aws(['s3', 'cp', base + 'tweet.txt', '-']).replace(/\r/g, '').trim();
@@ -68,7 +84,7 @@ async function publicarEnX(carpeta, base, placas, probar) {
   try {
     const base = `${BUCKET}/carruseles/${carpeta}/`;
     const placas = aws(['s3', 'ls', base]).split('\n').map(l => l.trim().split(/\s+/).pop()).filter(n => /\.(jpe?g|mp4)$/i.test(n || '')).sort();
-    if (enX) return await publicarEnX(carpeta, base, placas.filter(n => !/\.mp4$/i.test(n)), probar);
+    if (enX) return await publicarEnX(carpeta, base, placas, probar);
     if (facebook && placas.some(n => /\.mp4$/i.test(n))) throw new Error('el carrusel tiene un video: a Facebook no se puede mandar así, publicar sin --facebook');
     if (placas.length < 2) throw new Error(`en carruseles/${carpeta}/ hay ${placas.length} JPG y un carrusel necesita al menos 2`);
     if (placas.length > 10) throw new Error(`hay ${placas.length} placas e Instagram acepta hasta 10 por carrusel`);
