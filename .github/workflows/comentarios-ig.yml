@@ -1,0 +1,47 @@
+# Comentarios de Instagram: "listar" muestra los últimos posteos con sus
+# comentarios (en el log de la corrida); "responder" contesta un comentario
+# como @winning. Responder solo con el OK de Luchi para ese texto.
+name: Comentarios IG
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'listar o responder'
+        required: true
+        type: choice
+        options: [listar, responder]
+        default: listar
+      cantidad:
+        description: 'Listar: cuántos posteos recientes'
+        required: false
+        default: '10'
+      comentario_id:
+        description: 'Responder: id del comentario'
+        required: false
+      texto:
+        description: 'Responder: texto de la respuesta'
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  comentarios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Los datos van por variables de ambiente, no pegados en el comando.
+      - name: Comentarios
+        run: node tools/comentarios-ig.js "$MODO" "$CANTIDAD"
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          MODO: ${{ inputs.modo }}
+          CANTIDAD: ${{ inputs.cantidad }}
+          COMENTARIO_ID: ${{ inputs.comentario_id }}
+          TEXTO: ${{ inputs.texto }}
