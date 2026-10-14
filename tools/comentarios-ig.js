@@ -47,6 +47,9 @@ async function listar(n) {
     console.log(`«${corto(p.caption, 140)}»`);
     if (!p.comments_count) continue;
     const comentarios = await todos(`/${p.id}/comments`, { fields: 'id,text,username,timestamp,like_count,replies{username,text}', limit: 50 });
+    // Instagram cuenta los comentarios pero no los devuelve si el token no tiene
+    // el permiso instagram_business_manage_comments.
+    if (!comentarios.length) console.log('  ⚠ Instagram no devolvió los comentarios: falta el permiso de comentarios en el token. Respuesta cruda: ' + JSON.stringify(await graphIG(`/${p.id}/comments`, { fields: 'id,text' })).slice(0, 200));
     for (const c of comentarios) {
       const respuestas = (c.replies && c.replies.data) || [];
       const nuestra = respuestas.some(r => r.username === yo.username);
