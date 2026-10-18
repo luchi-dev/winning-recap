@@ -1,0 +1,29 @@
+# Cuánto venimos gastando de la API de X (tools/uso-x.js): tuits leídos por día y tope del proyecto.
+name: Uso de X
+
+on:
+  workflow_dispatch:
+    inputs:
+      dias:
+        description: 'Cuántos días para atrás (1 a 90)'
+        required: false
+        default: '30'
+
+permissions:
+  contents: read
+
+jobs:
+  uso-x:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Consultar
+        run: node tools/uso-x.js "$DIAS"
+        env:
+          DIAS: ${{ inputs.dias }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
