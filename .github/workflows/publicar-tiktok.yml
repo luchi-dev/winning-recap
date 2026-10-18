@@ -1,0 +1,52 @@
+# Sube a TikTok un video ya armado (el mismo de reels/<carpeta>/ en el S3 del sitio):
+# Actions → "Publicar en TikTok" → Run workflow → carpeta.
+# borrador: llega a la bandeja de la app de TikTok y se termina ahí (música, texto).
+# directo: se publica solo con caption.txt; en público recién cuando TikTok apruebe la app.
+# La cuenta se conecta una vez por año desde la compu con tools/tiktok-conectar.js.
+name: Publicar en TikTok
+
+on:
+  workflow_dispatch:
+    inputs:
+      carpeta:
+        description: 'Carpeta dentro de reels/ en el sitio (ej: censo-01-santiago)'
+        required: true
+      modo:
+        description: 'borrador: a la bandeja de la app · directo: público (con la app aprobada) · directo-privado: en "Solo yo"'
+        required: true
+        type: choice
+        options: [borrador, directo, directo-privado]
+        default: borrador
+      probar:
+        description: 'Solo probar: revisa video y caption, no sube nada'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+  TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+  TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  BUCKET: s3://winning-com-ar/iloveneuquen
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # La carpeta va por variable de ambiente, no pegada en el comando.
+      - name: Publicar
+        run: node tools/publicar-tiktok.js "$CARPETA" ${{ inputs.probar && '--probar' || '' }} ${{ inputs.modo != 'borrador' && '--directo' || '' }} ${{ inputs.modo == 'directo-privado' && '--privado' || '' }}
+        env:
+          CARPETA: ${{ inputs.carpeta }}

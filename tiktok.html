@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Conectar TikTok</title>
+<style>
+  :root { --fondo: #0b1220; --texto: #f3f6fb; --suave: #9fb0c8; --celeste: #3fb6ff; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--fondo); color: var(--texto); font: 16px/1.5 system-ui, sans-serif; padding: 16px; box-sizing: border-box; }
+  main { max-width: 520px; width: 100%; }
+  h1 { font-size: 22px; margin: 0 0 8px; }
+  p { color: var(--suave); margin: 0 0 16px; }
+  code { display: block; word-break: break-all; background: #16213a; padding: 12px; border-radius: 8px; color: var(--texto); }
+  button { margin-top: 12px; background: var(--celeste); color: #04121f; border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 700; font-size: 15px; cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="titulo">Conectar TikTok</h1>
+  <p id="texto"></p>
+  <code id="codigo" hidden></code>
+  <button id="copiar" hidden>Copiar código</button>
+</main>
+<script>
+  // TikTok vuelve acá después del login con ?code=… : el código se pega en el chat
+  // y tools/tiktok-conectar.js lo canjea en la compu. Esta página no guarda nada.
+  var q = new URLSearchParams(location.search), c = q.get('code');
+  var $ = function (id) { return document.getElementById(id); };
+  if (c) {
+    $('texto').textContent = 'Listo. Copiá este código y pegalo en el chat con Claude (vence en unos minutos):';
+    $('codigo').textContent = c; $('codigo').hidden = false; $('copiar').hidden = false;
+    $('copiar').onclick = function () { navigator.clipboard.writeText(c).then(function () { $('copiar').textContent = 'Copiado'; }); };
+  } else if (q.get('error')) {
+    $('titulo').textContent = 'No se conectó';
+    $('texto').textContent = 'TikTok dijo: ' + (q.get('error_description') || q.get('error'));
+  } else {
+    $('texto').textContent = 'Esta página recibe el login de TikTok. Abrila desde el link que te pasa Claude.';
+  }
+</script>
+</body>
+</html>
