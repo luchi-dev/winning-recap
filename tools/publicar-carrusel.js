@@ -68,12 +68,17 @@ async function publicarEnX(carpeta, base, placas, probar) {
   let responde = null;
   try { responde = aws(['s3', 'cp', base + 'responde.txt', '-']).trim() || null; } catch (e) { /* sin responde.txt es un posteo suelto */ }
   if (responde && !/^\d+$/.test(responde)) throw new Error('responde.txt tiene que ser solo el número del tweet');
+  // cita.txt (opcional): id del tweet que se cita (quote tweet).
+  let cita = null;
+  try { cita = aws(['s3', 'cp', base + 'cita.txt', '-']).trim() || null; } catch (e) { /* sin cita.txt no cita nada */ }
+  if (cita && !/^d+$/.test(cita)) throw new Error('cita.txt tiene que ser solo el número del tweet');
   // sin imágenes solo vale como respuesta: un texto suelto debajo de un tweet nuestro
   if (!placas.length && !responde) throw new Error(`en carruseles/${carpeta}/ no hay ningún JPG`);
   log(`texto (${texto.length} caracteres):\n${texto}\n`);
   if (responde) log('en respuesta a https://x.com/i/status/' + responde);
+  if (cita) log('citando https://x.com/i/status/' + cita);
   if (probar) { log('modo prueba: no se publica'); return; }
-  log('publicado en X: ' + await redes.publicarX(texto, jpgs, responde));
+  log('publicado en X: ' + await redes.publicarX(texto, jpgs, responde, null, cita));
 }
 
 (async () => {

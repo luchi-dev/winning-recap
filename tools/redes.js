@@ -92,7 +92,7 @@ function subirS3(jpg, nombre) {
 
 // ── X ─────────────────────────────────────────────────────────────────
 /* jpgs: hasta cuatro imágenes. video (opcional): un MP4 en vez de las imágenes. */
-async function publicarX(texto, jpgs, enRespuestaA, video) {
+async function publicarX(texto, jpgs, enRespuestaA, video, cita) {
   const { TwitterApi } = require('twitter-api-v2');
   const { X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET } = process.env;
   if (!X_API_KEY || !X_API_SECRET || !X_ACCESS_TOKEN || !X_ACCESS_SECRET) throw new Error('faltan las claves de X en el ambiente (X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET)');
@@ -101,7 +101,7 @@ async function publicarX(texto, jpgs, enRespuestaA, video) {
   const ids = [];
   if (video) ids.push(await client.v1.uploadMedia(video, { mimeType: 'video/mp4', target: 'tweet' }));   // sube por partes y espera a que X lo procese
   else for (const jpg of jpgs.slice(0, 4)) ids.push(await client.v1.uploadMedia(jpg, { mimeType: 'image/jpeg' }));
-  const r = await client.v2.tweet({ text: texto, ...(ids.length ? { media: { media_ids: ids } } : {}), ...(enRespuestaA ? { reply: { in_reply_to_tweet_id: String(enRespuestaA) } } : {}) });
+  const r = await client.v2.tweet({ text: texto, ...(ids.length ? { media: { media_ids: ids } } : {}), ...(enRespuestaA ? { reply: { in_reply_to_tweet_id: String(enRespuestaA) } } : {}), ...(cita ? { quote_tweet_id: String(cita) } : {}) });
   return 'https://x.com/i/status/' + (r.data && r.data.id);
 }
 
