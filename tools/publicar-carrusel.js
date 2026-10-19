@@ -71,7 +71,7 @@ async function publicarEnX(carpeta, base, placas, probar) {
   // cita.txt (opcional): id del tweet que se cita (quote tweet).
   let cita = null;
   try { cita = aws(['s3', 'cp', base + 'cita.txt', '-']).trim() || null; } catch (e) { /* sin cita.txt no cita nada */ }
-  if (cita && !/^d+$/.test(cita)) throw new Error('cita.txt tiene que ser solo el número del tweet');
+  if (cita && !/^\d+$/.test(cita)) throw new Error('cita.txt tiene que ser solo el número del tweet');
   // sin imágenes solo vale como respuesta: un texto suelto debajo de un tweet nuestro
   if (!placas.length && !responde) throw new Error(`en carruseles/${carpeta}/ no hay ningún JPG`);
   log(`texto (${texto.length} caracteres):\n${texto}\n`);
