@@ -1,0 +1,46 @@
+# Qué se dijo en X de unos jugadores (tools/buscar-x.js): top 10 de tuits por interacciones
+# de cada búsqueda, para escribir los posteos. Lee tuits con la API de X: consume crédito.
+name: Buscar en X
+
+on:
+  workflow_dispatch:
+    inputs:
+      busquedas:
+        description: 'Búsquedas separadas por ";" con formato Nombre=consulta (ej. Galván="Tomás Galván" River)'
+        required: true
+      desde:
+        description: 'Desde qué día (AAAA-MM-DD, máximo 7 días para atrás)'
+        required: false
+      max:
+        description: 'Tuits a leer por búsqueda (máx. 500)'
+        required: false
+        default: '100'
+
+permissions:
+  contents: read
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar herramientas
+        run: npm ci --no-audit --no-fund
+        working-directory: tools
+      # Las búsquedas van por variable de ambiente: tienen comillas.
+      - name: Buscar
+        run: |
+          IFS=';' read -ra B <<< "$BUSQUEDAS"
+          node tools/buscar-x.js ${DESDE:+--desde "$DESDE"} --max "$MAX" "${B[@]}"
+        env:
+          BUSQUEDAS: ${{ inputs.busquedas }}
+          DESDE: ${{ inputs.desde }}
+          MAX: ${{ inputs.max }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
