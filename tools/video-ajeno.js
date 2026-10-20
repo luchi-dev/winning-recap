@@ -2,7 +2,7 @@
 // nuestro y el video sigue siendo del tuit original, con su crédito ("De SportsCenter").
 // Se logra pegando al final del tuit el link del original + "/video/1".
 //
-//   node tools/video-ajeno.js leer --cuentas SC_ESPN,TNTSportsAR --desde 2026-10-11T19:30:00Z
+//   node tools/video-ajeno.js leer --cuentas SC_ESPN,TNTSportsAR --desde 2026-10-11T19:30:00Z [--hasta ...]
 //       → lista los tuits CON VIDEO de esas cuentas desde esa hora (una línea JSON por tuit)
 //   X_TEXTO="⚽ GOL de ..." node tools/video-ajeno.js publicar https://x.com/SC_ESPN/status/123 [--probar]
 //       → publica el texto + el video de ese tuit
@@ -27,13 +27,15 @@ async function leer() {
   const cuentas = opt('cuentas', 'SC_ESPN').split(',').map(s => s.trim().replace(/^@/, '')).filter(Boolean);
   const desde = new Date(opt('desde', new Date(Date.now() - 15 * 60e3).toISOString()));
   if (isNaN(desde)) throw new Error('--desde tiene que ser una fecha ISO, ej. 2026-10-11T19:30:00Z');
+  // --hasta (opcional): para leer un tramo viejo sin pasar por todo lo posterior.
+  const hasta = opt('hasta', null) ? new Date(opt('hasta')) : null;
   const client = cliente();
   for (const usuario of cuentas) {
     let id = IDS[usuario.toLowerCase()];
     if (!id) { const u = await client.v2.userByUsername(usuario); id = u.data && u.data.id; console.log(`# ${usuario} = ${id}`); }
     if (!id) { console.log(`# ${usuario}: la cuenta no existe`); continue; }
     const tl = await client.v2.userTimeline(id, {
-      start_time: desde.toISOString(), max_results: 100, exclude: ['retweets', 'replies'],
+      start_time: desde.toISOString(), ...(hasta ? { end_time: hasta.toISOString() } : {}), max_results: 100, exclude: ['retweets', 'replies'],
       'tweet.fields': ['created_at', 'attachments'], expansions: ['attachments.media_keys'], 'media.fields': ['type', 'duration_ms'],
     });
     let n = 0;

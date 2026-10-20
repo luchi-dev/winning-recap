@@ -21,6 +21,9 @@ on:
       desde:
         description: 'leer: desde qué hora, en UTC (ej. 2026-10-11T19:30:00Z)'
         required: false
+      hasta:
+        description: 'leer: hasta qué hora, en UTC (opcional)'
+        required: false
       link:
         description: 'publicar: link del tuit original con el video'
         required: false
@@ -65,7 +68,7 @@ jobs:
       - name: Hacerlo
         run: |
           case "$ACCION" in
-            leer)     node tools/video-ajeno.js leer --cuentas "$CUENTAS" ${DESDE:+--desde "$DESDE"} ;;
+            leer)     node tools/video-ajeno.js leer --cuentas "$CUENTAS" ${DESDE:+--desde "$DESDE"} ${HASTA:+--hasta "$HASTA"} ;;
             publicar) node tools/video-ajeno.js publicar "$LINK" ${{ inputs.probar && '--probar' || '' }} ;;
             borrar)   node tools/video-ajeno.js borrar "$ID" ;;
           esac
@@ -73,6 +76,7 @@ jobs:
           ACCION: ${{ inputs.accion }}
           CUENTAS: ${{ inputs.cuentas }}
           DESDE: ${{ inputs.desde }}
+          HASTA: ${{ inputs.hasta }}
           LINK: ${{ inputs.link }}
           ID: ${{ inputs.id }}
           X_TEXTO: ${{ inputs.texto }}
