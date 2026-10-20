@@ -94,7 +94,8 @@ async function publicarEnX(carpeta, base, placas, probar) {
     const placas = aws(['s3', 'ls', base]).split('\n').map(l => l.trim().split(/\s+/).pop()).filter(n => /\.(jpe?g|mp4)$/i.test(n || '')).sort();
     if (enX) return await publicarEnX(carpeta, base, placas, probar);
     if (facebook && placas.some(n => /\.mp4$/i.test(n))) throw new Error('el carrusel tiene un video: a Facebook no se puede mandar así, publicar sin --facebook');
-    if (placas.length < 2) throw new Error(`en carruseles/${carpeta}/ hay ${placas.length} JPG y un carrusel necesita al menos 2`);
+    // Con una sola placa sale como foto común (publicarInstagram acepta 1 a 10).
+    if (placas.length < 1) throw new Error(`en carruseles/${carpeta}/ no hay JPG`);
     if (placas.length > 10) throw new Error(`hay ${placas.length} placas e Instagram acepta hasta 10 por carrusel`);
     const caption = aws(['s3', 'cp', base + 'caption.txt', '-']).replace(/\r/g, '').trim();
     if (!caption) throw new Error('caption.txt está vacío');
