@@ -7,7 +7,10 @@ on:
     inputs:
       busquedas:
         description: 'Búsquedas separadas por ";" con formato Nombre=consulta (ej. Galván="Tomás Galván" River)'
-        required: true
+        required: false
+      citas:
+        description: 'O ids de tuits nuestros separados por coma: lista quién los citó'
+        required: false
       desde:
         description: 'Desde qué día (AAAA-MM-DD, máximo 7 días para atrás)'
         required: false
@@ -34,11 +37,12 @@ jobs:
       # Las búsquedas van por variable de ambiente: tienen comillas.
       - name: Buscar
         run: |
-          IFS=';' read -ra B <<< "$BUSQUEDAS"
-          node tools/buscar-x.js ${DESDE:+--desde "$DESDE"} --max "$MAX" "${B[@]}"
+          B=(); [ -n "$BUSQUEDAS" ] && IFS=';' read -ra B <<< "$BUSQUEDAS"
+          node tools/buscar-x.js ${DESDE:+--desde "$DESDE"} ${CITAS:+--citas "$CITAS"} --max "$MAX" "${B[@]}"
         env:
           BUSQUEDAS: ${{ inputs.busquedas }}
           DESDE: ${{ inputs.desde }}
+          CITAS: ${{ inputs.citas }}
           MAX: ${{ inputs.max }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}

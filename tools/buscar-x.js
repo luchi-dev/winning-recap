@@ -12,6 +12,8 @@ const args = process.argv.slice(2);
 const opt = (k, def) => { const i = args.indexOf('--' + k); if (i < 0) return def; const v = args[i + 1]; args.splice(i, 2); return v; };
 const desde = opt('desde', null);
 const max = Math.min(Number(opt('max', 100)), 500);
+// --citas id1,id2: en vez de buscar, lista quién citó esos tuits (quote tweets).
+const citas = (opt('citas', '') || '').split(',').filter(Boolean);
 const busquedas = args.map(a => { const i = a.indexOf('='); return { nombre: a.slice(0, i), q: a.slice(i + 1) }; });
 
 (async () => {
@@ -19,6 +21,16 @@ const busquedas = args.map(a => { const i = a.indexOf('='); return { nombre: a.s
   if (!X_API_KEY || !X_ACCESS_TOKEN) throw new Error('faltan las claves de X en el ambiente');
   const client = new TwitterApi({ appKey: X_API_KEY, appSecret: X_API_SECRET, accessToken: X_ACCESS_TOKEN, accessSecret: X_ACCESS_SECRET });
   let leidos = 0;
+  for (const id of citas) {
+    const pag = await client.v2.quotes(id, { max_results: 100, 'tweet.fields': ['created_at', 'public_metrics'], expansions: ['author_id'], 'user.fields': ['username', 'public_metrics'] });
+    console.log(`\n===== citas de ${id}`);
+    for await (const t of pag) {
+      const u = pag.includes.author(t) || {};
+      const m = t.public_metrics || {};
+      leidos += 1;
+      console.log(`\n♥${m.like_count} 🔁${m.retweet_count} 💬${m.reply_count} | @${u.username} (${(u.public_metrics || {}).followers_count} seg.) ${t.created_at}\n${t.text.replace(/\s+/g, ' ')}\nhttps://x.com/${u.username}/status/${t.id}`);
+    }
+  }
   for (const b of busquedas) {
     const params = {
       max_results: Math.min(max, 100), sort_order: 'relevancy',
