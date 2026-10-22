@@ -42,10 +42,14 @@ async function publicarVideoEnX(carpeta, base, placas, probar) {
   const r = await fetch(u + '?v=' + Date.now());
   if (!r.ok || !/video\/mp4/.test(r.headers.get('content-type') || '')) throw new Error('no es un MP4 público: ' + u);
   const mp4 = Buffer.from(await r.arrayBuffer());
-  log(`video ${u} (${(mp4.length / 1048576).toFixed(1)} MB)`);
+  // responde.txt (opcional), igual que con imágenes: el video sale como respuesta en el hilo.
+  let responde = null;
+  try { responde = aws(['s3', 'cp', base + 'responde.txt', '-']).trim() || null; } catch (e) { /* sin responde.txt es un posteo suelto */ }
+  if (responde && !/^\d+$/.test(responde)) throw new Error('responde.txt tiene que ser solo el número del tweet');
+  log(`video ${u} (${(mp4.length / 1048576).toFixed(1)} MB)` + (responde ? ` · en respuesta a ${responde}` : ''));
   log(`texto (${texto.length} caracteres):\n${texto}\n`);
   if (probar) { log('modo prueba: no se publica'); return; }
-  log('publicado en X: ' + await redes.publicarX(texto, [], null, mp4));
+  log('publicado en X: ' + await redes.publicarX(texto, [], responde, mp4));
 }
 
 /* X: una a cuatro imágenes y el texto de tweet.txt. Las imágenes se bajan del sitio. */
