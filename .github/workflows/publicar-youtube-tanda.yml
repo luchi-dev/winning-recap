@@ -1,0 +1,53 @@
+# Sube a YouTube los videos de tools/youtube-tanda.json, cada uno con su horario:
+# el primero sale público en el momento y los demás quedan programados en YouTube.
+# Si se corta, repetirla con la misma hora de inicio (la muestra el log): sigue donde quedó.
+name: YouTube en tanda
+
+on:
+  workflow_dispatch:
+    inputs:
+      probar:
+        description: 'Solo probar: muestra títulos y horarios, no sube nada'
+        required: false
+        type: boolean
+        default: true
+      inicio:
+        description: 'Solo al retomar una tanda cortada: hora de inicio que muestra el log (ISO)'
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: youtube-tanda
+  cancel-in-progress: false
+
+env:
+  YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+  YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+  YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: sa-east-1
+  BUCKET: s3://winning-com-ar/iloveneuquen
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # La hora va por variable de ambiente, no pegada en el comando.
+      - name: Subir
+        run: |
+          args=()
+          if [ "$PROBAR" = "true" ]; then args+=(--probar); fi
+          if [ -n "$INICIO" ]; then args+=(--inicio "$INICIO"); fi
+          node tools/publicar-youtube-tanda.js "${args[@]}"
+        env:
+          PROBAR: ${{ inputs.probar }}
+          INICIO: ${{ inputs.inicio }}

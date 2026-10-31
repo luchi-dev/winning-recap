@@ -109,13 +109,15 @@ async function confirmar(token, id) {
   return v && v.status;
 }
 
-/* video: Buffer del MP4. privacidad: 'private', 'unlisted' o 'public'. */
-async function subirYouTube(video, { titulo, descripcion = '', privacidad = 'private' } = {}) {
+/* video: Buffer del MP4. privacidad: 'private', 'unlisted' o 'public'.
+   programar: fecha ISO en la que YouTube lo hace público solo; hasta entonces queda privado. */
+async function subirYouTube(video, { titulo, descripcion = '', privacidad = 'private', programar = null } = {}) {
   if (!['private', 'unlisted', 'public'].includes(privacidad)) throw new Error('privacidad tiene que ser private, unlisted o public');
+  if (programar) privacidad = 'private';   // YouTube solo acepta publishAt en videos privados
   const token = await tokenNuevo();
   const cuerpo = JSON.stringify({
     snippet: { title: titulo, description: descripcion, categoryId: CATEGORIA_DEPORTES, defaultLanguage: 'es-419', defaultAudioLanguage: 'es-419' },
-    status: { privacyStatus: privacidad, selfDeclaredMadeForKids: false, embeddable: true },
+    status: { privacyStatus: privacidad, selfDeclaredMadeForKids: false, embeddable: true, ...(programar ? { publishAt: programar } : {}) },
   });
   const ini = await fetch(`${SUBIDA}?uploadType=resumable&part=snippet,status`, {
     method: 'POST',
@@ -145,7 +147,8 @@ async function subirYouTube(video, { titulo, descripcion = '', privacidad = 'pri
   const quedo = (s && s.privacyStatus) || (d.status && d.status.privacyStatus) || '?';
   const link = 'https://www.youtube.com/shorts/' + d.id;
   if (quedo !== privacidad) throw new Error(`se subió pero quedó "${quedo}" y se pidió "${privacidad}": ${link}`);
-  return { id: d.id, link, privacidad: quedo, estado: s && s.uploadStatus };
+  if (programar && !(s && s.publishAt)) throw new Error(`se subió pero YouTube no guardó el horario de publicación: ${link}`);
+  return { id: d.id, link, privacidad: quedo, estado: s && s.uploadStatus, programado: (s && s.publishAt) || null };
 }
 
 function linkLogin(state, redirect) {

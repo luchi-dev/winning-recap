@@ -1,0 +1,21 @@
+{
+  "horas": 2,
+  "videos": [
+    { "carpeta": "censo-06-santa-fe", "titulo": "¿Central tiene más hinchas que Newell's en Santa Fe? | Davoo y Edul" },
+    { "carpeta": "censo-08-corrientes", "titulo": "Corrientes: la mitad de la provincia tiene un solo color | Davoo y Edul" },
+    { "carpeta": "censo-07-tucuman", "titulo": "¿San Martín o Atlético? La pelea eterna de Tucumán | Davoo y Edul" },
+    { "carpeta": "censo-04-caba", "titulo": "¿Quién es el tercero en Capital después de Boca y River? | Davoo y Edul" },
+    { "carpeta": "censo-05-cordoba-sc", "titulo": "¿Boca tiene más hinchas que Belgrano y Talleres en Córdoba? | Davoo y Edul" },
+    { "carpeta": "censo-01-santiago", "titulo": "La única provincia donde River le gana a Boca | Davoo y Edul" },
+    { "carpeta": "censo-02-tierra-del-fuego", "titulo": "Un club de La Plata en el top 5 de Tierra del Fuego | Davoo y Edul" },
+    { "carpeta": "censo-03b-buenos-aires-jugatela-sc", "titulo": "Jugátela: ¿quién tiene más gente, Independiente o Racing? | Davoo y Edul" },
+    { "carpeta": "censo-11-millones", "titulo": "¿Cuántos millones de hinchas tienen Boca y River? | Davoo y Edul" },
+    { "carpeta": "censo-09-boca-gana-todas-sc", "titulo": "¿Los dos grandes tienen más hinchas que el club de tu ciudad? | Davoo y Edul" },
+    { "carpeta": "censo-12-reparto-sc", "titulo": "Repartieron los hinchas del país club por club | Davoo y Edul" },
+    { "carpeta": "censo-13-censo-2036-sc", "titulo": "¿Clubes de Europa en el censo de hinchas de 2036? | Davoo y Edul" },
+    { "carpeta": "censo-03-buenos-aires-sc", "titulo": "Buenos Aires: la diferencia entre Independiente y Racing | Davoo y Edul" },
+    { "carpeta": "censo-14-propuesta-sc", "titulo": "Piden que el censo nacional pregunte de qué equipo sos | Davoo y Edul" },
+    { "carpeta": "censo-15-general-sc", "titulo": "Davoo y Edul recorren el mapa de las hinchadas de Argentina" },
+    { "carpeta": "censo-10-veredicto", "titulo": "¿Le creés o no le creés al censo de hinchas? | Davoo y Edul" }
+  ]
+}
