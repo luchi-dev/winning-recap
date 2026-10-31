@@ -12,13 +12,14 @@
  *   (sin flags) sube en privado
  *   --oculto    sube como "no listado": solo lo ve quien tiene el link
  *   --publico   sube en público
+ *   --miniatura <id>  no sube video: pone reels/<carpeta>/portada.jpg en el video <id>
  *
  * Claves en el ambiente: YOUTUBE_CLIENT_ID, YOUTUBE_CLIENT_SECRET, YOUTUBE_REFRESH_TOKEN.
  */
 
 const { spawnSync } = require('child_process');
 const redes = require('./redes.js');
-const { subirYouTube, tituloYDescripcion } = require('./youtube.js');
+const { subirYouTube, ponerMiniatura, tituloYDescripcion } = require('./youtube.js');
 
 const BUCKET = process.env.BUCKET || 's3://winning-com-ar/iloveneuquen';
 const log = m => console.log('[publicar-youtube] ' + m);
@@ -43,6 +44,15 @@ function texto(ruta) {
     process.exit(2);
   }
   try {
+    const iMini = a.indexOf('--miniatura');
+    if (iMini >= 0) {
+      const url = `${redes.SITIO}/reels/${carpeta}/portada.jpg`;
+      const r = await fetch(url);
+      if (!r.ok || !/image\/jpeg/.test(r.headers.get('content-type') || '')) throw new Error('falta la portada: ' + url);
+      await ponerMiniatura(a[iMini + 1], Buffer.from(await r.arrayBuffer()));
+      log(`miniatura puesta en ${a[iMini + 1]}`);
+      return;
+    }
     const base = `${BUCKET}/reels/${carpeta}/`;
     const videos = aws(['s3', 'ls', base]).split('\n').map(l => l.trim().split(/\s+/).pop()).filter(n => /\.mp4$/i.test(n || ''));
     if (videos.length !== 1) throw new Error(`en reels/${carpeta}/ hay ${videos.length} videos .mp4 y tiene que haber uno solo`);

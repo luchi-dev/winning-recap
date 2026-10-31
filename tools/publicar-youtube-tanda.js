@@ -36,6 +36,14 @@ function leer(ruta) {
   try { return aws(['s3', 'cp', ruta, '-']).replace(/\r/g, '').trim(); } catch { return ''; }
 }
 
+// La miniatura de cada video: reels/<carpeta>/portada.jpg. Sin ella no se sube, para no largar una tanda con portada negra.
+async function bajarPortada(carpeta) {
+  const url = `${redes.SITIO}/reels/${carpeta}/portada.jpg`;
+  const r = await fetch(url);
+  if (!r.ok || !/image\/jpeg/.test(r.headers.get('content-type') || '')) throw new Error('falta la portada: ' + url);
+  return Buffer.from(await r.arrayBuffer());
+}
+
 (async () => {
   const a = process.argv.slice(2);
   const probar = a.includes('--probar');
@@ -56,7 +64,7 @@ function leer(ruta) {
       const { titulo, descripcion } = tituloYDescripcion(leer(base + 'caption.txt'), v.titulo);
       const url = `${redes.SITIO}/reels/${v.carpeta}/${archivos[0]}`;
       log(`${i + 1}. ${hora(cuando)} · ${v.carpeta}\n    ${titulo}`);
-      if (probar) continue;
+      if (probar) { await bajarPortada(v.carpeta); continue; }
 
       // Solo el primero sale en el momento; un horario vencido cortaría la tanda a mitad de camino.
       const programar = i === 0 ? null : cuando.toISOString();
@@ -64,9 +72,10 @@ function leer(ruta) {
       const r = await fetch(url);
       if (!r.ok || !/video\/mp4/.test(r.headers.get('content-type') || '')) throw new Error('no es un MP4 público: ' + url);
       const video = Buffer.from(await r.arrayBuffer());
-      const s = await subirYouTube(video, { titulo, descripcion, privacidad: 'public', programar });
+      const miniatura = await bajarPortada(v.carpeta);
+      const s = await subirYouTube(video, { titulo, descripcion, privacidad: 'public', programar, miniatura });
       aws(['s3', 'cp', '-', base + 'youtube.txt', '--content-type', 'text/plain', '--cache-control', 'no-cache'], `${s.link} ${s.programado || 'publico ' + new Date().toISOString()}\n`);
-      log(`    subido: ${s.link} · ${s.programado ? 'programado ' + hora(new Date(s.programado)) : 'público ya'}`);
+      log(`    subido: ${s.link} · ${s.programado ? 'programado ' + hora(new Date(s.programado)) : 'público ya'} · ${s.miniatura ? 'con miniatura' : 'SIN miniatura'}`);
     }
     log(probar ? 'modo prueba: no se subió nada' : 'tanda terminada');
   } catch (e) {

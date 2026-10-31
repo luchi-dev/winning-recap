@@ -22,6 +22,9 @@ on:
         required: false
         type: boolean
         default: true
+      miniatura:
+        description: 'Solo poner miniatura: id del video ya subido (usa portada.jpg de la carpeta)'
+        required: false
 
 permissions:
   contents: read
@@ -47,6 +50,12 @@ jobs:
 
       # La carpeta va por variable de ambiente, no pegada en el comando.
       - name: Publicar
-        run: node tools/publicar-youtube.js "$CARPETA" ${{ inputs.probar && '--probar' || '' }} ${{ inputs.visibilidad == 'publico' && '--publico' || '' }} ${{ inputs.visibilidad == 'oculto' && '--oculto' || '' }}
+        run: |
+          if [ -n "$MINIATURA" ]; then
+            node tools/publicar-youtube.js "$CARPETA" --miniatura "$MINIATURA"
+          else
+            node tools/publicar-youtube.js "$CARPETA" ${{ inputs.probar && '--probar' || '' }} ${{ inputs.visibilidad == 'publico' && '--publico' || '' }} ${{ inputs.visibilidad == 'oculto' && '--oculto' || '' }}
+          fi
         env:
           CARPETA: ${{ inputs.carpeta }}
+          MINIATURA: ${{ inputs.miniatura }}

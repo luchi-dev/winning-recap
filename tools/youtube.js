@@ -109,9 +109,22 @@ async function confirmar(token, id) {
   return v && v.status;
 }
 
+/* Pone la miniatura (Buffer de un JPG). YouTube la permite en canales verificados,
+   y hasta 2 MB. */
+async function ponerMiniatura(videoId, jpg, token) {
+  const r = await fetch(`https://www.googleapis.com/upload/youtube/v3/thumbnails/set?uploadType=media&videoId=${encodeURIComponent(videoId)}`, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + (token || await tokenNuevo()), 'Content-Type': 'image/jpeg', 'Content-Length': String(jpg.length) },
+    body: jpg,
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(r.status === 403 ? 'YouTube no dejó poner la miniatura: el canal tiene que estar verificado [forbidden]' : explicar(r.status, d));
+  return d;
+}
+
 /* video: Buffer del MP4. privacidad: 'private', 'unlisted' o 'public'.
    programar: fecha ISO en la que YouTube lo hace público solo; hasta entonces queda privado. */
-async function subirYouTube(video, { titulo, descripcion = '', privacidad = 'private', programar = null } = {}) {
+async function subirYouTube(video, { titulo, descripcion = '', privacidad = 'private', programar = null, miniatura = null } = {}) {
   if (!['private', 'unlisted', 'public'].includes(privacidad)) throw new Error('privacidad tiene que ser private, unlisted o public');
   if (programar) privacidad = 'private';   // YouTube solo acepta publishAt en videos privados
   const token = await tokenNuevo();
@@ -148,7 +161,13 @@ async function subirYouTube(video, { titulo, descripcion = '', privacidad = 'pri
   const link = 'https://www.youtube.com/shorts/' + d.id;
   if (quedo !== privacidad) throw new Error(`se subió pero quedó "${quedo}" y se pidió "${privacidad}": ${link}`);
   if (programar && !(s && s.publishAt)) throw new Error(`se subió pero YouTube no guardó el horario de publicación: ${link}`);
-  return { id: d.id, link, privacidad: quedo, estado: s && s.uploadStatus, programado: (s && s.publishAt) || null };
+  // Una miniatura rechazada no borra lo subido: se avisa y se sigue.
+  let conMiniatura = false;
+  if (miniatura) {
+    try { await ponerMiniatura(d.id, miniatura, token); conMiniatura = true; }
+    catch (e) { log(`::warning::${link}: ${e.message}`); }
+  }
+  return { id: d.id, link, privacidad: quedo, estado: s && s.uploadStatus, programado: (s && s.publishAt) || null, miniatura: conMiniatura };
 }
 
 function linkLogin(state, redirect) {
@@ -165,4 +184,4 @@ function linkLogin(state, redirect) {
   return u.toString();
 }
 
-module.exports = { subirYouTube, tituloYDescripcion, tokenNuevo, tokensDesdeCodigo, canalPropio, linkLogin };
+module.exports = { subirYouTube, ponerMiniatura, tituloYDescripcion, tokenNuevo, tokensDesdeCodigo, canalPropio, linkLogin };
