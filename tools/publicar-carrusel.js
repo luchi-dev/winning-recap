@@ -46,10 +46,14 @@ async function publicarVideoEnX(carpeta, base, placas, probar) {
   let responde = null;
   try { responde = aws(['s3', 'cp', base + 'responde.txt', '-']).trim() || null; } catch (e) { /* sin responde.txt es un posteo suelto */ }
   if (responde && !/^\d+$/.test(responde)) throw new Error('responde.txt tiene que ser solo el número del tweet');
-  log(`video ${u} (${(mp4.length / 1048576).toFixed(1)} MB)` + (responde ? ` · en respuesta a ${responde}` : ''));
+  // cita.txt (opcional): id del tweet que se cita, igual que con imágenes.
+  let cita = null;
+  try { cita = aws(['s3', 'cp', base + 'cita.txt', '-']).trim() || null; } catch (e) { /* sin cita.txt no cita nada */ }
+  if (cita && !/^\d+$/.test(cita)) throw new Error('cita.txt tiene que ser solo el número del tweet');
+  log(`video ${u} (${(mp4.length / 1048576).toFixed(1)} MB)` + (responde ? ` · en respuesta a ${responde}` : '') + (cita ? ` · citando ${cita}` : ''));
   log(`texto (${texto.length} caracteres):\n${texto}\n`);
   if (probar) { log('modo prueba: no se publica'); return; }
-  log('publicado en X: ' + await redes.publicarX(texto, [], responde, mp4));
+  log('publicado en X: ' + await redes.publicarX(texto, [], responde, mp4, cita));
 }
 
 /* X: una a cuatro imágenes y el texto de tweet.txt. Las imágenes se bajan del sitio. */
