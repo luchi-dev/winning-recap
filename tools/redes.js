@@ -197,4 +197,19 @@ async function publicarFacebook(caption, urls) {
   return 'https://www.facebook.com/' + d.id;
 }
 
-module.exports = { imagenes, subirS3, publicarX, publicarInstagram, publicarReel, publicarFacebook, COMPETITION, SEASON, RAIZ, SITIO };
+
+/* Historia de Instagram con una imagen (JPG vertical 1080x1920 en una dirección pública). */
+async function publicarHistoria(url) {
+  const { IG_USER_ID, IG_ACCESS_TOKEN } = process.env;
+  if (!IG_USER_ID || !IG_ACCESS_TOKEN) throw new Error('faltan las claves de Instagram en el ambiente (IG_USER_ID, IG_ACCESS_TOKEN)');
+  const id = (await graphIG('/' + IG_USER_ID + '/media', { media_type: 'STORIES', image_url: url }, 'POST')).id;
+  await esperarContenedor(id);
+  let p = null;
+  for (let i = 0; i < 12 && !p; i++) {
+    try { p = await graphIG('/' + IG_USER_ID + '/media_publish', { creation_id: id }, 'POST'); }
+    catch (e) { if (!/9007|2207027|not ready|not available/i.test(e.message) || i === 11) throw e; log('Instagram: todavía no está lista, espero 10 s (' + (i + 1) + '/12)'); await dormir(10000); }
+  }
+  return 'id ' + p.id;
+}
+
+module.exports = { imagenes, subirS3, publicarX, publicarInstagram, publicarHistoria, publicarReel, publicarFacebook, COMPETITION, SEASON, RAIZ, SITIO };

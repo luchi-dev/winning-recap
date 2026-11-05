@@ -1,0 +1,36 @@
+# Publica una historia de Instagram con una imagen ya subida al sitio:
+# Actions → "Publicar historia" → Run workflow → url del JPG (1080x1920).
+name: Publicar historia
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Dirección pública del JPG (ej: https://winning.com.ar/iloveneuquen/carruseles/x/01.jpg)'
+        required: true
+      probar:
+        description: 'Solo probar: revisa la imagen, no publica'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  IG_USER_ID: ${{ secrets.IG_USER_ID }}
+  IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Publicar
+        run: node tools/publicar-historia.js "$URL" ${{ inputs.probar && '--probar' || '' }}
+        env:
+          URL: ${{ inputs.url }}
