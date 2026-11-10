@@ -35,6 +35,22 @@ async function todos(ruta, params) {
 
 const corto = (t, n = 90) => (t || '').replace(/\s+/g, ' ').trim().slice(0, n);
 
+// Captions enteros de los últimos n posteos (para estudiar cómo se escriben).
+async function captions(n) {
+  let d = await graphIG(`/${process.env.IG_USER_ID}/media`, { fields: 'caption,timestamp,permalink,media_type', limit: Math.min(n, 100) });
+  const out = [...(d.data || [])];
+  while (out.length < n && d.paging && d.paging.next) {
+    d = await (await fetch(d.paging.next)).json();
+    if (d.error) break;
+    out.push(...(d.data || []));
+  }
+  for (const p of out.slice(0, n)) {
+    console.log('━'.repeat(70));
+    console.log(`${p.timestamp.slice(0, 10)} · ${p.media_type} · ${p.permalink}`);
+    console.log(p.caption || '(sin caption)');
+  }
+}
+
 async function listar(n) {
   const yo = await graphIG('/me', { fields: 'username' });
   const posteos = (await graphIG(`/${process.env.IG_USER_ID}/media`, {
@@ -69,6 +85,7 @@ async function responder(id, texto) {
 (async () => {
   if (!process.env.IG_USER_ID || !process.env.IG_ACCESS_TOKEN) throw new Error('faltan IG_USER_ID / IG_ACCESS_TOKEN');
   const [modo, a, b] = process.argv.slice(2);
-  if (modo === 'responder') await responder(process.env.COMENTARIO_ID || a, process.env.TEXTO || b);
+  if (modo === 'captions') await captions(Number(a) || 50);
+  else if (modo === 'responder') await responder(process.env.COMENTARIO_ID || a, process.env.TEXTO || b);
   else await listar(Number(a) || 10);
 })().catch(e => { console.error('Error: ' + e.message); process.exit(1); });

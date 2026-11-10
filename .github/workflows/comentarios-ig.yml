@@ -7,10 +7,10 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'listar o responder'
+        description: 'listar, responder o captions (texto entero)'
         required: true
         type: choice
-        options: [listar, responder]
+        options: [listar, responder, captions]
         default: listar
       cantidad:
         description: 'Listar: cuántos posteos recientes'
