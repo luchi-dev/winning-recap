@@ -14,6 +14,8 @@ const desde = opt('desde', null);
 const max = Math.min(Number(opt('max', 100)), 500);
 // --citas id1,id2: en vez de buscar, lista quién citó esos tuits (quote tweets).
 const citas = (opt('citas', '') || '').split(',').filter(Boolean);
+// --archivo: busca en todo el historial de X (no solo 7 días) y lista todos los tuits por fecha.
+const archivo = args.includes('--archivo'); if (archivo) args.splice(args.indexOf('--archivo'), 1);
 const busquedas = args.map(a => { const i = a.indexOf('='); return { nombre: a.slice(0, i), q: a.slice(i + 1) }; });
 
 (async () => {
@@ -33,11 +35,11 @@ const busquedas = args.map(a => { const i = a.indexOf('='); return { nombre: a.s
   }
   for (const b of busquedas) {
     const params = {
-      max_results: Math.min(max, 100), sort_order: 'relevancy',
+      max_results: Math.max(10, Math.min(max, 100)), ...(archivo ? {} : { sort_order: 'relevancy' }),
       'tweet.fields': ['created_at', 'public_metrics', 'author_id'], expansions: ['author_id'], 'user.fields': ['username', 'public_metrics'],
     };
     if (desde) params.start_time = new Date(desde).toISOString();
-    const pag = await client.v2.search(b.q + ' -is:retweet', params);
+    const pag = archivo ? await client.v2.searchAll(b.q + ' -is:retweet', params) : await client.v2.search(b.q + ' -is:retweet', params);
     const lista = [];
     for await (const t of pag) {
       const u = pag.includes.author(t) || {};
@@ -48,9 +50,9 @@ const busquedas = args.map(a => { const i = a.indexOf('='); return { nombre: a.s
       if (lista.length >= max) break;
     }
     leidos += lista.length;
-    lista.sort((a, b) => b.puntaje - a.puntaje);
+    if (archivo) lista.sort((a, b) => a.fecha.localeCompare(b.fecha)); else lista.sort((a, b) => b.puntaje - a.puntaje);
     console.log(`\n===== ${b.nombre} (${lista.length} tuits) — ${b.q}`);
-    for (const t of lista.slice(0, 10)) {
+    for (const t of archivo ? lista : lista.slice(0, 10)) {
       console.log(`\n♥${t.likes} 🔁${t.rt} 💬${t.resp} ❝${t.citas} | @${t.cuenta} (${t.seguidores} seg.) ${t.fecha}\n${t.texto}\n${t.url}`);
     }
   }

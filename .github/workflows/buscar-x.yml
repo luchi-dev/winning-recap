@@ -14,6 +14,10 @@ on:
       desde:
         description: 'Desde qué día (AAAA-MM-DD, máximo 7 días para atrás)'
         required: false
+      archivo:
+        description: 'Buscar en todo el historial (no solo 7 días) y listar todo por fecha'
+        type: boolean
+        default: false
       max:
         description: 'Tuits a leer por búsqueda (máx. 500)'
         required: false
@@ -38,12 +42,13 @@ jobs:
       - name: Buscar
         run: |
           B=(); [ -n "$BUSQUEDAS" ] && IFS=';' read -ra B <<< "$BUSQUEDAS"
-          node tools/buscar-x.js ${DESDE:+--desde "$DESDE"} ${CITAS:+--citas "$CITAS"} --max "$MAX" "${B[@]}"
+          node tools/buscar-x.js ${DESDE:+--desde "$DESDE"} ${CITAS:+--citas "$CITAS"} $( [ "$ARCHIVO" = "true" ] && echo --archivo ) --max "$MAX" "${B[@]}"
         env:
           BUSQUEDAS: ${{ inputs.busquedas }}
           DESDE: ${{ inputs.desde }}
           CITAS: ${{ inputs.citas }}
           MAX: ${{ inputs.max }}
+          ARCHIVO: ${{ inputs.archivo }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
