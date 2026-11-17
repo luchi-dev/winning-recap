@@ -70,7 +70,7 @@ jobs:
         run: aws s3 cp $BUCKET/captions.json captions.json --only-show-errors || echo "(uso el captions.json del repo)"
 
       - name: Instalar herramientas
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --onnxruntime-node-install-cuda=skip
         working-directory: tools
 
       # El caption propio va por variable de ambiente: puede tener comillas y saltos de línea.

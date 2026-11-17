@@ -44,7 +44,7 @@ jobs:
           node-version: 22
 
       - name: Instalar herramientas
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --onnxruntime-node-install-cuda=skip
         working-directory: tools
 
       - name: Leer las cuentas y armar el informe

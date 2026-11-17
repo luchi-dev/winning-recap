@@ -74,7 +74,7 @@ jobs:
 
       - name: Instalar herramientas
         if: steps.mirar.outputs.trabajo == 'true'
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --onnxruntime-node-install-cuda=skip
         working-directory: tools
 
       # Publica solo cada cosa apenas la encuentra (no espera al final) y, si hay

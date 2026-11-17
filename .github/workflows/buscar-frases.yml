@@ -54,7 +54,7 @@ jobs:
           aws s3 sync $BUCKET/frases/ frases/ --only-show-errors
 
       - name: Instalar herramientas
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --onnxruntime-node-install-cuda=skip
         working-directory: tools
 
       - name: Buscar

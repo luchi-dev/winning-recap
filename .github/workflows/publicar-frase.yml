@@ -62,7 +62,7 @@ jobs:
         run: aws s3 cp $BUCKET/frases.json frases.json --only-show-errors
 
       - name: Instalar herramientas
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --onnxruntime-node-install-cuda=skip
         working-directory: tools
 
       - name: Armar la placa y publicar

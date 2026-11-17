@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: 22
       - name: Instalar herramientas
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --onnxruntime-node-install-cuda=skip
         working-directory: tools
       # Las búsquedas van por variable de ambiente: tienen comillas.
       - name: Buscar

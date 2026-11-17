@@ -56,7 +56,7 @@ jobs:
       # Solo X necesita paquetes (twitter-api-v2); Instagram y Facebook van con fetch.
       - name: Dependencias
         if: ${{ inputs.x }}
-        run: npm ci --no-audit --no-fund
+        run: npm ci --no-audit --no-fund --onnxruntime-node-install-cuda=skip
         working-directory: tools
 
       # La carpeta va por variable de ambiente, no pegada en el comando.
