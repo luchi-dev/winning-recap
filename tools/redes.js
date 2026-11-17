@@ -202,7 +202,7 @@ async function publicarFacebook(caption, urls) {
 async function publicarHistoria(url) {
   const { IG_USER_ID, IG_ACCESS_TOKEN } = process.env;
   if (!IG_USER_ID || !IG_ACCESS_TOKEN) throw new Error('faltan las claves de Instagram en el ambiente (IG_USER_ID, IG_ACCESS_TOKEN)');
-  const id = (await graphIG('/' + IG_USER_ID + '/media', { media_type: 'STORIES', image_url: url }, 'POST')).id;
+  const id = (await graphIG('/' + IG_USER_ID + '/media', { media_type: 'STORIES', ...(/.mp4$/i.test(url) ? { video_url: url } : { image_url: url }) }, 'POST')).id;
   await esperarContenedor(id);
   let p = null;
   for (let i = 0; i < 12 && !p; i++) {

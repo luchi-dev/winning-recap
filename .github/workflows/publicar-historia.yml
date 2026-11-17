@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       url:
-        description: 'Dirección pública del JPG (ej: https://winning.com.ar/iloveneuquen/carruseles/x/01.jpg)'
+        description: 'Dirección pública del JPG o MP4 (ej: https://winning.com.ar/iloveneuquen/carruseles/x/01.jpg)'
         required: true
       probar:
         description: 'Solo probar: revisa la imagen, no publica'
