@@ -8,6 +8,7 @@
  *   carpeta     nombre dentro de reels/ en el S3 del sitio. Adentro van un solo
  *               .mp4 (H.264 + AAC, vertical) y caption.txt con el texto; si hay
  *               portada.jpg, va como tapa (si no, el cuadro del segundo 1,5).
+ *               Si hay colaboradores.txt (usuarios de IG), se los invita a colaborar.
  *   --probar    revisa el video y el caption y los muestra, pero no publica
  *   --prueba    lo publica como reel de prueba (solo lo ven no seguidores):
  *               manual = se pasa a los seguidores a mano desde la app de Instagram
@@ -52,13 +53,17 @@ function aws(args) {
     if (!r.ok || !/video\/mp4/.test(r.headers.get('content-type') || '')) throw new Error('no es un MP4 público: ' + url);
     log(`video: ${url} (${Math.round((+r.headers.get('content-length') || 0) / 1048576)} MB)`);
     log(`caption (${caption.length} caracteres):\n${caption}\n`);
+    // colaboradores.txt (opcional): un usuario de IG por renglón (con o sin @); les llega la invitación de colaboración
+    let colaboradores = [];
+    try { colaboradores = aws(['s3', 'cp', base + 'colaboradores.txt', '-']).split(/[\s,]+/).map(u => u.replace(/^@/, '').trim()).filter(Boolean); } catch (e) { /* no hay archivo */ }
+    if (colaboradores.length) log('colaboración con: ' + colaboradores.map(u => '@' + u).join(', '));
     log(modo ? `reel de prueba (${modo}): lo ven solo no seguidores` : 'reel común: lo ven todos los seguidores');
     if (probar) { log('modo prueba: no se publica'); return; }
     // portada.jpg en la misma carpeta (opcional): va como tapa del reel
     const tapa = `${redes.SITIO}/reels/${carpeta}/portada.jpg`, rt = await fetch(tapa, { method: 'HEAD' });
     const portada = rt.ok && /image\/jpeg/.test(rt.headers.get('content-type') || '') ? tapa : null;
     log(portada ? 'portada: ' + portada : 'portada: el cuadro del segundo 1,5');
-    log('publicado en Instagram: ' + await redes.publicarReel(caption, url, modo ? ESTRATEGIA[modo] : null, portada));
+    log('publicado en Instagram: ' + await redes.publicarReel(caption, url, modo ? ESTRATEGIA[modo] : null, portada, colaboradores));
   } catch (e) {
     console.error('[publicar-reel] ' + (e.message || e));
     process.exit(1);

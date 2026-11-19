@@ -156,13 +156,15 @@ async function publicarInstagram(caption, urls) {
    reel de prueba (se muestra solo a no seguidores): con MANUAL se pasa a los seguidores a mano desde la app,
    con SS_PERFORMANCE lo pasa Instagram solo si rinde bien. Sin prueba es un reel común.
    portada: dirección pública de un JPG para la tapa (opcional). */
-async function publicarReel(caption, url, prueba, portada) {
+async function publicarReel(caption, url, prueba, portada, colaboradores) {
   const { IG_USER_ID, IG_ACCESS_TOKEN } = process.env;
   if (!IG_USER_ID || !IG_ACCESS_TOKEN) throw new Error('faltan las claves de Instagram en el ambiente (IG_USER_ID, IG_ACCESS_TOKEN)');
   if (caption.length > 2200) throw new Error(`el caption tiene ${caption.length} caracteres e Instagram permite 2200`);
   // portada: el primer cuadro entra desde negro, así que se toma el del segundo 1,5 (o una imagen propia con portada)
   const params = { media_type: 'REELS', video_url: url, caption, ...(portada ? { cover_url: portada } : { thumb_offset: '1500' }) };
   if (prueba) params.trial_params = JSON.stringify({ graduation_strategy: prueba });
+  // colaboradores: usuarios de IG (sin @, máx. 3) que reciben la invitación de colaboración; aparece en su perfil cuando aceptan
+  if (colaboradores && colaboradores.length) params.collaborators = JSON.stringify(colaboradores.slice(0, 3));
   const id = (await graphIG(`/${IG_USER_ID}/media`, params, 'POST', GRAPH_IG_REEL)).id;
   await esperarContenedor(id);
   let p = null;
