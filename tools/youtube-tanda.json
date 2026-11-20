@@ -1,8 +1,8 @@
 {
-  "horas": 1,
+  "horas": 0.25,
   "videos": [
-    { "carpeta": "mi11-luchi", "titulo": "Mi 11 ideal de los playoffs: un jugador por equipo" },
-    { "carpeta": "mi11-mamut", "titulo": "El 11 ideal de los playoffs de MamuTV: un jugador por equipo" },
-    { "carpeta": "octavos-tomas", "titulo": "El 11 de Tomás Escudero para los octavos: un jugador por equipo" }
+    { "carpeta": "ad-llave-voz", "titulo": "La Llave de los playoffs: pronosticá quién pasa y ganá premios" },
+    { "carpeta": "ad-fantasy-voz", "titulo": "Armá tu 11 de los playoffs en Winning" },
+    { "carpeta": "ad-prode-voz", "titulo": "El Prode de los playoffs: pronosticá los resultados y sumá puntos" }
   ]
 }
