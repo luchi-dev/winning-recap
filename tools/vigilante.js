@@ -380,7 +380,7 @@ async function pasada(estado) {
   }
   // FOTOS DE JUGADORES: una búsqueda por jugador; se publica al terminar cada partido.
   for (const f of fotosJug) {
-    correr('foto-jugador.js', [f.j.game_id, '--top', f.top]);
+    correr('foto-jugador.js', [f.j.game_id, '--top', f.top, '--recortes', 1]);   // recortes: la figura (placa "La figura del partido")
     P(f.j.game_id)[f.paso] = Date.now();
     guardar();
     publicar();

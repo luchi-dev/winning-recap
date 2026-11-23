@@ -48,6 +48,7 @@ function args() {
     ids: v('--ids') ? v('--ids').split(',').map(Number) : null,
     top: parseInt(v('--top') || '6', 10),
     forzar: a.includes('--forzar'),
+    recortes: parseInt(v('--recortes') || '0', 10),   // a los N primeros (la figura) se les saca el fondo a cada foto
   };
 }
 
@@ -232,8 +233,27 @@ function puntuar(c, j, equipos) {
     for (const f of fs.readdirSync(dp)) if (f.startsWith(cfg.game + '-') || f === cfg.game + '.jpg') { const h = await huella(path.join(dp, f)); if (h) huellasPartido.push(h); }
   } catch (e) {}
 
-  for (const j of js) {
-    if (reg[cfg.game][j.id] && reg[cfg.game][j.id].opciones && reg[cfg.game][j.id].opciones.length && !cfg.forzar) { console.log('\n── ' + j.nombre + ': ya tiene fotos'); continue; }
+  /* Recorte (sin fondo) de cada foto del jugador, para la placa "La figura del partido":
+     el apellido va detrás del jugador. Deja <archivo>-recorte.png al lado de cada opción. */
+  async function recortar(opciones) {
+    const { removeBackground } = require('@imgly/background-removal-node');
+    for (const o of opciones || []) {
+      const src = path.join(RAIZ, o.archivo), dst = src.replace(/\.jpg$/, '-recorte.png');
+      if (fs.existsSync(dst)) continue;
+      try {
+        const r = await removeBackground(pathToFileURL(src).href, { model: 'medium', publicPath: MODELO, output: { format: 'image/png' } });
+        fs.writeFileSync(dst, Buffer.from(await r.arrayBuffer()));
+        console.log('   recorte: ' + path.basename(dst));
+      } catch (e) { console.log('   recorte falló (' + path.basename(src) + '): ' + e.message); }
+    }
+  }
+
+  for (const [ji, j] of js.entries()) {
+    if (reg[cfg.game][j.id] && reg[cfg.game][j.id].opciones && reg[cfg.game][j.id].opciones.length && !cfg.forzar) {
+      console.log('\n── ' + j.nombre + ': ya tiene fotos');
+      if (ji < cfg.recortes) await recortar(reg[cfg.game][j.id].opciones);
+      continue;
+    }
     const club = nombreEq[j.team] || '';
     const rival = nombreEq[j.team === fx.home_id ? fx.away_id : fx.home_id] || '';
     const equipos = palabrasEquipo(club);
@@ -315,6 +335,7 @@ function puntuar(c, j, equipos) {
       console.log('   ' + opciones.length + '. ' + (c.w + 'x' + c.h).padEnd(11) + c.host.padEnd(26) + String(c.nota).padEnd(5) + (c.delPartido ? 'DEL PARTIDO ' : 'reciente    ') + (c.h >= c.w ? 'vertical · ' : '') + (c.titulo || '').slice(0, 60));
     }
     if (!opciones.length) console.log('   ninguna foto que lo nombre: la ficha sale sin foto');
+    if (ji < cfg.recortes) await recortar(opciones);
     reg[cfg.game][j.id] = { nombre: j.nombre, opciones, actualizado: new Date().toISOString() };
     fs.writeFileSync(regPath, JSON.stringify(reg, null, 1));
   }
