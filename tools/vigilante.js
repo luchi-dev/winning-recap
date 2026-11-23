@@ -275,8 +275,11 @@ async function pasada(estado) {
   // FOTOS DE JUGADORES (la ficha de jugador): al pitazo, las de los 6 mejores del partido;
   // 30 min después, las del resto de los que jugaron. Nunca se usa la foto del partido.
   const fotosJug = [];
-  for (const j of fx.filter(j => reciente(j) && terminado(j))) {
+  for (const j of fx.filter(reciente)) {
     const p = P(j.game_id);
+    // MINUTO ~75: las fotos de los que van mejor y el recorte del primero, para que al pitazo
+    // la figura ya tenga foto (buscarlas lleva varios minutos). Al pitazo se completa lo que falte.
+    if (!terminado(j)) { if (!p.jug75 && min2T(j) >= PRE_DESDE && min2T(j) < ESPERA_MAX) fotosJug.push({ j, top: 6, paso: 'jug75' }); continue; }
     if (!p.final) continue;
     if (!p.jug6) fotosJug.push({ j, top: 6, paso: 'jug6' });
     else if (!p.jugTodos && ahora - p.final >= REINTENTO) fotosJug.push({ j, top: 30, paso: 'jugTodos' });
@@ -341,7 +344,7 @@ async function pasada(estado) {
   const motivos = [...new Set(listaCaras.map(c => c.motivo))];
   motivos.forEach(m => log('momento: caras de ' + m + ' → ' + listaCaras.filter(c => c.motivo === m).map(c => c.nombre).join(', ')));
   captionsPendientes.forEach(md => log('momento: captions del 11 Ideal de la fecha ' + md));
-  fotosJug.forEach(f => log('momento: fotos de jugadores de ' + nombre(f.j) + (f.top === 6 ? ' (los 6 mejores)' : ' (el resto de los que jugaron)')));
+  fotosJug.forEach(f => log('momento: fotos de jugadores de ' + nombre(f.j) + (f.paso === 'jug75' ? ' (los 6 que van mejor, antes del pitazo)' : f.top === 6 ? ' (los 6 mejores)' : ' (el resto de los que jugaron)')));
   entrevistas.forEach(j => log('momento: entrevistas de ' + nombre(j) + ' (' + ((P(j.game_id).ent || []).length + 1) + 'ª búsqueda)'));
 
   // Publicaciones automáticas que faltan (fin del día y cierre; las del pitazo van con la foto)
