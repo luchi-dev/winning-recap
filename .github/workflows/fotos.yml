@@ -58,9 +58,10 @@ jobs:
 
       - name: Traer lo que ya está publicado
         run: |
-          mkdir -p fotos fotos-partido captions
+          mkdir -p fotos fotos-partido fotos-jugador captions
           aws s3 cp $BUCKET/vigilante.json vigilante.json --only-show-errors || echo "(todavía no hay vigilante.json)"
           aws s3 cp $BUCKET/fotos-partido/elegidas.json fotos-partido/elegidas.json --only-show-errors
+          aws s3 cp $BUCKET/fotos-jugador/elegidas.json fotos-jugador/elegidas.json --only-show-errors || echo "(todavía no hay fotos de jugadores)"
           aws s3 sync $BUCKET/fotos/ fotos/ --only-show-errors
           aws s3 cp $BUCKET/captions.json captions.json --only-show-errors || echo "(todavía no hay captions.json)"
           aws s3 sync $BUCKET/captions/ captions/ --only-show-errors --exclude "auto-*" --exclude "ig-*" --exclude "x-*"
@@ -92,6 +93,7 @@ jobs:
           node tools/lista-fotos.js
           aws s3 sync fotos/ $BUCKET/fotos/ --cache-control "no-cache" --only-show-errors --exclude "revisar.html"
           aws s3 sync fotos-partido/ $BUCKET/fotos-partido/ --cache-control "no-cache" --only-show-errors --exclude "*" --include "*.jpg" --include "elegidas.json" --exclude "_*"
+          test -d fotos-jugador && aws s3 sync fotos-jugador/ $BUCKET/fotos-jugador/ --cache-control "no-cache" --only-show-errors --exclude "_*" || true
           aws s3 cp vigilante.json $BUCKET/vigilante.json --cache-control "no-cache" --only-show-errors
           test -f captions.json && aws s3 cp captions.json $BUCKET/captions.json --cache-control "no-cache" --only-show-errors || true
           aws s3 sync captions/ $BUCKET/captions/ --cache-control "no-cache" --only-show-errors --exclude "auto-*" --exclude "ig-*" --exclude "x-*"

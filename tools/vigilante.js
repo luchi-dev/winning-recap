@@ -118,6 +118,7 @@ function publicar() {
   const ok = [
     aws('s3', 'sync', 'fotos/', B + '/fotos/', ...nc, '--exclude', 'revisar.html'),
     aws('s3', 'sync', 'fotos-partido/', B + '/fotos-partido/', ...nc, '--exclude', '*', '--include', '*.jpg', '--include', 'elegidas.json', '--exclude', '_*'),
+    !fs.existsSync(path.join(RAIZ, 'fotos-jugador')) || aws('s3', 'sync', 'fotos-jugador/', B + '/fotos-jugador/', ...nc, '--exclude', '_*'),
     aws('s3', 'cp', 'vigilante.json', B + '/vigilante.json', ...nc),
     // Los captions escritos por captions.js (si no hay, sync no hace nada)
     !fs.existsSync(path.join(RAIZ, 'captions.json')) || aws('s3', 'cp', 'captions.json', B + '/captions.json', ...nc),
@@ -134,6 +135,8 @@ function publicar() {
 function traerRegistro() {
   if (!process.env.BUCKET || MIRAR) return;
   spawnSync('aws', ['s3', 'cp', process.env.BUCKET + '/fotos-partido/elegidas.json', REGISTRO, '--only-show-errors'], { cwd: RAIZ, stdio: 'inherit' });
+  fs.mkdirSync(path.join(RAIZ, 'fotos-jugador'), { recursive: true });
+  spawnSync('aws', ['s3', 'cp', process.env.BUCKET + '/fotos-jugador/elegidas.json', path.join(RAIZ, 'fotos-jugador', 'elegidas.json'), '--only-show-errors'], { cwd: RAIZ, stdio: 'inherit' });
 }
 
 /* Lanza la próxima corrida (sólo en GitHub: hace falta GH_TOKEN y el repo). La
@@ -269,6 +272,16 @@ async function pasada(estado) {
     }
   }
 
+  // FOTOS DE JUGADORES (la ficha de jugador): al pitazo, las de los 6 mejores del partido;
+  // 30 min después, las del resto de los que jugaron. Nunca se usa la foto del partido.
+  const fotosJug = [];
+  for (const j of fx.filter(j => reciente(j) && terminado(j))) {
+    const p = P(j.game_id);
+    if (!p.final) continue;
+    if (!p.jug6) fotosJug.push({ j, top: 6, paso: 'jug6' });
+    else if (!p.jugTodos && ahora - p.final >= REINTENTO) fotosJug.push({ j, top: 30, paso: 'jugTodos' });
+  }
+
   // ENTREVISTAS: a los 45 y 120 min del pitazo se buscan en X (TNT + Juego Simple) y se arma la
   // frase más polémica (queda para aprobar, o sale sola si 'frase' está prendido). Una por partido.
   const entrevistas = [];
@@ -328,6 +341,7 @@ async function pasada(estado) {
   const motivos = [...new Set(listaCaras.map(c => c.motivo))];
   motivos.forEach(m => log('momento: caras de ' + m + ' → ' + listaCaras.filter(c => c.motivo === m).map(c => c.nombre).join(', ')));
   captionsPendientes.forEach(md => log('momento: captions del 11 Ideal de la fecha ' + md));
+  fotosJug.forEach(f => log('momento: fotos de jugadores de ' + nombre(f.j) + (f.top === 6 ? ' (los 6 mejores)' : ' (el resto de los que jugaron)')));
   entrevistas.forEach(j => log('momento: entrevistas de ' + nombre(j) + ' (' + ((P(j.game_id).ent || []).length + 1) + 'ª búsqueda)'));
 
   // Publicaciones automáticas que faltan (fin del día y cierre; las del pitazo van con la foto)
@@ -336,7 +350,7 @@ async function pasada(estado) {
   autoDias.forEach(d => log('momento: publicar MVPs del día ' + d.dia));
   autoCierres.forEach(md => log('momento: publicar el cierre de la fecha ' + md));
 
-  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0 || captionsPendientes.length > 0 || autoDias.length > 0 || autoCierres.length > 0 || entrevistas.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
+  const hayTrabajo = fotos.length > 0 || listaCaras.length > 0 || captionsPendientes.length > 0 || autoDias.length > 0 || autoCierres.length > 0 || entrevistas.length > 0 || fotosJug.length > 0;   // anotar un pitazo o cerrar un partido también es trabajo: hay que guardarlo
   if (MIRAR) return { hayTrabajo, esperando, vigilar };
 
   // ── A trabajar ──
@@ -362,6 +376,13 @@ async function pasada(estado) {
   if (listaCaras.length) {
     const ok = listaCaras.filter(c => fs.existsSync(path.join(DIR_FOTOS, c.id + '.png'))).length;
     log('caras: ' + ok + '/' + listaCaras.length + ' bajadas');
+    publicar();
+  }
+  // FOTOS DE JUGADORES: una búsqueda por jugador; se publica al terminar cada partido.
+  for (const f of fotosJug) {
+    correr('foto-jugador.js', [f.j.game_id, '--top', f.top]);
+    P(f.j.game_id)[f.paso] = Date.now();
+    guardar();
     publicar();
   }
   // ENTREVISTAS: la frase del partido (y a las redes si 'frase' está prendido; si no, queda para aprobar)

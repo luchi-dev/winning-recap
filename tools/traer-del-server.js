@@ -55,6 +55,24 @@ function mezclarElegidas() {
   console.log('   elegidas.json: ' + (n ? n + ' partido(s) actualizados desde el server' : 'nada nuevo'));
 }
 
+/* fotos-jugador/elegidas.json: las fotos propias de cada jugador (tools/foto-jugador.js, en
+   GitHub al pitazo). Se mezcla jugador por jugador; gana el "actualizado" más nuevo. */
+function mezclarFotosJugador() {
+  const tmp = path.join(os.tmpdir(), 'fotos-jugador-server.json');
+  if (aws('s3', 'cp', BUCKET + '/fotos-jugador/elegidas.json', tmp, '--only-show-errors').status !== 0) { console.log('   fotos-jugador/elegidas.json: no hay en el server'); return; }
+  const local = path.join(RAIZ, 'fotos-jugador', 'elegidas.json');
+  let mio = {}, suyo = {};
+  try { mio = JSON.parse(fs.readFileSync(local, 'utf8')); } catch (e) {}
+  try { suyo = JSON.parse(fs.readFileSync(tmp, 'utf8')); } catch (e) { return; }
+  let n = 0;
+  for (const g of Object.keys(suyo)) for (const p of Object.keys(suyo[g] || {})) {
+    mio[g] = mio[g] || {};
+    if (!mio[g][p] || String(suyo[g][p].actualizado || '') > String(mio[g][p].actualizado || '')) { mio[g][p] = suyo[g][p]; n++; }
+  }
+  if (n) { fs.mkdirSync(path.dirname(local), { recursive: true }); fs.writeFileSync(local, JSON.stringify(mio, null, 1)); }
+  console.log('   fotos-jugador/elegidas.json: ' + (n ? n + ' jugador(es) actualizados desde el server' : 'nada nuevo'));
+}
+
 /* captions.json: los escribe tools/captions.js en GitHub al cierre de cada fecha.
    Se mezcla fecha por fecha; gana la versión 'v' más alta. Los informes
    (captions/fecha-N.md) se traen si acá no están. */
@@ -103,6 +121,8 @@ try {
   traerFaltantes('fotos', rel => /\.png$/i.test(rel));
   traerFaltantes('fotos-partido', rel => /\.jpg$/i.test(rel) && !rel.startsWith('_'));
   mezclarElegidas();
+  try { traerFaltantes('fotos-jugador', rel => /.jpg$/i.test(rel) && !rel.startsWith('_')); } catch (e) { console.log('   fotos-jugador: no hay en el server'); }
+  mezclarFotosJugador();
   mezclarCaptions();
   mezclarFrases();
 } catch (e) { console.error('   ' + e.message); process.exit(1); }
