@@ -334,7 +334,10 @@ const claveFoto = u => sinAcentos(u.split('?')[0].replace(/^https?:\/\/(www\.)?/
       if (og) await candidata(new URL(og, nt.url).href, { titulo: tit, notaUrl: nt.url, via: nt.via, origen: 'nota', quien: nt.q.quien, consulta: nt.q.texto });
       // 2. Galerías linkeadas desde la nota (o la nota misma si es una galería).
       const esGaleria = /galeria|fotogaleria|postales/i.test(nt.url);
-      const links = esGaleria ? [nt.url] : linksGaleria(html, nt.url).slice(0, 1);
+      // Sólo galerías de ESTE partido: el link tiene que nombrar a un equipo o a un goleador.
+      // (23-nov: la nota de Almada en Clarín linkeaba a una galería general del diario: playa, Obelisco, Boca campeón.)
+      const delPartido = u => { const s = sinAcentos(u); return equipos.some(e => s.includes(e)) || goles.some(g => s.includes(sinAcentos(g.apellido))); };
+      const links = esGaleria ? (delPartido(nt.url) ? [nt.url] : []) : linksGaleria(html, nt.url).filter(delPartido).slice(0, 1);
       for (const g of links) {
         if (galerias >= MAX_GALERIAS) break; galerias++;
         let gh = html; if (g !== nt.url) { try { gh = get(g); } catch (e) { continue; } }
