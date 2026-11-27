@@ -143,4 +143,32 @@ function linkLogin(state) {
   return u.toString();
 }
 
-module.exports = { subirTikTok, tokenNuevo, tokensDesdeCodigo, linkLogin, REDIRECT };
+
+/* Fotos (modo foto de TikTok). TikTok solo las toma de una URL pública (PULL_FROM_URL), así que van las del S3 del sitio.
+   modo borrador = MEDIA_UPLOAD: llega a la bandeja de la app con el texto cargado y se publica desde ahí.
+   modo directo = DIRECT_POST (en público solo con la app aprobada; antes, privado:true = "Solo yo"). */
+async function subirFotosTikTok(urls, { modo = 'borrador', titulo = '', caption = '', privado = false } = {}) {
+  if (!['borrador', 'directo'].includes(modo)) throw new Error('modo tiene que ser borrador o directo');
+  if (!urls.length || urls.length > 35) throw new Error('TikTok acepta de 1 a 35 fotos');
+  if (caption.length > 4000) throw new Error(`el texto tiene ${caption.length} caracteres y TikTok permite 4000`);
+  const token = await tokenNuevo();
+  const post_info = { title: titulo.slice(0, 90), description: caption, disable_comment: false, auto_add_music: true };
+  if (modo === 'directo') {
+    const c = await api(token, '/post/publish/creator_info/query/');
+    const nivel = privado ? 'SELF_ONLY' : 'PUBLIC_TO_EVERYONE';
+    if (!(c.privacy_level_options || []).includes(nivel)) throw new Error(`la cuenta @${c.creator_username} no permite publicar como ${nivel} (permite: ${(c.privacy_level_options || []).join(', ')})`);
+    post_info.privacy_level = nivel;
+  }
+  const init = await api(token, '/post/publish/content/init/', {
+    post_info,
+    source_info: { source: 'PULL_FROM_URL', photo_cover_index: 0, photo_images: urls },
+    post_mode: modo === 'borrador' ? 'MEDIA_UPLOAD' : 'DIRECT_POST',
+    media_type: 'PHOTO',
+  });
+  log('fotos pedidas (publish_id ' + init.publish_id + '), esperando a TikTok...');
+  const st = await esperar(token, init.publish_id, modo);
+  log('estado: ' + st.status);
+  return { publish_id: init.publish_id, status: st.status };
+}
+
+module.exports = { subirTikTok, subirFotosTikTok, tokenNuevo, tokensDesdeCodigo, linkLogin, REDIRECT };
