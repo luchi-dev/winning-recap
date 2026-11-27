@@ -27,17 +27,14 @@ function aws(args) {
   const probar = a.includes('--probar'), directo = a.includes('--directo'), privado = a.includes('--privado');
   if (!carpeta || !/^[a-z0-9-]+$/.test(carpeta)) { console.error('uso: node publicar-tiktok-foto.js <carpeta> [--probar] [--directo] [--privado]'); process.exit(2); }
   try {
-    const lista = aws(['s3', 'ls', `${BUCKET}/carruseles/${carpeta}/`]).split('
-').map(l => l.trim().split(/s+/).pop()).filter(n => /.jpe?g$/i.test(n)).sort();
+    const lista = aws(['s3', 'ls', `${BUCKET}/carruseles/${carpeta}/`]).split('\n').map(l => l.trim().split(/\s+/).pop()).filter(n => /\.jpe?g$/i.test(n)).sort();
     if (!lista.length) throw new Error('no hay JPG en carruseles/' + carpeta);
     const urls = lista.map(n => `${WEB}/carruseles/${carpeta}/${n}`);
     const caption = aws(['s3', 'cp', `${BUCKET}/carruseles/${carpeta}/caption.txt`, '-']).trim();
-    const titulo = caption.split('
-')[0].trim();
+    const titulo = caption.split('\n')[0].trim();
     log('fotos: ' + urls.join(' '));
     log('título: ' + titulo);
-    log(`texto (${caption.length} caracteres):
-${caption}`);
+    log(`texto (${caption.length} caracteres):\n${caption}`);
     if (probar) { log('modo prueba: no se sube'); return; }
     const r = await subirFotosTikTok(urls, { modo: directo ? 'directo' : 'borrador', titulo, caption, privado });
     log(directo ? 'publicado: ' + r.status : 'listo: está en la bandeja de la app de TikTok (' + r.status + ')');
